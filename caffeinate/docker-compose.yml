@@ -1,5 +1,11 @@
 version: "3.8"
 services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
   frontend:
     container_name: frontend
     build:
@@ -7,12 +13,23 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - backend
-    ports:
-      - "3001:3000"
+    expose:
+      - "3000"
+    environment:
+      - VIRTUAL_HOST=caffeinate.local
+      - VIRTUAL_PORT=3000
   backend:
     container_name: backend
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "3002:3000"
+    expose:
+      - "3001"
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: todo_use_secrets_4_username
+      MONGO_INITDB_ROOT_PASSWORD: todo_use_secrets_4_password
+    expose:
+      - "27017"

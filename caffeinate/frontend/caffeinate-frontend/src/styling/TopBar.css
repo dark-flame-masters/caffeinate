@@ -1,0 +1,42 @@
+.topbar-full {
+    margin-top: 0.7em;
+}
+
+.brand {
+    all: unset;
+    font-family: 'Handlee';
+    font-size: 2em;
+    color: #EED6C4;
+    margin-left: 0.8em;
+    cursor: pointer;
+}
+
+.topbar {
+    display: flex;
+    flex-direction: row;
+    text-align: right;
+    font-weight: 600;
+    font-size: 1.2em;
+    font-family: 'Krub';
+    justify-content: right;
+    color: #edcdbbc2;
+    margin-top: -2.5em;
+}
+
+.topbar_button {
+    margin-right: 1.5em;
+    padding: 0.8em;
+    background-color: #291b1b;
+    border-radius: 0.7em;
+    border: 1px solid #edcdbb91;
+}
+
+#signout {
+    margin-right: 3.2em;
+}
+
+.link {
+    all: unset;
+    cursor: pointer;
+}
+

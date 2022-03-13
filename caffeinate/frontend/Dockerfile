@@ -9,7 +9,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY ./package*.json ./
 RUN npm i
 RUN npm install react-scripts@3.4.1 -g
-COPY ./app ./
+COPY . .
 RUN npm run build
 
 # Serve these static files with NGINX.

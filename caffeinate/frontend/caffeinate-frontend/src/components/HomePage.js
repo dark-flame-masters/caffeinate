@@ -48,7 +48,7 @@ export default function HomePage(props) {
 
                 <div className="nav" onClick={() => nav(2)}>
                     <div className="nav_text">
-                        <h2 className="section-text">My Surveys</h2>
+                        <h2 className="section-text">Daily Survey</h2>
                     </div>
                     <div className="nav_text_generic">
                         <h2 className="section-slogan">Complete your daily check-in.</h2>

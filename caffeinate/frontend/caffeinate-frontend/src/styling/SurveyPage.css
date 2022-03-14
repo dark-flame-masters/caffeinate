@@ -1,0 +1,122 @@
+.survey {
+    text-align: center;
+}
+
+.daily-survey {
+    margin: auto;
+    border-radius: 2em;
+    width: 58em;
+    height: 33em;
+    background-color: #251b1b5d;
+    align-items: center;
+    justify-content: center;
+}
+
+.selfie {
+    border-radius: 10em;
+    border: 0.4em solid moccasin;
+    margin-left: 20em;
+    margin-top: 2em;
+}
+
+.question_text {
+    color: #C68B59;
+    font-size: 2.6em;
+    font-weight: 400;
+    padding-top: 1em;
+}
+
+.question_subtext {
+    color: #D7B19D;
+    margin-top: -1.5em;
+    font-size: 1.5em;
+}
+
+.rating-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.rating-button {
+    font-family: 'Krub';
+    font-weight: 600;
+    font-size: 1.7em;
+    color: #D7B19D;
+    margin: 1.5em;
+    cursor: pointer;
+    padding: 0.9em;
+    width: 1.2em;
+    height: 1.3em;
+    border-radius: 1em;
+    border: 0.1em solid #C68B59;
+    text-align: center;
+}
+
+.rating-button:hover {
+    background-color: #865439d2;
+}
+
+.quesion_form {
+    margin-top: 3em;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.question_entry {
+    all: unset;
+    padding: 0.7em;
+    padding-top: 0.4em;
+    background-color: #301f1a77;
+    border: 0.1em solid #4e372f;
+    width: 40em;
+    height: 10em;
+    border-radius: 0.1em;
+}
+
+.question_submit, .submit-survey {
+    all: unset;
+    margin-top: 2em;
+    cursor: pointer;
+    font-family: 'Krub';
+    font-weight: 600;
+    padding: 0.8em;
+    border: 0.15em solid  #4e372f;
+    border-radius: 0.3em;
+}
+
+.survey-settings {
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    cursor: pointer;
+    text-decoration: underline;
+    color: #EDCDBB;
+}
+
+.completed-message {
+    font-weight: 500;
+    color: #a07161;
+    margin-top: 2em;
+    padding-bottom: 1em;
+    font-size: 1.5em;
+}
+
+.view-surveys {
+    display: flex;
+    flex-direction: row;
+}
+
+.survey-entry {
+    background-color: #301f1a77;
+    border-radius: 0.4em;
+    border: 0.3em solid #815a4d;
+    padding: 1em;
+    width: 40em;
+    font-size: 1.1em;
+    min-height: 20em;
+    font-family: 'Krub';
+}

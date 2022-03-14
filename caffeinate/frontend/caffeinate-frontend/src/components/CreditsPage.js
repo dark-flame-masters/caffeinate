@@ -16,6 +16,7 @@ export default function CreditsPage() {
             <h2>Credits:</h2>
             <ul>
                 <li>material ui</li>
+                <li>face-api.js</li>
                 <li>freepik/flaticon https://www.flaticon.com/premium-icon/coffee_2465580?term=coffee&related_id=2465580</li>
                 <li>https://stackoverflow.com/questions/52911169/how-to-change-the-border-color-of-mui-textfield</li>
                 <li>https://www.codesdope.com/blog/article/getting-notebook-paper-effect-with-css/, https://codepen.io/magnificode/pen/rQpaBO</li>

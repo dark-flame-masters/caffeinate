@@ -9,7 +9,7 @@ function App() {
 
   const onClick = async (e) => {
     e.preventDefault();
-    const res = await axios.get('/hello/');
+    const res = await axios.get('/api/hello/');
     setHello(res.data)
   }
 

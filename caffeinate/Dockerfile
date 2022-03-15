@@ -28,18 +28,3 @@ COPY --from=backend-builder /backend/package.json ./
 COPY --from=backend-builder /backend/dist ./dist
 EXPOSE 3000
 CMD ["node", "dist/main"]
-
-
-# FROM node:14 AS builder
-# WORKDIR /app
-# COPY ./backend/package*.json ./
-# RUN npm install
-# COPY . .
-# RUN npm run build
-
-# FROM node:14
-# COPY --from=builder /app/node_modules ./node_modules
-# COPY --from=builder /app/package*.json ./
-# COPY --from=builder /app/backend/dist ./dist
-# EXPOSE 3000
-# CMD [ "node", "dist/main" ]

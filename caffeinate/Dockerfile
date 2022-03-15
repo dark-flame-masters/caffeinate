@@ -4,28 +4,28 @@
 
 # Compile into static js files
 FROM node:14-alpine3.14 as frontend-builder
-WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
+WORKDIR /frontend
+ENV PATH /frontend/node_modules/.bin:$PATH
 COPY ./frontend/package.json ./
 RUN npm i
 RUN npm install react-scripts -g
-COPY . .
+COPY ./frontend .
 RUN npm run build
 
 # Compile node server
 FROM node:14-alpine3.14 AS backend-builder
-WORKDIR /app
+WORKDIR /backend
 COPY ./backend/package.json ./
 RUN npm i
-COPY . .
+COPY ./backend .
 RUN npm run build
 
 # Serve the frontend and backend in one app
 FROM node:14-alpine3.14
-COPY --from=frontend-builder /app/build ./build
-COPY --from=backend-builder /app/node_modules ./node_modules
-COPY --from=backend-builder /app/package.json ./
-COPY --from=backend-builder /app/backend/dist ./dist
+COPY --from=frontend-builder /frontend/build ./build
+COPY --from=backend-builder /backend/node_modules ./node_modules
+COPY --from=backend-builder /backend/package.json ./
+COPY --from=backend-builder /backend/dist ./dist
 EXPOSE 3000
 CMD ["node", "dist/main"]
 

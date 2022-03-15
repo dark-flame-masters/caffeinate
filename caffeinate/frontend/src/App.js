@@ -1,7 +1,18 @@
 import logo from './logo.svg';
 import './App.css';
+import { useState } from 'react';
+import axios from 'axios';
 
 function App() {
+
+  const [hello, setHello] = useState('undef');
+
+  const onClick = async (e) => {
+    e.preventDefault();
+    const res = await axios.get('/hello/');
+    setHello(res.data)
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -15,7 +26,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          Learn <button onClick={onClick}>{hello}</button>
         </a>
       </header>
     </div>

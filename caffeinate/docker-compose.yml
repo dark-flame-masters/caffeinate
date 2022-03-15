@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb
+    ports:
+      - "3000:3000"
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: todo_use_secrets_4_username
+      MONGO_INITDB_ROOT_PASSWORD: todo_use_secrets_4_password
+    expose:
+      - "27017"

@@ -22,10 +22,10 @@ export class UsersService {
     return await this.userModel.findOne({ username: username }).lean();
   } 
   async findMany() {
-    return this.userModel.find().lean();
+    return await this.userModel.find().lean();
   }
 
   async createUser(input) {
-    return this.userModel.create(input);
+    return await this.userModel.create(input);
   }
 }

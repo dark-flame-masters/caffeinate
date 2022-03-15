@@ -7,6 +7,7 @@ import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [PassportModule, UsersModule],
-  providers: [AuthService, AuthResolver, LocalStrategy]
+  providers: [AuthService, AuthResolver, LocalStrategy],
+  exports: [AuthService]
 })
 export class AuthModule {}

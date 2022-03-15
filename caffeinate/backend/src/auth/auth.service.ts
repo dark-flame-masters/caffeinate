@@ -38,9 +38,9 @@ export class AuthService {
             throw new Error('User already exists');
         }
 
-
         //hash
-        const password = await bcrypt.hash(loginUserInput.password, 10);
+        const salt = await bcrypt.genSalt(10);
+        const password = await bcrypt.hash(loginUserInput.password, salt);
         return this.usersService.createUser({...loginUserInput,password,});
     }
 

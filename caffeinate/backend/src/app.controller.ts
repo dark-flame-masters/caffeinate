@@ -1,12 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Post, Body } from '@nestjs/common';
+import { AuthService } from './auth/auth.service';
+import { User, UserDocument } from './users/users.schema';
+import { LoginUserInput } from './auth/dto/login-user.input';
+import { copyFileSync } from 'fs';
+
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AuthService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('signup') // endpoint
+  signinUser(@Body() input: LoginUserInput) { // the kind of input the user inputs
+    return this.appService.signup(input); // call the right function from x.service
   }
 }

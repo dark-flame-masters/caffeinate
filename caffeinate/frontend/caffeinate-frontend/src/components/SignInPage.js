@@ -5,6 +5,8 @@ import Button from '@mui/material/Button';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 
 const StyledTextField = styled(TextField)`
     label.focused {
@@ -38,9 +40,21 @@ export default function SignInPage(props) {
         }
     });
 
-    const signUpUser = (email, password) => {
-        console.log("backend");
+    const signUpUser = (username, password) => {
+        axios.post('http://localhost:3000/api/signup/', { username: username, password: password})
+        .then(res => {
+            console.log(res);
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
+    
     };
+
+    // const signInUser = async (email, password) => {
+    //     const res = await axios.post('http://localhost:3000/api/signin/', { input: {username: email, password: password}});
+    //     console.log(res);
+    // }
 
     const signInUser = (email, password, onetime='') => {
         console.log("backend");
@@ -48,13 +62,18 @@ export default function SignInPage(props) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log(UsernameRef.current);
         const username = UsernameRef.current.value;
         const password = PassRef.current.value;
         if (option) {
             console.log("signing in")
+            console.log(username)
+            console.log(password)
             signInUser(username, password);
   
         } else {
+            console.log(username)
+            console.log(password)
             console.log("signing up")
             signUpUser(username, password)
         }
@@ -94,8 +113,8 @@ export default function SignInPage(props) {
                     <h3 className="form-message">Sign in to <span className="name">Caffeinate</span></h3>
                     <ThemeProvider theme={theme}>
                         <form className="entry-page_form" onSubmit={handleSubmit}>
-                            <StyledTextField sx={{ my: "1em" }} className="TextField" id="outlined-basic" label="Username" variant="outlined" ref={UsernameRef} required/>                                <a className="forgot-password-message">Forgot password?</a>
-                            <StyledTextField sx={{ mb: "5em" }} className="TextField" id="outlined-basic" label="Password" variant="outlined" ref={PassRef} required/>
+                            <StyledTextField sx={{ my: "1em" }} className="TextField" id="outlined-basic" label="Username" variant="outlined" inputRef={UsernameRef} required/>                                <a className="forgot-password-message">Forgot password?</a>
+                            <StyledTextField sx={{ mb: "5em" }} className="TextField" id="outlined-basic" label="Password" variant="outlined" inputRef={PassRef} required/>
                             <Button id="signin" color="test" className="Button" type="submit" onClick={(e) => setOption(1)} variant="contained" disableElevation>Sign in</Button>
                             or
                             <Button id="signup" color="test" className="Button" type="submit" onClick={(e) => setOption(0)} variant="outlined" disableElevation>Sign up</Button>

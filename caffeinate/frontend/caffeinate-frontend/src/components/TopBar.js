@@ -1,7 +1,16 @@
 import { Link } from "react-router-dom";
 import '../styling/TopBar.css';
 
-export default function TopBar() {
+export default function TopBar(props) {
+  const {setUser, navigate } = props;
+
+  const signOut = () => {
+    console.log("hi");
+    sessionStorage.clear();
+    setUser(null);
+    navigate('/');
+  }
+
   return (
     <div className="topbar-full">
       <div className="appname">
@@ -15,7 +24,7 @@ export default function TopBar() {
               <Link className="link" to="/analytics">Analytics</Link>
           </div>
           <div className="topbar_button" id="signout">
-              <Link className="link" to="/signout">Sign out</Link>
+              <button onClick={signOut} className="link">Sign out</button>
           </div>
       </div>
     </div>

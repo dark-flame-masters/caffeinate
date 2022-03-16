@@ -31,12 +31,14 @@ export default function SurveyPage() {
     setRating(num);
   }
 
-  const submitQOne = () => {
+  const submitQOne = (e) => {
+    e.preventDefault();
     console.log("click")
     setQOne(1);
   }
 
-  const submitQTwo = () => {
+  const submitQTwo = (e) => {
+    e.preventDefault();
     setQTwo(1);
   }
 
@@ -61,7 +63,7 @@ export default function SurveyPage() {
             <p className="question_subtext">Did something influence your mood?</p>
           </div>
           <form className="quesion_form" onSubmit={submitQOne}>
-          <textarea className="question_entry" ref={qOneRef}></textarea>
+            <textarea className="question_entry" ref={qOneRef} required></textarea>
             <button className="question_submit" type="submit">submit</button>
           </form>
         </>
@@ -74,7 +76,7 @@ export default function SurveyPage() {
             <p className="question_subtext">Write down something you can do to be happier.</p>
           </div>
           <form className="quesion_form" onSubmit={submitQTwo}>
-            <textarea className="question_entry" ref={qTwoRef}></textarea>
+            <textarea className="question_entry" ref={qTwoRef} required></textarea>
             <button className="question_submit" type="submit">submit</button>
           </form>
         </>

@@ -10,7 +10,12 @@ export class AppController {
   constructor(private readonly appService: AuthService) {}
 
   @Post('signup') // endpoint
-  signinUser(@Body() input: LoginUserInput) { // the kind of input the user inputs
+  signupUser(@Body() input: LoginUserInput) { // the kind of input the user inputs
     return this.appService.signup(input); // call the right function from x.service
+  }
+
+  @Post('signin') // endpoint
+  signinUser(@Body() input: LoginUserInput) { 
+    return this.appService.login(input); 
   }
 }

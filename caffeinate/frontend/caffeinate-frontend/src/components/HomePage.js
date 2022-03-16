@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import '../styling/HomePage.css'
 
 export default function HomePage(props) {
-    const { user } = props;
-    const navigate = useNavigate();
+    const { user, navigate } = props;
     const [greeting, setGreeting] = useState('');
     
     const nav = (page) => {

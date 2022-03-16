@@ -4,7 +4,6 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
@@ -26,24 +25,24 @@ const StyledTextField = styled(TextField)`
 `;
 
 export default function SignInPage(props) {
-    const { token, setToken } = props;
-    const navigate = useNavigate();
+    const { user, setUser, navigate } = props;
     const [option, setOption] = useState(1);
     const UsernameRef = useRef(null);
     const PassRef = useRef(null);
-    console.log(token);
-    
+
     useEffect(() => {
-        if (token) {
-            console.log(token);
+        console.log(user);
+        if (user) {
             navigate('/');
         }
-    });
+    }, [JSON.stringify(user)]);
 
     const signUpUser = (username, password) => {
-        axios.post('http://localhost:3000/api/signup/', { username: username, password: password})
+        axios.post('http://localhost:3000/api/signup/', {username: username, password: password})
         .then(res => {
-            console.log(res);
+            console.log(res.data);
+            sessionStorage.setItem('user', res.data.username);
+            setUser(res.data.username);
         })
         .catch(error => {
           console.log(error.response);
@@ -51,34 +50,29 @@ export default function SignInPage(props) {
     
     };
 
-    // const signInUser = async (email, password) => {
-    //     const res = await axios.post('http://localhost:3000/api/signin/', { input: {username: email, password: password}});
-    //     console.log(res);
-    // }
+    const signInUser = (username, password, onetime='') => {
+        axios.post('http://localhost:3000/api/signin/', {username: username, password: password})
+        .then(res => {
+            console.log(res.data);
+            sessionStorage.setItem('user', username);
+            setUser(username);
 
-    const signInUser = (email, password, onetime='') => {
-        console.log("backend");
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(UsernameRef.current);
         const username = UsernameRef.current.value;
         const password = PassRef.current.value;
         if (option) {
-            console.log("signing in")
-            console.log(username)
-            console.log(password)
             signInUser(username, password);
   
         } else {
-            console.log(username)
-            console.log(password)
-            console.log("signing up")
             signUpUser(username, password)
         }
-        setToken('token');
-        navigate('/');
     };
 
     const theme = createTheme({

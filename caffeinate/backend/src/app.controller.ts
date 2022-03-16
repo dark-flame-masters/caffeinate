@@ -18,4 +18,10 @@ export class AppController {
   signinUser(@Body() input: LoginUserInput) { 
     return this.appService.login(input); 
   }
+
+  @Post('signout') // endpoint
+  signoutUser(@Body() input: LoginUserInput) { // the kind of input the user inputs
+    return this.appService.logout(input); // call the right function from x.service
+  }
+
 }

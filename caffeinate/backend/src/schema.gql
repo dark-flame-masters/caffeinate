@@ -2,6 +2,23 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input CreateJournalInput {
+  author: String!
+  content: String!
+}
+
+input FindJournalInput {
+  _id: Float!
+  author: String!
+  index: Float!
+}
+
+type Journal {
+  _id: Int!
+  author: String!
+  content: String!
+}
+
 type LoginResponse {
   access_token: String!
   user: User!
@@ -13,12 +30,14 @@ input LoginUserInput {
 }
 
 type Mutation {
+  createJournal(input: CreateJournalInput!): Journal!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   logout(loginUserInput: LoginUserInput!): Boolean!
   signup(loginUserInput: LoginUserInput!): User!
 }
 
 type Query {
+  journal(input: FindJournalInput!): Journal!
   user(username: String!): User!
   users: [User!]!
 }

@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { LoginUserInput } from './dto/login-user.input';
 import * as bcrypt from 'bcrypt'
+import { ExecutionContext } from "@nestjs/common";
+import { GqlExecutionContext } from "@nestjs/graphql";
 
 @Injectable()
 export class AuthService {
@@ -38,10 +40,18 @@ export class AuthService {
             throw new Error('User already exists');
         }
 
-
         //hash
-        const password = await bcrypt.hash(loginUserInput.password, 10);
-        return this.usersService.createUser({...loginUserInput,password,});
+        const salt = await bcrypt.genSalt(10);
+        const password = await bcrypt.hash(loginUserInput.password, salt);
+        return await this.usersService.createUser({...loginUserInput,password,});
+    }
+
+    async logout(context){
+        //login user input is to test in playground
+        //should be "include" for request credentials
+        context.req.session.destroy();
+        if(context.req.session) return false;
+        return true;
     }
 
 }

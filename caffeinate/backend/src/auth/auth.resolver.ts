@@ -1,5 +1,5 @@
-import { Req, UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { ExecutionContext, Req, UseGuards } from '@nestjs/common';
+import { Args, Context, GqlExecutionContext, Mutation, Resolver } from '@nestjs/graphql';
 import { User } from 'src/users/users.schema';
 import { AuthService } from './auth.service';
 import { LoginResponse } from './dto/login-response';
@@ -23,9 +23,6 @@ export class AuthResolver {
 
     @Mutation(() => Boolean)  
     logout(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context){
-        //login user input is to test in playground
-        context.req.session.destroy();
-        if(context.req.session) return false;
-        return true;
+        return this.authService.logout(context);
     }
 }

@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb
+    ports:
+      - "3000:3000"
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      SESSION_SECRET: ${SESSION_SECRET}
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGODB_DB}
+    ports:
+      - "27017:27017"

@@ -9,11 +9,13 @@ services:
       - mongodb
     ports:
       - "3000:3000"
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      SESSION_SECRET: ${SESSION_SECRET}
   mongodb:
     container_name: mongodb
     image: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: todo_use_secrets_4_username
-      MONGO_INITDB_ROOT_PASSWORD: todo_use_secrets_4_password
-    expose:
-      - "27017"
+      MONGO_INITDB_DATABASE: ${MONGODB_DB}
+    ports:
+      - "27017:27017"

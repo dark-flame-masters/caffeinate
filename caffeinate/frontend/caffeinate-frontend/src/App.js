@@ -29,7 +29,7 @@ export default function App() {
               <Route path="surveys" element={<SurveyPage/>}/>
               <Route path="tree" element={<TreePage/>}/>
               <Route path="analytics" element={<AnalyticsPage/>}/>
-              <Route path="signin" element={<SignInPage user={user} setUser={setUser} navigate={navigate}/>}/>
+              <Route path="signin" element={<Navigate to="/" replace={true}/>}/>
               <Route path="credits" element={<CreditsPage/>}/>
             </Routes>
           </div>

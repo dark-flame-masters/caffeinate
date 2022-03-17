@@ -33,7 +33,8 @@ export default function SignInPage(props) {
     useEffect(() => {
         console.log(user);
         if (user) {
-            navigate('/');
+            console.log("here");
+            return navigate('/');
         }
     }, [JSON.stringify(user)]);
 

@@ -22,9 +22,17 @@ export default function JournalPage() {
     if (!content) {
       alert("Write something first!");
     } else {
-      setDate(new Date().toUTCString());
-      console.log(content);
-      resetContent();
+      // axios.post('http://localhost:3000/api/signup/', {username: username, password: password})
+      // .then(res => {
+      //   console.log(res.data);
+      //   sessionStorage.setItem('user', res.data.username);
+      //   setUser(res.data.username);
+      //   setDate(new Date().toUTCString());
+      //   resetContent();
+      // })
+      // .catch(error => {
+      //   console.log(error.response);
+      // });
     }
   };
 

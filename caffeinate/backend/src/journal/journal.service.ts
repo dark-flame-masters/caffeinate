@@ -13,24 +13,26 @@ export class JournalService {
           //this.journals = journals;
       }
      
-    
-      //TODO: find prev find next
-      async findByAuthorIndex(username, idx) {
-        return await this.journalModel.find({ author: username }).sort({create_at: -1}).limit(1).skip(idx);
+      async findJournalByAuthorIndex(username, idx) {
+        return await this.journalModel.find({ author: username }).sort({date: -1}).skip(idx).limit(1).findOne();
       }
 
-      async findById(id) {
+      /*async findById(id) {
         return await this.journalModel.findById(id).lean();
-      }
-      async findByAuthor(username) {
-        return await this.journalModel.find({ author: username }).lean();
+      }*/
+
+      async findJournalByAuthor(username) {
+        return await this.journalModel.find({ author: username }).sort({date: -1}).lean();
       } 
+
       async findMany() {
         return await this.journalModel.find().lean();
       }
     
       async createJournal(input) {
-          console.log(input);
-        return await this.journalModel.create(input);
+        let newJournal = await this.journalModel.create(input);
+        newJournal.date = new Date();
+        await newJournal.save();
+        return newJournal;
       }
 }

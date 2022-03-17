@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AuthModule } from './auth/auth.module';
 import { JournalModule } from './journal/journal.module';
+import { SurveyModule } from './survey/survey.module';
 
 
 @Module({
@@ -25,7 +26,8 @@ import { JournalModule } from './journal/journal.module';
     }),
     UsersModule,
     AuthModule,
-    JournalModule
+    JournalModule,
+    SurveyModule
   ],
   controllers: [AppController],
   providers: [AppService],

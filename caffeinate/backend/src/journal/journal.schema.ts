@@ -15,11 +15,11 @@ export class Journal {
     @Field()
     content: string;
 
-     /*@Prop()
+    @Prop()
     @Field()
     date: Date;
 
-   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+    /*@Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
     @Field(() => User)
     author: User | number;*/
     @Prop()
@@ -45,8 +45,8 @@ export class CreateJournalInput {
 
 @InputType()
 export class FindJournalInput {
-  @Field()
-  _id: number;
+  /*@Field()
+  _id: number;*/
 
   @Field()
   author: string;

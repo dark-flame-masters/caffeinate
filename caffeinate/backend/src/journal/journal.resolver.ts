@@ -6,30 +6,28 @@ import { CreateJournalInput, FindJournalInput, Journal } from './journal.schema'
 export class JournalResolver {
     constructor(private readonly journalService: JournalService) {}
 
-  @Query(() => [Journal], { name: 'journal' })
+  @Query(() => [Journal])
   findMany() {
     return this.journalService.findMany();
   }
 
-  @Query(() => Journal, { name: 'journal' })
-  findByAuthor(@Args('input') { author }: FindJournalInput) {
-    return this.journalService.findByAuthor(author);
+  @Query(() => [Journal])
+  async findJournalByAuthor(@Args('input') author : string) {
+    return await this.journalService.findJournalByAuthor(author);
   }
 
-  @Query(() => Journal, { name: 'journal' })
-  findByAuthorIndex(@Args('input') { author, index }: FindJournalInput) {
-    return this.journalService.findByAuthorIndex(author, index);
+  @Query(() => Journal)
+  async findJournalByAuthorIndex(@Args('input') { author, index }: FindJournalInput) {
+    return await this.journalService.findJournalByAuthorIndex(author, index);
   }
 
-  @Query(() => Journal, { name: 'journal' })
+  /*@Query(() => Journal, { name: 'journal' })
   findById(@Args('input') { _id }: FindJournalInput) {
     return this.journalService.findById(_id);
-  }
+  }*/
 
   @Mutation(() => Journal)
   async createJournal(@Args('input') journal: CreateJournalInput) {
-    console.log(journal);
-      console.log(await this.journalService.createJournal({...journal}));
     return await this.journalService.createJournal({...journal});
   }
 

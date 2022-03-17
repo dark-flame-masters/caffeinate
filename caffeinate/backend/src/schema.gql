@@ -7,8 +7,25 @@ input CreateJournalInput {
   content: String!
 }
 
+input CreateSurveyInput {
+  answer1: String!
+  answer2: String!
+  author: String!
+  rate: Float!
+  sentiment: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 input FindJournalInput {
-  _id: Float!
+  author: String!
+  index: Float!
+}
+
+input FindSurveyInput {
   author: String!
   index: Float!
 }
@@ -17,6 +34,7 @@ type Journal {
   _id: Int!
   author: String!
   content: String!
+  date: DateTime!
 }
 
 type LoginResponse {
@@ -31,15 +49,30 @@ input LoginUserInput {
 
 type Mutation {
   createJournal(input: CreateJournalInput!): Journal!
+  createSurvey(input: CreateSurveyInput!): Survey!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   logout(loginUserInput: LoginUserInput!): Boolean!
   signup(loginUserInput: LoginUserInput!): User!
 }
 
 type Query {
-  journal(input: FindJournalInput!): Journal!
+  findJournalByAuthor(input: String!): [Journal!]!
+  findJournalByAuthorIndex(input: FindJournalInput!): Journal!
+  findMany: [Journal!]!
+  findSurveyByAuthor(input: String!): [Survey!]!
+  findSurveyByAuthorIndex(input: FindSurveyInput!): Survey!
   user(username: String!): User!
   users: [User!]!
+}
+
+type Survey {
+  _id: Float!
+  answer1: String!
+  answer2: String!
+  author: String!
+  date: DateTime!
+  rate: Float!
+  sentiment: String!
 }
 
 type User {

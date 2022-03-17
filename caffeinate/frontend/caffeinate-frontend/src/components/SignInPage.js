@@ -6,7 +6,6 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import styled from "styled-components";
 import axios from "axios";
 
-
 const StyledTextField = styled(TextField)`
     label.focused {
         color: #D7B19D;

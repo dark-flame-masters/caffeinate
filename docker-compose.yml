@@ -1,10 +1,17 @@
 version: "3.8"
 services:
-  app:
-    container_name: app
+  nginx:
+    restart: always
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./nginx
+    depends_on:
+      - caffeinate
+    ports:
+      - "80:80"
+  caffeinate:
+    container_name: caffeinate
+    build:
+      context: ./caffeinate
     depends_on:
       - mongodb
     ports:

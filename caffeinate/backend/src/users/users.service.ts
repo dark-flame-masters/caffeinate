@@ -26,6 +26,22 @@ export class UsersService {
   }
 
   async createUser(input) {
-    return await this.userModel.create(input);
+    let newUser = await this.userModel.create(input);
+    newUser.treeDate = new Date();
+    newUser.treeStatus = 0;
+    await newUser.save();
+    return newUser;
+  }
+
+  async updateStatus(username, amount) {
+    let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {treeStatus : amount}}).lean();
+    console.log(user)
+    return user;
+  }
+
+  async updateTreeDate(username, newDate) {
+    let user = await this.userModel.findOneAndUpdate({ username: username }, {treeDate : newDate}).lean();
+    console.log(user)
+    return user;
   }
 }

@@ -23,4 +23,10 @@ export class SurveyService {
         await newSurvey.save();
         return newSurvey;
     }
+
+    async findRecentRatesByAuthor(username, startDate, endDate) {
+        // this function returns a list of rate, at most five, that is within the given time slot
+        let lst = await this.surveyModel.find({ author: username, date:{"$gte": startDate, "$lt": endDate} }).sort({date: -1}).limit(5);
+        return lst;
+    }
 }

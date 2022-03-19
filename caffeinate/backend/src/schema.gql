@@ -78,5 +78,7 @@ type Survey {
 type User {
   _id: Int!
   password: String!
+  treeDate: DateTime!
+  treeStatus: Float!
   username: String!
 }

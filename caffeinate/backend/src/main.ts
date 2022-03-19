@@ -7,7 +7,6 @@ import {graphqlHTTP} from 'express-graphql';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
   app.enableCors();
   //session here
   // somewhere in your initialization file

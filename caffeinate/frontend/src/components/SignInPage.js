@@ -5,22 +5,23 @@ import Button from '@mui/material/Button';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import styled from "styled-components";
 import axios from "axios";
+import * as Constants from '../constants'
 
 const StyledTextField = styled(TextField)`
-    label.focused {
-        color: #D7B19D;
+label.focused {
+    color: #D7B19D;
+}
+.MuiOutlinedInput-root {
+    fieldset {
+        border-color: #D7B19D;
     }
-    .MuiOutlinedInput-root {
-        fieldset {
-            border-color: #D7B19D;
-        }
-        &:hover fieldset {
-            border-color: #D7B19D;
-        }
-        &.Mui-focused fieldset {
-            border-color: #483434;
-        }     
+    &:hover fieldset {
+        border-color: #D7B19D;
     }
+    &.Mui-focused fieldset {
+        border-color: #483434;
+    }     
+}
 `;
 
 export default function SignInPage(props) {
@@ -30,36 +31,59 @@ export default function SignInPage(props) {
     const PassRef = useRef(null);
 
     useEffect(() => {
-        console.log(user);
         if (user) {
-            console.log("here");
             return navigate('/');
         }
     }, [JSON.stringify(user)]);
 
+
     const signUpUser = (username, password) => {
-        axios.post('http://localhost:3000/api/signup/', {username: username, password: password})
+        axios({
+            url: Constants.GRAPHQL_ENDPOINT,
+            method: "post",
+            headers: Constants.HEADERS,
+            data: { "operationName": "signup",
+                    "query": 
+                        `mutation signup($username: String!, $password: String!){
+                            signup(loginUserInput: { username: $username, password: $password }){
+                                username
+                            }
+                        }`,
+                    "variables": {username, password},}
+        })
         .then(res => {
-            console.log(res.data);
-            sessionStorage.setItem('user', res.data.username);
-            setUser(res.data.username);
+            sessionStorage.setItem('user', username);
+            setUser(res.data.data.signup.username);
         })
         .catch(error => {
-          console.log(error.response);
-        });
-    
+            alert("Error signing up. Try a different username");
+        });    
     };
 
     const signInUser = (username, password, onetime='') => {
-        axios.post('http://localhost:3000/api/signin/', {username: username, password: password})
+        axios({
+            url: Constants.GRAPHQL_ENDPOINT,
+            method: "post",
+            headers: Constants.HEADERS,
+            data: { "operationName": "login",
+                    "query": 
+                        `mutation login($username: String!, $password: String!){
+                            login(loginUserInput: { username: $username, password: $password }){
+                                user {
+                                    username
+                                    treeStatus
+                                    treeDate
+                                }
+                            }
+                        }`,
+                    "variables": {username, password},}
+        })
         .then(res => {
-            console.log(res.data);
             sessionStorage.setItem('user', username);
-            setUser(username);
-
+            setUser(res.data.data.login.user.username);
         })
         .catch(error => {
-          console.log(error.response);
+            alert("Error signing in");
         });
     };
 

@@ -2,6 +2,8 @@ import '../styling/JournalPage.css';
 import { useState } from "react";
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import axios from "axios";
+import * as Constants from '../constants'
 
 export default function JournalPage() {
   const [content, setContent] = useState("");

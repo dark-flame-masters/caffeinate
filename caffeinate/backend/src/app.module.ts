@@ -7,6 +7,8 @@ import { join } from 'path';
 import { UsersModule } from './users/users.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AuthModule } from './auth/auth.module';
+import { JournalModule } from './journal/journal.module';
+import { SurveyModule } from './survey/survey.module';
 
 
 @Module({
@@ -23,7 +25,9 @@ import { AuthModule } from './auth/auth.module';
       driver: ApolloDriver,
     }),
     UsersModule,
-    AuthModule
+    AuthModule,
+    JournalModule,
+    SurveyModule
   ],
   controllers: [AppController],
   providers: [AppService],

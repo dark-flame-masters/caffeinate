@@ -17,6 +17,14 @@ export class User {
     @Prop()
     @Field()
     password: string;
+
+    @Prop()
+    @Field()
+    treeDate: Date;
+
+    @Prop()
+    @Field()
+    treeStatus: number; //in [0, 1, 2, 3]
   
 }
   

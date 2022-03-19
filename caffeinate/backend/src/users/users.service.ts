@@ -35,13 +35,11 @@ export class UsersService {
 
   async updateStatus(username, amount) {
     let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {treeStatus : amount}}).lean();
-    console.log(user)
     return user;
   }
 
   async updateTreeDate(username, newDate) {
     let user = await this.userModel.findOneAndUpdate({ username: username }, {treeDate : newDate}).lean();
-    console.log(user)
     return user;
   }
 }

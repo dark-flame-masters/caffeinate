@@ -37,10 +37,6 @@ export class CreateJournalInput {
   @IsNotEmpty()
   @Matches(/[A-Za-z0-9\s\-':()!.,;?]+/) // to avoid front end injection
   content: string;
-
-  //@Field()
-  //date: Date;
-
   
   @Field()
   @IsNotEmpty()
@@ -49,8 +45,6 @@ export class CreateJournalInput {
 
 @InputType()
 export class FindJournalInput {
-  /*@Field()
-  _id: number;*/
 
   @Field()
   author: string;

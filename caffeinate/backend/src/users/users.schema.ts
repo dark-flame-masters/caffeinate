@@ -26,6 +26,14 @@ export class User {
     @Prop()
     @Field()
     treeStatus: number; //in [0, 1, 2, 3]
+
+    @Prop()
+    @Field()
+    journalCount: number;
+
+    @Prop()
+    @Field()
+    surveyCount: number;
   
 }
   

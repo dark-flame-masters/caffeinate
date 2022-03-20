@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
 
@@ -29,6 +27,8 @@ export class UsersService {
     let newUser = await this.userModel.create(input);
     newUser.treeDate = new Date();
     newUser.treeStatus = 0;
+    newUser.journalCount = 0;
+    newUser.surveyCount = 0;
     await newUser.save();
     return newUser;
   }
@@ -40,6 +40,18 @@ export class UsersService {
 
   async updateTreeDate(username, newDate) {
     let user = await this.userModel.findOneAndUpdate({ username: username }, {treeDate : newDate}).lean();
+    return user;
+  }
+
+  async updateJournalCount(username, count) {
+    // increase the journal count by param count
+    let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {journalCount : count}}).lean();
+    return user;
+  }
+
+  async updateSurveyCount(username, count) {
+    // increase the journal count by param count
+    let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {surveyCount : count}}).lean();
     return user;
   }
 }

@@ -1,10 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { JournalService } from './journal.service';
 import { CreateJournalInput, FindJournalInput, Journal } from './journal.schema';
+import { UnauthorizedException } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
 
 @Resolver()
 export class JournalResolver {
-    constructor(private readonly journalService: JournalService) {}
+    constructor(private readonly journalService: JournalService, private readonly usersService: UsersService) {}
 
   @Query(() => [Journal])
   findMany() {
@@ -12,22 +14,22 @@ export class JournalResolver {
   }
 
   @Query(() => [Journal])
-  async findJournalByAuthor(@Args('input') author : string) {
+  async findJournalByAuthor(@Args('input') author : string, @Context() context) {
+    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
     return await this.journalService.findJournalByAuthor(author);
   }
 
   @Query(() => Journal)
-  async findJournalByAuthorIndex(@Args('input') { author, index }: FindJournalInput) {
+  async findJournalByAuthorIndex(@Args('input') { author, index }: FindJournalInput, @Context() context) {
+    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
     return await this.journalService.findJournalByAuthorIndex(author, index);
   }
 
-  /*@Query(() => Journal, { name: 'journal' })
-  findById(@Args('input') { _id }: FindJournalInput) {
-    return this.journalService.findById(_id);
-  }*/
 
   @Mutation(() => Journal)
-  async createJournal(@Args('input') journal: CreateJournalInput) {
+  async createJournal(@Args('input') journal: CreateJournalInput, @Context() context) {
+    if(context.req.session === undefined || context.req.session.username != journal.author) {throw new UnauthorizedException();}
+    await this.usersService.updateJournalCount(journal.author, 1);
     return await this.journalService.createJournal({...journal});
   }
 

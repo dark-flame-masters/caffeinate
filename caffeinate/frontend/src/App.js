@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import SignInPage from './components/SignInPage';
-import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import JournalPage from "./components/JournalPage";
 import SurveyPage from "./components/SurveyPage";
 import TreePage from "./components/TreePage";
@@ -25,10 +25,10 @@ export default function App() {
             <TopBar setUser={setUser} navigate={navigate} />
             <Routes>
               <Route exact path="*" element={<HomePage user={user} navigate={navigate}/>}/>
-              <Route path="journal" element={<JournalPage/>}/>
-              <Route path="surveys" element={<SurveyPage/>}/>
-              <Route path="tree" element={<TreePage/>}/>
-              <Route path="analytics" element={<AnalyticsPage/>}/>
+              <Route path="journal" element={<JournalPage user={user}/>}/>
+              <Route path="surveys" element={<SurveyPage user={user}/>}/>
+              <Route path="tree" element={<TreePage user={user}/>}/>
+              <Route path="analytics" element={<AnalyticsPage user={user}/>}/>
               <Route path="signin" element={<Navigate to="/" replace={true}/>}/>
               <Route path="credits" element={<CreditsPage/>}/>
             </Routes>

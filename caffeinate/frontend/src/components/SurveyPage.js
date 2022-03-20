@@ -2,44 +2,159 @@ import { useEffect, useRef, useState } from "react";
 import '../styling/SurveyPage.css';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import axios from "axios";
+import * as Constants from '../constants'
 
-export default function SurveyPage() {
+export default function SurveyPage(props) {
+  const { user } = props;
   const videoRef = useRef(null);
-  const qOneRef = useRef(null);
-  const qTwoRef = useRef(null);
 
   const [cam, setCam] = useState(true);
   const [surveyCompleted, setSurveyCompleted] = useState(false);
-  const [viewMode, setViewMode] = useState(0);
 
-  const [date, setDate] = useState(new Date().toUTCString());
   const [rating, setRating] = useState(0);
-  const [expression, setExpression] = useState(null);
-  const [qOne, setQOne] = useState('');
-  const [qTwo, setQTwo] = useState('');
+  const [sentiment, setSentiment] = useState('');
+  
+  const [qOneContent, setQOneContent] = useState('');
+  const [qTwoContent, setQTwoContent] = useState('');
+  
+  const [qOne, setQOne] = useState(0);
+  const [qTwo, setQTwo] = useState(0);
+
+  const [view, setView] = useState(0);
+  const [idx, setIDX] = useState(0);
+  const [date, setDate] = useState(new Date());
+  const [currentSurvey, setCurrentSurvey] = useState({});
+
+  const resetSurvey = () => {
+    console.log("here");
+    setSentiment(null);
+    setQOneContent('');
+    setQTwoContent('');
+    setQOne(0);
+    setQTwo(0);
+    setRating(0);
+    setDate(new Date());
+    setSurveyCompleted(false);
+  }
+
+  useEffect(() => {
+    getSurvey();
+  }, [idx]);
+
+  useEffect(() => {
+    console.log("in")
+    if (currentSurvey) {
+      setTimeout(resetSurvey, Math.min(10000, Math.abs(date.getTime() - new Date(currentSurvey.date).getTime())));
+    }
+  }, [surveyCompleted]);
+
+  const setViewMode = (viewMode) => {
+    if (viewMode) {
+      getSurvey();
+    } else {
+      setIDX(0);
+    }
+    setView(viewMode);
+  }
+
+  const getSurvey = () => {
+    console.log(idx);
+    axios({
+      url: Constants.GRAPHQL_ENDPOINT,
+      method: "post",
+      headers: Constants.HEADERS,
+      data: { "operationName": "findSurveyByAuthorIndex",
+              "query": 
+                `query findSurveyByAuthorIndex($input: FindSurveyInput!){
+                  findSurveyByAuthorIndex(input: $input){
+                    rate
+                    answer1
+                    answer2
+                    sentiment
+                    author
+                    date
+                  }
+                }`,
+              "variables": {'input': {index: idx, author: user}},
+            }
+    })
+    .then(res => {
+      console.log(res.data);
+      setCurrentSurvey(() => res.data.data.findSurveyByAuthorIndex);
+      setDate(new Date());
+      let time = Math.abs(date.getTime() - new Date(res.data.data.findSurveyByAuthorIndex.date).getTime());
+      if (time < 10000) {
+        setSurveyCompleted(true);
+      } 
+    })
+    .catch(error => {
+      if (!idx) setViewMode(0);
+      else alert( "Reached beginning of surveys!");
+      setIDX(idx === 0 ? idx : idx => idx - 1);
+    });  
+  };
 
   const submitSurvey = () => {
-    setExpression('happy');
-    if (!expression || !qOne || !rating || !qTwo) {
+    if (!qOne || !rating || !qTwo ) {
       console.log("something wrong...");
+    } else {
+      axios({
+        url: Constants.GRAPHQL_ENDPOINT,
+        method: "post",
+        headers: Constants.HEADERS,
+        data: { "operationName": "createSurvey",
+                "query": 
+                  `mutation createSurvey($input: CreateSurveyInput!){
+                    createSurvey(input: $input){
+                      rate
+                      answer1
+                      answer2
+                      sentiment
+                      author
+                      date
+                    }
+                  }`,
+                "variables": {'input': {answer1: qOneContent, answer2: qTwoContent, rate: rating, sentiment: 'happy', author: user}},
+              }
+      })
+      .then(res => {
+        console.log(res.data);
+        setSurveyCompleted(true);
+      })
+      .catch(error => {
+        alert("Error completing survey");
+      });  
     }
-    setSurveyCompleted(true);
+  }
+
+  const changeSurvey = (direction) => {
+    if (direction) {
+      setIDX(idx => idx - 1);
+    } else {
+      setIDX(idx => idx + 1);
+    }
   }
 
   const submitRating = (num) => {
-    console.log("click")
     setRating(num);
   }
 
-  const submitQOne = (e) => {
-    e.preventDefault();
-    console.log("click")
-    setQOne(1);
-  }
+  const editContent = (e, q) => {
+    if (q) {
+      setQOneContent(e.target.value);
+    } else {
+      setQTwoContent(e.target.value);
+    }
+  };
 
-  const submitQTwo = (e) => {
+  const finishQuestion = (e, q) => {
     e.preventDefault();
-    setQTwo(1);
+    if (q) {
+      setQTwo(1);
+    } else {
+      setQOne(1);
+    }
   }
 
   function showSurveyQuestions(question=1) {
@@ -62,8 +177,8 @@ export default function SurveyPage() {
             <p className="question_text">What made you feel this way today?</p>
             <p className="question_subtext">Did something influence your mood?</p>
           </div>
-          <form className="quesion_form" onSubmit={submitQOne}>
-            <textarea className="question_entry" ref={qOneRef} required></textarea>
+          <form className="quesion_form" onSubmit={(e) => finishQuestion(e, 0)}>
+            <textarea className="question_entry" onChange={(e) => editContent(e, 0)} required></textarea>
             <button className="question_submit" type="submit">submit</button>
           </form>
         </>
@@ -75,8 +190,8 @@ export default function SurveyPage() {
             <p className="question_text">How are you going to have a better day tomorrow?</p>
             <p className="question_subtext">Write down something you can do to be happier.</p>
           </div>
-          <form className="quesion_form" onSubmit={submitQTwo}>
-            <textarea className="question_entry" ref={qTwoRef} required></textarea>
+          <form className="quesion_form" onSubmit={(e) => finishQuestion(e, 1)}>
+            <textarea className="question_entry" onChange={(e) => editContent(e, 1)} required></textarea>
             <button className="question_submit" type="submit">submit</button>
           </form>
         </>
@@ -99,7 +214,7 @@ export default function SurveyPage() {
 
   return (
     <div className="survey">
-      {surveyCompleted ? 
+      {surveyCompleted || view ? 
       <>
         <div className="completed-message"> 
           You completed today's survey. Check back in tomorrow for another one. <span className="survey-settings" onClick={() => setViewMode(1)}>Read previous entries</span>
@@ -110,10 +225,9 @@ export default function SurveyPage() {
           {!rating ? showSurveyQuestions(1): ""}
           {rating && !qOne ? showSurveyQuestions(2) : ""}
           {rating && qOne && !qTwo ? showSurveyQuestions(3) : ""}
-          {qTwo && !expression ? showSurveyQuestions(4) : ""}
+          {qTwo && !sentiment ? showSurveyQuestions(4) : ""}
         </div>
       }
-
 
       {/* {cam ? (
       <video 
@@ -127,17 +241,18 @@ export default function SurveyPage() {
       : <div>hi</div>} */}
       {/* {expression ? <div> You look {expression} </div>: ( <div> You look ugly </div>)} */}
 
-      {!viewMode ? "" :
-      <div className="view-surveys">
-        <div className="previous"> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div>
-        <div className="survey-entry">
-          I rated -date- as: number
-          I felt this way because: q1
-          I was going to improve that day as following: q2
-          I looked: impression
+      {!view ? "" :
+        <div className="view-surveys">
+          <div className="previous" onClick={() => changeSurvey(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div>
+          <div className="survey-entry">
+            <p className="survey-date">{currentSurvey.date}</p>
+            <p className="survey-response">I rated this day a {currentSurvey.rate}/5</p>
+            <p className="survey-response">I felt this way because: {currentSurvey.answer1}</p>
+            <p className="survey-response">I planned to improve the day like the following: {currentSurvey.answer2}</p>
+            <p className="survey-response">On that day, I looked: {currentSurvey.sentiment}</p>
+          </div>
+          {idx !== 0 ? <div className="next" onClick={() => changeSurvey(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="spacing"></div>}
         </div>
-        <div className="next"> <NavigateNextIcon style={{ fontSize: 80 }}/></div>
-      </div>
       }
     </div>
   );

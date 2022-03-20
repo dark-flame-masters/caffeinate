@@ -52,6 +52,7 @@ export default function SignInPage(props) {
                     "variables": {username, password},}
         })
         .then(res => {
+            sessionStorage.setItem('treeStatus', 0);
             sessionStorage.setItem('user', username);
             setUser(res.data.data.signup.username);
         })
@@ -79,6 +80,7 @@ export default function SignInPage(props) {
                     "variables": {username, password},}
         })
         .then(res => {
+            sessionStorage.setItem('treeStatus', res.data.data.login.user.treeStatus);
             sessionStorage.setItem('user', username);
             setUser(res.data.data.login.user.username);
         })

@@ -1,15 +1,68 @@
 import '../styling/JournalPage.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import axios from "axios";
 import * as Constants from '../constants'
 
-export default function JournalPage() {
+export default function JournalPage(props) {
+  const { user } = props;
   const [content, setContent] = useState("");
-  const [date, setDate] = useState(new Date().toUTCString());
-  const [viewMode, setViewMode] = useState(0);
-  const [currentJournalEntry, setCurrentJournalEntry] = useState({'date': 'Sun, 13 Mar 2022 04:36:00 GMT', 'content': 'sdfdfdfdff\ndfd\ndfdfdf'});
+  const [date, setDate] = useState(Date());
+  const [view, setView] = useState(0);
+  const [idx, setIDX] = useState(0);
+  const [currentJournalEntry, setCurrentJournalEntry] = useState({'date': '2022-03-20T02:15:48.323Z', 'content': 'hi', 'author': user});
+
+  useEffect(() => {
+    getJournal();
+  }, [idx]);
+
+  const getJournal = () => {
+    console.log(idx);
+    axios({
+      url: Constants.GRAPHQL_ENDPOINT,
+      method: "post",
+      headers: Constants.HEADERS,
+      data: { "operationName": "findJournalByAuthorIndex",
+              "query": 
+                `query findJournalByAuthorIndex($input: FindJournalInput!){
+                  findJournalByAuthorIndex(input: $input){
+                    content
+                    author
+                    date
+                  }
+                }`,
+              "variables": {'input': {index: idx, author: user}},
+            }
+    })
+    .then(res => {
+      console.log(res.data);
+      setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
+    })
+    .catch(error => {
+      alert(idx === 0 ? "No journal entries yet...": "Reached beginning of journal!");
+      setIDX(idx === 0 ? idx : idx => idx - 1);
+    });  
+  };
+
+  const changeJournal = (direction) => {
+    console.log(idx);
+    if (direction) {
+      setIDX(idx => idx - 1);
+    } else {
+      setIDX(idx => idx + 1);
+    }
+    console.log(idx);
+  }
+
+  const setViewMode = (viewMode) => {
+    if (viewMode) {
+      getJournal();
+    } else {
+      setIDX(0);
+    }
+    setView(viewMode);
+  }
 
   const editContent = (e) => {
     setContent(e.target.value);
@@ -19,12 +72,38 @@ export default function JournalPage() {
     setContent("");
   };
 
+  const addJournal = () => {
+    axios({
+      url: Constants.GRAPHQL_ENDPOINT,
+      method: "post",
+      headers: Constants.HEADERS,
+      data: { "operationName": "createJournal",
+              "query": 
+                `mutation createJournal($input: CreateJournalInput!){
+                  createJournal(input: $input){
+                    content
+                    author
+                    date
+                  }
+                }`,
+              "variables": {'input': {content, author: user}},
+            }
+    })
+    .then(res => {
+      console.log(res.data);
+    })
+    .catch(error => {
+      alert("Error saving journal entry");
+    });  
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!content) {
       alert("Write something first!");
     } else {
-      setDate(new Date().toUTCString());
+      addJournal();
+      setDate(Date());
       console.log(content);
       resetContent();
     }
@@ -32,7 +111,7 @@ export default function JournalPage() {
 
   return (
     <div className="journal">
-      {!viewMode ? (
+      {!view ? (
         <>
           <div className="paper">
             <div className="paper-lines">
@@ -53,14 +132,14 @@ export default function JournalPage() {
           </div>
         </> ) : (
         <div className="view-journals">
-          <div className="previous"> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div>
+          <div className="previous" onClick={() => changeJournal(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div>
           <div className="journal-paper">
             <div className="paper-lines">
-              <p className="date">{currentJournalEntry.date}</p>
+              <p className="date">{Date(currentJournalEntry.date)}</p>
               <div className="journal-entry">{currentJournalEntry.content.split('\n').map(str => <p key={Math.random()}>{str}</p>)}</div>
             </div>
           </div>
-          <div className="next"><NavigateNextIcon style={{ fontSize: 80 }}/></div>
+          {idx !== 0 ? <div className="next" onClick={() => changeJournal(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="spacing"></div>}
           <div className="journal-settings" onClick={() => setViewMode(0)}>
             Write a journal entry
           </div>

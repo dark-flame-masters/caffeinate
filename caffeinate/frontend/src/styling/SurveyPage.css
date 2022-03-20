@@ -120,3 +120,8 @@
     min-height: 20em;
     font-family: 'Krub';
 }
+
+.survey-response {
+    text-align: left;
+    margin-left: 1em;
+}

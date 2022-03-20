@@ -1,0 +1,65 @@
+.tree-page {
+    margin-top: 4em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(41, 32, 32);
+    border-radius: 3em;
+    width: 80em;
+    margin-left: 5em;
+    height: 30em;
+    font-family: 'Krub';
+}
+
+.tree-image {
+    margin-top: 3em;
+    margin-left: 5em;
+}
+
+.tree-message {
+    margin: auto;
+    margin-left: 6em;
+    margin-right: 3em;
+    width: 80em;
+}
+
+.message {
+    font-size: 3em;
+}
+
+#stage-zero {
+    background: url('../media/stage-zero.png') no-repeat;
+    width: 400px;
+    height: 400px;
+}
+
+#stage-one {
+    background: url('../media/stage-one.png') no-repeat;
+    width: 400px;
+    height: 400px;
+}
+
+#stage-two {
+    background: url('../media/stage-two.png') no-repeat;
+    width: 400px;
+    height: 400px;
+}
+
+#stage-three {
+    background: url('../media/stage-three.png') no-repeat;
+    width: 400px;
+    height: 400px;
+}
+
+#message-0 {
+    color: rgb(63, 43, 6);
+}
+
+
+#message-2 {
+    color: rgb(148, 140, 66);
+}
+
+#message-3 {
+    color: rgb(19, 100, 26);
+}

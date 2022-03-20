@@ -24,7 +24,9 @@ export class SurveyResolver {
   @Mutation(() => Survey)
   async createSurvey(@Args('input') survey: CreateSurveyInput, @Context() context) {
     if(context.req.session === undefined || context.req.session.username != survey.author) {throw new UnauthorizedException();}
-    await this.usersService.updateSurveyCount(survey.author, 1);
-    return await this.surveyService.createSurvey({...survey});
+    return{
+      user: await this.usersService.updateSurveyCount(survey.author, 1),
+      survey: await this.surveyService.createSurvey({...survey})
+    }
   }
 }

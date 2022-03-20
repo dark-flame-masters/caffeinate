@@ -51,7 +51,7 @@ type Mutation {
   createJournal(input: CreateJournalInput!): Journal!
   createSurvey(input: CreateSurveyInput!): Survey!
   login(loginUserInput: LoginUserInput!): LoginResponse!
-  logout(loginUserInput: LoginUserInput!): Boolean!
+  logout(input: String!): Boolean!
   signup(loginUserInput: LoginUserInput!): User!
 }
 

@@ -30,6 +30,8 @@
     "apollo-server-express": "^3.6.3",
     "bcrypt": "^5.0.1",
     "class": "^0.1.4",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.13.2",
     "express-session": "^1.17.2",
     "graphql": "^15.8.0",
     "passport": "^0.5.2",

@@ -1,5 +1,6 @@
 import { Field, ObjectType, ID, InputType, Int } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IsNotEmpty, Matches } from 'class-validator';
 import * as mongoose from 'mongoose';
 import { User } from 'src/users/users.schema';
 
@@ -33,6 +34,8 @@ export const JournalSchema = SchemaFactory.createForClass(Journal);
 @InputType()
 export class CreateJournalInput {
   @Field()
+  @IsNotEmpty()
+  @Matches(/[A-Za-z0-9\s\-':()!.,;?]+/) // to avoid front end injection
   content: string;
 
   //@Field()
@@ -40,6 +43,7 @@ export class CreateJournalInput {
 
   
   @Field()
+  @IsNotEmpty()
   author: string;
 }
 

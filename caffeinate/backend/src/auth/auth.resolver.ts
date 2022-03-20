@@ -22,7 +22,7 @@ export class AuthResolver {
     }
 
     @Mutation(() => Boolean)  
-    logout(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context){
+    logout(@Args('input') username : string, @Context() context){
         return this.authService.logout(context);
     }
 }

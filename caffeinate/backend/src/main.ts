@@ -4,6 +4,7 @@ import * as session from 'express-session';
 import express from 'express';
 import cors from 'cors';
 import {graphqlHTTP} from 'express-graphql';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,7 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 
 }

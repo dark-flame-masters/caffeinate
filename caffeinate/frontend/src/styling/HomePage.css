@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Handlee&family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Serif+Display:wght@200;300;400;500;600;700;800;900&display=swap');
+
+.homepage {
+    color: #EED6C4;
+    text-align: center;
+}
+
+.greeting-message {
+    font-weight: 800;
+    font-size: 5em;
+    color: #c5aba1;
+}
+
+.username {
+    color: #291b1b;
+}
+
+.greeting-message_generic {
+    font-weight: 500;
+    font-size: 2.5em;
+    margin-top: -1.3em;
+    margin-left: 10em;
+    color: #a77f70;
+    letter-spacing: 0.05em;
+}
+
+.navigation-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 83em;
+    margin-left: 3em;
+    margin-top: 3em;
+    font-family: 'Krub';
+}
+
+.nav {
+    background-color: #6B4F4F;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    width: 25em;
+    height: 20em;
+    border-radius: 1.5em;
+    box-shadow: 5px 8px 3px 2px #270e0228;
+    transition: 0.2s;
+    -webkit-transition:  0.2s;
+}
+
+.nav:hover {
+    cursor: pointer;
+    background-color: #D7B19D;
+    color: #865439;
+    transition: 0.2s;
+    -webkit-transition: 0.2s;
+}
+
+.section-text {
+    font-size: 2.3em;
+    margin-top: auto;
+}
+
+.section-slogan {
+    font-size: 1.3em;
+    font-weight: 100;
+    margin-top: -1em;
+}

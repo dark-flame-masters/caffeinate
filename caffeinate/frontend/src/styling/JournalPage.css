@@ -1,0 +1,117 @@
+.journal {
+    margin-top: 1.7em;
+    display: flex;
+    flex-direction: row;
+}
+
+.paper {
+    margin-left: 18em;
+    width: 35em;
+    height: 30.5em;
+    background-color: #EDCDBB;
+    position: relative;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.journal-paper {
+    width: 35em;
+    height: 30.5em;
+    background-color: #EDCDBB;
+    position: relative;
+    padding-top: 40px;
+    padding-bottom: 40px;  
+}
+
+.entry {
+    all: unset;
+    resize: none;
+    margin-top: -0.7em;
+    font-family: "Handlee";
+    color: #483434;
+    font-size: 1.1em;
+    width: 28em;
+    height: 27em;
+    padding-left: 1em;
+    line-height: 1.37em;
+}
+
+.journal-entry {
+    margin-top: -0.2em;
+    font-family: "Handlee";
+    color: #483434;
+    font-size: 1.1em;
+    width: 28em;
+    height: 27em;
+    padding-left: 1em;
+    line-height: 0.35em;
+}
+
+.paper-lines {
+    margin-top: 2em;
+    height: 33em;
+    background-image: repeating-linear-gradient(#EDCDBB 0px,  #EDCDBB 23px, #BF9270 24px);
+}
+
+.date {
+    margin-top: -2em;
+    text-align: right;
+    margin-right: 0.5em;
+}
+
+.settings, .journal-settings {
+    margin: 2em;
+    margin-bottom: 4em;
+    font-weight: 400;
+    text-align: center;
+    font-size: 1.1em;
+    color: #ffead3;
+    padding-left: 0.7em;
+    padding-right: 0.7em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border: 0.4em solid #BF9270;
+    background-color: #e0b096;
+    border-radius: 1em;
+    margin-left: 2em;
+    transition: 0.2s;
+    -webkit-transition: 0.2s;
+}
+.spacing {
+    margin-right: 4.5em;
+}
+
+.journal-settings {
+    margin-left: -2em;
+    height: fit-content;
+}
+
+.settings:hover, .journal-settings:hover {
+    cursor: pointer;
+    background-color: #865439;
+    border-color: #C68B59;
+    transition: 0.2s;
+    -webkit-transition: 0.2s;
+}
+
+.settings-area {
+    border-top-right-radius: 1em;
+    border-bottom-right-radius: 1em;
+    background-color: #251b1b5d;
+}
+
+.view-journals {
+    display: flex;
+    flex-direction: row;
+}
+
+.previous {
+    margin-left: 15em;
+}
+
+.previous, .next {
+    cursor: pointer;
+    align-self: center;
+    justify-self: center;
+    margin-top: -1em;
+}

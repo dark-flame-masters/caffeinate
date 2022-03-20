@@ -31,7 +31,7 @@ export class AuthService {
         //set session
         context.req.session.username = loginUserInput.username;
 
-        const dateDist = 100000; //600000 ms = 10 mins
+        const dateDist = 600000; //600000 ms = 10 mins
         let newDate = new Date().valueOf();
         let lastDate = user.treeDate.valueOf();
         let updatedUser = result;

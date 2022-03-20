@@ -61,8 +61,7 @@ type Query {
   findMany: [Journal!]!
   findSurveyByAuthor(input: String!): [Survey!]!
   findSurveyByAuthorIndex(input: FindSurveyInput!): Survey!
-  user(username: String!): User!
-  users: [User!]!
+  findUserByName(username: String!): User!
 }
 
 type Survey {

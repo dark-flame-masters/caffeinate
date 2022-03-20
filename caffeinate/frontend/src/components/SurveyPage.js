@@ -23,11 +23,26 @@ export default function SurveyPage(props) {
 
   const [view, setView] = useState(0);
   const [idx, setIDX] = useState(0);
+  const [count, setCount] = useState(0);
+
   const [date, setDate] = useState(new Date());
   const [currentSurvey, setCurrentSurvey] = useState({});
 
+  useEffect(() => {
+    getSurvey();
+  }, [idx]);
+
+  useEffect(() => {
+    if (currentSurvey) {
+      setTimeout(resetSurvey, Math.min(10000, Math.abs(date.getTime() - new Date(currentSurvey.date).getTime())));
+    }
+  }, [surveyCompleted]);
+
+  useEffect(() => {
+    console.log(currentSurvey);
+  }, [currentSurvey])
+
   const resetSurvey = () => {
-    console.log("here");
     setSentiment(null);
     setQOneContent('');
     setQTwoContent('');
@@ -38,20 +53,16 @@ export default function SurveyPage(props) {
     setSurveyCompleted(false);
   }
 
-  useEffect(() => {
-    getSurvey();
-  }, [idx]);
+ 
 
-  useEffect(() => {
-    console.log("in")
-    if (currentSurvey) {
-      setTimeout(resetSurvey, Math.min(10000, Math.abs(date.getTime() - new Date(currentSurvey.date).getTime())));
-    }
-  }, [surveyCompleted]);
 
   const setViewMode = (viewMode) => {
     if (viewMode) {
       getSurvey();
+      if (!currentSurvey) {
+        alert("No survey entries yet!");
+        return;
+      }
     } else {
       setIDX(0);
     }
@@ -90,7 +101,7 @@ export default function SurveyPage(props) {
     })
     .catch(error => {
       if (!idx) setViewMode(0);
-      else alert( "Reached beginning of surveys!");
+      else alert("Reached beginning of surveys!");
       setIDX(idx === 0 ? idx : idx => idx - 1);
     });  
   };

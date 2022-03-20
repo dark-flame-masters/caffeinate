@@ -11,11 +11,18 @@ export default function JournalPage(props) {
   const [date, setDate] = useState(Date());
   const [view, setView] = useState(0);
   const [idx, setIDX] = useState(0);
-  const [currentJournalEntry, setCurrentJournalEntry] = useState({'date': '2022-03-20T02:15:48.323Z', 'content': 'hi', 'author': user});
+  const [count, setCount] = useState(0);
+  const [currentJournalEntry, setCurrentJournalEntry] = useState({});
+  console.log('render');
 
   useEffect(() => {
+    console.log("lll");
     getJournal();
   }, [idx]);
+
+  useEffect(() => {
+    console.log(currentJournalEntry);
+  }, [currentJournalEntry])
 
   const getJournal = () => {
     console.log(idx);
@@ -37,11 +44,17 @@ export default function JournalPage(props) {
     })
     .then(res => {
       console.log(res.data);
-      setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
+      console.log("tester");
+      if (res.data.data.findJournalByAuthorIndex) {
+        console.log("please");
+        setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
+      } else {
+        if (idx !== 0) alert( "Reached beginning of journal!");
+        setIDX(idx === 0 ? idx : idx => idx - 1);
+      }
     })
     .catch(error => {
-      alert(idx === 0 ? "No journal entries yet...": "Reached beginning of journal!");
-      setIDX(idx === 0 ? idx : idx => idx - 1);
+      console.log(error);
     });  
   };
 
@@ -56,11 +69,17 @@ export default function JournalPage(props) {
   }
 
   const setViewMode = (viewMode) => {
+    getJournal();
+    console.log(currentJournalEntry);
     if (viewMode) {
-      getJournal();
-    } else {
-      setIDX(0);
-    }
+      if (!Object.keys(currentJournalEntry).length) {
+        console.log("h");
+        alert("No journal entries yet!");
+        return;
+      }
+    } 
+    console.log("arrived");
+    setIDX(0);
     setView(viewMode);
   }
 
@@ -91,6 +110,9 @@ export default function JournalPage(props) {
     })
     .then(res => {
       console.log(res.data);
+      setCurrentJournalEntry(res.data.data.createJournal);
+      setIDX(0);
+      resetContent();
     })
     .catch(error => {
       alert("Error saving journal entry");
@@ -105,7 +127,6 @@ export default function JournalPage(props) {
       addJournal();
       setDate(Date());
       console.log(content);
-      resetContent();
     }
   };
 

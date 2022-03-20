@@ -19,7 +19,7 @@ export class JournalResolver {
     return await this.journalService.findJournalByAuthor(author);
   }
 
-  @Query(() => Journal)
+  @Query(() => Journal, {nullable: true})
   async findJournalByAuthorIndex(@Args('input') { author, index }: FindJournalInput, @Context() context) {
     if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
     return await this.journalService.findJournalByAuthorIndex(author, index);

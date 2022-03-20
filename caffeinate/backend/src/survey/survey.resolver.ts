@@ -15,7 +15,7 @@ export class SurveyResolver {
     return await this.surveyService.findSurveyByAuthor(author);
   }
 
-  @Query(() => Survey)
+  @Query(() => Survey, {nullable: true})
   async findSurveyByAuthorIndex(@Args('input') { author, index }: FindSurveyInput, @Context() context) {
     if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
     return await this.surveyService.findSurveyByAuthorIndex(author, index);

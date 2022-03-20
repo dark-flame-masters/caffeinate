@@ -51,7 +51,7 @@ type Mutation {
   createJournal(input: CreateJournalInput!): Journal!
   createSurvey(input: CreateSurveyInput!): Survey!
   login(loginUserInput: LoginUserInput!): LoginResponse!
-  logout(loginUserInput: LoginUserInput!): Boolean!
+  logout(input: String!): Boolean!
   signup(loginUserInput: LoginUserInput!): User!
 }
 
@@ -61,8 +61,7 @@ type Query {
   findMany: [Journal!]!
   findSurveyByAuthor(input: String!): [Survey!]!
   findSurveyByAuthorIndex(input: FindSurveyInput!): Survey!
-  user(username: String!): User!
-  users: [User!]!
+  findUserByName(username: String!): User!
 }
 
 type Survey {
@@ -77,7 +76,9 @@ type Survey {
 
 type User {
   _id: Int!
+  journalCount: Float!
   password: String!
+  surveyCount: Float!
   treeDate: DateTime!
   treeStatus: Float!
   username: String!

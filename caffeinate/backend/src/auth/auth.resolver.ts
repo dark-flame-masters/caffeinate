@@ -1,4 +1,4 @@
-import { ExecutionContext, Req, UseGuards } from '@nestjs/common';
+import { ExecutionContext, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Args, Context, GqlExecutionContext, Mutation, Resolver } from '@nestjs/graphql';
 import { User } from 'src/users/users.schema';
 import { AuthService } from './auth.service';
@@ -12,8 +12,8 @@ export class AuthResolver {
 
     @Mutation(() => LoginResponse)  //(post: req res)
     @UseGuards(GqlAuthGuard)
-    login(@Args('loginUserInput') loginUserInput: LoginUserInput){
-        return this.authService.login(loginUserInput);
+    async login(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context){
+        return await this.authService.login(loginUserInput, context);
     }
 
     @Mutation(() => User)  
@@ -22,7 +22,8 @@ export class AuthResolver {
     }
 
     @Mutation(() => Boolean)  
-    logout(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context){
+    logout(@Args('input') username : string, @Context() context) {
+        if(context.req.session === undefined || context.req.session.username != username) {throw new UnauthorizedException();}
         return this.authService.logout(context);
     }
 }

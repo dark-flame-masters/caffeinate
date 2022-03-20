@@ -4,6 +4,7 @@ import { User, UserSchema } from 'src/users/users.schema';
 import { SurveyService } from './survey.service';
 import { SurveyResolver } from './survey.resolver';
 import { Survey, SurveySchema } from './survey.schema';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { Survey, SurveySchema } from './survey.schema';
       { name: Survey.name, schema: SurveySchema },
       { name: User.name, schema: UserSchema },
     ]),
+    UsersModule,
   ],
   providers: [SurveyService, SurveyResolver],
   exports: [SurveyService]

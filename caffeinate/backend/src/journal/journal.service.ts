@@ -1,17 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { UsersService } from 'src/users/users.service';
 import { Journal, JournalDocument } from './journal.schema';
 
 
 @Injectable()
 export class JournalService {
-    journals: Partial<Journal>[];
-    constructor(
-        @InjectModel(Journal.name) private journalModel: Model<JournalDocument>,
-      ) {
-          //this.journals = journals;
-      }
+    constructor(@InjectModel(Journal.name) private journalModel: Model<JournalDocument>) {}
      
       async findJournalByAuthorIndex(username, idx) {
         return await this.journalModel.find({ author: username }).sort({date: -1}).skip(idx).limit(1).findOne();

@@ -32,6 +32,7 @@ import { SurveyModule } from './survey/survey.module';
       autoSchemaFile: join(__dirname, './src/schema.gql'),
       sortSchema: true,
       driver: ApolloDriver,
+      outputAs: 'class',
     }),
     UsersModule,
     AuthModule,

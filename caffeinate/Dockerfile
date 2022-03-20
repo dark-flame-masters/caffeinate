@@ -10,6 +10,7 @@ FROM node:14-alpine3.14 as frontend-builder
 WORKDIR /frontend
 ENV PATH /frontend/node_modules/.bin:$PATH
 COPY ./frontend/package.json ./
+RUN apk --no-cache add --virtual builds-deps build-base python3
 RUN npm i
 RUN npm install react-scripts -g
 COPY ./frontend .

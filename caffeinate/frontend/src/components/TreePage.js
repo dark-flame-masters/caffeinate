@@ -4,8 +4,7 @@ import axios from "axios";
 import * as Constants from '../constants'
 
 export default function Tree() {
-  // const treeStatus = parseInt(sessionStorage.getItem('treeStatus')[0]);
-  const treeStatus = 0;
+  const treeStatus = parseInt(sessionStorage.getItem('treeStatus')[0]);
   const [message, setMessage] = useState('');
 
   useEffect(() => {

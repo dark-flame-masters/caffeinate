@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Handlee&family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Serif+Display:wght@200;300;400;500;600;700;800;900&display=swap');
+
+body {
+    background-color: #483434;
+    font-family: 'Noto Serif Display';
+    font-style: normal;
+    color: #a1887f;
+    margin: auto;
+}
+
+.entry-page {
+    width: 75em;
+    margin-left: 6em;
+    margin-top: -2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+}
+
+.entry-page_logo {
+    margin-left: 3em;
+    width: 25em;
+}
+
+h1 {
+    letter-spacing: 0.01em;
+    line-height: 1.2em;
+    font-weight: 800;
+    font-size: 5.9em;
+}
+
+.form-section {
+    margin-top: 5em;
+    background-color: #6B4F4F;
+    width: 28em;
+    height: 34em;
+    border-radius: 3em;
+    padding: 2em;
+    padding-top: 0em;
+    text-align: center;
+}
+
+.entry-page_form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo-special {
+    color: #d4bba7;
+}
+
+.form-message {
+    font-size: 2em;
+    color: #a17e70d2;
+}
+
+.name {
+    font-family: 'Handlee';
+    margin-left: auto;
+    font-size: 1.15em;
+    letter-spacing: 0.03em;
+    color: #d4bba7;
+}
+
+.TextField {
+    margin-top: 1em;
+}
+
+.forgot-password-message {
+    text-align: right;
+    font-family: 'Handlee';
+    color: #271b1b;
+    cursor: pointer;
+}
+
+.forgot-password-message:hover {
+    color: #D7B19D;
+}

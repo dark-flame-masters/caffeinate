@@ -3,6 +3,7 @@ import { SurveyService } from './survey.service';
 import { CreateSurveyInput, FindSurveyInput, Survey } from './survey.schema';
 import { UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
+import { CreateSurveyResponse } from 'src/auth/dto/create-survey-response';
 
 
 @Resolver()
@@ -21,7 +22,7 @@ export class SurveyResolver {
     return await this.surveyService.findSurveyByAuthorIndex(author, index);
   }
 
-  @Mutation(() => Survey)
+  @Mutation(() => CreateSurveyResponse)
   async createSurvey(@Args('input') survey: CreateSurveyInput, @Context() context) {
     if(context.req.session === undefined || context.req.session.username != survey.author) {throw new UnauthorizedException();}
     return{

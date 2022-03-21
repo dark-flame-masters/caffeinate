@@ -9,5 +9,5 @@ export class CreateSurveyResponse{
     user: User;
 
     @Field(() => Survey)
-    journal: Survey;
+    survey: Survey;
 }

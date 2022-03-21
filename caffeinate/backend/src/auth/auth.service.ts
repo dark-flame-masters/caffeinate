@@ -44,12 +44,13 @@ export class AuthService {
         
     }
 
-    async signup(loginUserInput: LoginUserInput){
+    async signup(loginUserInput: LoginUserInput, context){
         const user = await this.usersService.findOne(loginUserInput.username);
         if(user){
             throw new Error('User already exists');
         }
 
+        context.req.session.username = loginUserInput.username;
         //hash
         const salt = await bcrypt.genSalt(10);
         const password = await bcrypt.hash(loginUserInput.password, salt);

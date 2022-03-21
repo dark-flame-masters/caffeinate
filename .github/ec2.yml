@@ -1,0 +1,27 @@
+# https://farhan-tanvir.medium.com/ci-cd-from-github-to-aws-ec2-using-github-action-e18b621c0507
+
+name: caffeinate
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Deploy on AWS EC2
+        run: |
+          echo "${{ secrets.AWS_PRIVATE_KEY }}" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.AWS_USER_NAME }}@${{ secrets.AWS_HOST_NAME }} '
+            cd ~/project-dark-flame-masters &&
+            git checkout main &&
+            git fetch --all &&
+            git reset --hard origin/main &&
+            git pull origin main &&
+            docker-compose -f docker-compose.prod.yml up -d --build 
+          '

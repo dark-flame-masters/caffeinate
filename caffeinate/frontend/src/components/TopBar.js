@@ -4,39 +4,29 @@ import axios from "axios";
 import * as Constants from '../constants'
 
 export default function TopBar(props) {
-  const {setUser, navigate } = props;
+  const {user, setUser, navigate } = props;
 
   const signOut = () => {
-    console.log("hi");
-    sessionStorage.clear();
-    setUser(null);
-    navigate('/');
-    // axios({
-    //     url: Constants.GRAPHQL_ENDPOINT,
-    //     method: "post",
-    //     headers: Constants.HEADERS,
-    //     data: { "operationName": "login",
-    //             "query": 
-    //                 `mutation login($username: String!, $password: String!){
-    //                     login(loginUserInput: { username: $username, password: $password }){
-    //                         user {
-    //                             username
-    //                             treeStatus
-    //                             treeDate
-    //                         }
-    //                     }
-    //                 }`,
-    //             "variables": {username, password},}
-    // })
-    // .then(res => {
-    //   console.log("hi");
-    //   sessionStorage.clear();
-    //   setUser(null);
-    //   navigate('/');
-    // })
-    // .catch(error => {
-    //     alert("Error signing out");
-    // });
+    axios({
+        url: Constants.GRAPHQL_ENDPOINT,
+        method: "post",
+        headers: Constants.HEADERS,
+        data: { "operationName": "logout",
+                "query": 
+                    `mutation logout($input: String!){
+                      logout(input: $input)
+                    }`,
+                "variables": {'input': user},
+              }
+    })
+    .then(res => {
+      sessionStorage.clear();
+      setUser(null);
+      navigate('/');
+    })
+    .catch(error => {
+      alert("Error signing out");
+    });
   };
 
   return (

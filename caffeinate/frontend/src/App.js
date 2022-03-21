@@ -22,7 +22,7 @@ export default function App() {
           </Routes> 
         ) : ( 
           <div>
-            <TopBar setUser={setUser} navigate={navigate} />
+            <TopBar user={user} setUser={setUser} navigate={navigate} />
             <Routes>
               <Route exact path="*" element={<HomePage user={user} navigate={navigate}/>}/>
               <Route path="journal" element={<JournalPage user={user}/>}/>

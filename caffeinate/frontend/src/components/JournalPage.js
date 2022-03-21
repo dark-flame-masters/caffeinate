@@ -14,9 +14,32 @@ export default function JournalPage(props) {
   const [count, setCount] = useState(0);
   const [currentJournalEntry, setCurrentJournalEntry] = useState({});
   console.log('render');
+  console.log(count);
 
   useEffect(() => {
-    console.log("lll");
+    axios({
+      url: Constants.GRAPHQL_ENDPOINT,
+      method: "post",
+      headers: Constants.HEADERS,
+      data: { "operationName": "findUserByName",
+              "query": 
+                `query findUserByName($input: String!){
+                  findUserByName(username: $input){
+                    journalCount
+                  }
+                }`,
+              "variables": {'input': user},
+            }
+    })
+    .then(res => {
+      console.log(res.data);
+      setCount(res.data.data.findUserByName.journalCount);
+    }).catch(error => {
+      console.log(error);
+    })
+  }, []);
+
+  useEffect(() => {
     getJournal();
   }, [idx]);
 
@@ -44,9 +67,7 @@ export default function JournalPage(props) {
     })
     .then(res => {
       console.log(res.data);
-      console.log("tester");
       if (res.data.data.findJournalByAuthorIndex) {
-        console.log("please");
         setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
       } else {
         if (idx !== 0) alert( "Reached beginning of journal!");
@@ -100,9 +121,14 @@ export default function JournalPage(props) {
               "query": 
                 `mutation createJournal($input: CreateJournalInput!){
                   createJournal(input: $input){
-                    content
-                    author
-                    date
+                    user {
+                      journalCount
+                    }
+                    journal {
+                      content
+                      author
+                      date
+                    }
                   }
                 }`,
               "variables": {'input': {content, author: user}},
@@ -110,8 +136,10 @@ export default function JournalPage(props) {
     })
     .then(res => {
       console.log(res.data);
-      setCurrentJournalEntry(res.data.data.createJournal);
+      let newJournal = {'date': res.data.data.createJournal.journal.date, 'author': res.data.data.createJournal.journal.author, 'content': res.data.data.createJournal.journal.content};
+      setCurrentJournalEntry(newJournal);
       setIDX(0);
+      setCount(res.data.data.createJournal.user.journalCount);
       resetContent();
     })
     .catch(error => {
@@ -153,14 +181,14 @@ export default function JournalPage(props) {
           </div>
         </> ) : (
         <div className="view-journals">
-          <div className="previous" onClick={() => changeJournal(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div>
+          {idx + 1 < count ? <div className="previous" onClick={() => changeJournal(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div> : <div className="prev-spacing"></div>}
           <div className="journal-paper">
             <div className="paper-lines">
               <p className="date">{Date(currentJournalEntry.date)}</p>
               <div className="journal-entry">{currentJournalEntry.content.split('\n').map(str => <p key={Math.random()}>{str}</p>)}</div>
             </div>
           </div>
-          {idx !== 0 ? <div className="next" onClick={() => changeJournal(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="spacing"></div>}
+          {idx !== 0 ? <div className="next" onClick={() => changeJournal(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing"></div>}
           <div className="journal-settings" onClick={() => setViewMode(0)}>
             Write a journal entry
           </div>

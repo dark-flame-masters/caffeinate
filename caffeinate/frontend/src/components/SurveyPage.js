@@ -29,11 +29,34 @@ export default function SurveyPage(props) {
   const [currentSurvey, setCurrentSurvey] = useState({});
 
   useEffect(() => {
+    axios({
+      url: Constants.GRAPHQL_ENDPOINT,
+      method: "post",
+      headers: Constants.HEADERS,
+      data: { "operationName": "findUserByName",
+              "query": 
+                `query findUserByName($input: String!){
+                  findUserByName(username: $input){
+                    surveyCount
+                  }
+                }`,
+              "variables": {'input': user},
+            }
+    })
+    .then(res => {
+      console.log(res.data);
+      setCount(res.data.data.findUserByName.surveyCount);
+    }).catch(error => {
+      console.log(error);
+    })
+  }, []);
+
+  useEffect(() => {
     getSurvey();
   }, [idx]);
 
   useEffect(() => {
-    if (currentSurvey) {
+    if (surveyCompleted && currentSurvey) {
       setTimeout(resetSurvey, Math.min(10000, Math.abs(date.getTime() - new Date(currentSurvey.date).getTime())));
     }
   }, [surveyCompleted]);
@@ -53,19 +76,16 @@ export default function SurveyPage(props) {
     setSurveyCompleted(false);
   }
 
- 
-
-
   const setViewMode = (viewMode) => {
+    getSurvey();
     if (viewMode) {
-      getSurvey();
-      if (!currentSurvey) {
+      if (!Object.keys(currentSurvey).length) {
         alert("No survey entries yet!");
         return;
       }
-    } else {
-      setIDX(0);
-    }
+    } 
+    console.log("arrived");
+    setIDX(0);
     setView(viewMode);
   }
 
@@ -92,17 +112,22 @@ export default function SurveyPage(props) {
     })
     .then(res => {
       console.log(res.data);
-      setCurrentSurvey(() => res.data.data.findSurveyByAuthorIndex);
-      setDate(new Date());
-      let time = Math.abs(date.getTime() - new Date(res.data.data.findSurveyByAuthorIndex.date).getTime());
-      if (time < 10000) {
-        setSurveyCompleted(true);
-      } 
+      if (res.data.data.findSurveyByAuthorIndex) {
+        setCurrentSurvey(res.data.data.findSurveyByAuthorIndex);
+        setDate(new Date());
+        if (!idx) {
+          let time = Math.abs(date.getTime() - new Date(res.data.data.findSurveyByAuthorIndex.date).getTime());
+          if (time < 10000) {
+            setSurveyCompleted(true);
+          } 
+        }
+      } else {
+        if (idx !== 0) alert( "Reached beginning of surveys!");
+        setIDX(idx === 0 ? idx : idx => idx - 1);
+      }
     })
     .catch(error => {
-      if (!idx) setViewMode(0);
-      else alert("Reached beginning of surveys!");
-      setIDX(idx === 0 ? idx : idx => idx - 1);
+      console.log(error);
     });  
   };
 
@@ -118,12 +143,17 @@ export default function SurveyPage(props) {
                 "query": 
                   `mutation createSurvey($input: CreateSurveyInput!){
                     createSurvey(input: $input){
-                      rate
-                      answer1
-                      answer2
-                      sentiment
-                      author
-                      date
+                      user {
+                        surveyCount
+                      }
+                      survey {
+                        rate
+                        answer1
+                        answer2
+                        sentiment
+                        author
+                        date
+                      }
                     }
                   }`,
                 "variables": {'input': {answer1: qOneContent, answer2: qTwoContent, rate: rating, sentiment: 'happy', author: user}},
@@ -131,7 +161,13 @@ export default function SurveyPage(props) {
       })
       .then(res => {
         console.log(res.data);
+        let newSurvey = {'date': res.data.data.createSurvey.survey.date, 'author': res.data.data.createSurvey.survey.author, 
+            'rate': res.data.data.createSurvey.survey.rate, 'answer1': res.data.data.createSurvey.survey.answer1, 
+            'sentiment': res.data.data.createSurvey.survey.sentiment, 'answer2': res.data.data.createSurvey.survey.answer2};
+        setCurrentSurvey(newSurvey);
         setSurveyCompleted(true);
+        setCount(res.data.data.createSurvey.user.surveyCount);
+        setIDX(0);
       })
       .catch(error => {
         alert("Error completing survey");
@@ -254,7 +290,7 @@ export default function SurveyPage(props) {
 
       {!view ? "" :
         <div className="view-surveys">
-          <div className="previous" onClick={() => changeSurvey(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div>
+          {idx + 1 < count ? <div className="previous" onClick={() => changeSurvey(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div> : <div className="prev-spacing"></div>}
           <div className="survey-entry">
             <p className="survey-date">{currentSurvey.date}</p>
             <p className="survey-response">I rated this day a {currentSurvey.rate}/5</p>
@@ -262,7 +298,7 @@ export default function SurveyPage(props) {
             <p className="survey-response">I planned to improve the day like the following: {currentSurvey.answer2}</p>
             <p className="survey-response">On that day, I looked: {currentSurvey.sentiment}</p>
           </div>
-          {idx !== 0 ? <div className="next" onClick={() => changeSurvey(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="spacing"></div>}
+          {idx !== 0 ? <div className="next" onClick={() => changeSurvey(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing"></div>}
         </div>
       }
     </div>

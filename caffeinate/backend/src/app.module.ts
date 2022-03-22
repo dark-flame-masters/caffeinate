@@ -15,7 +15,7 @@ import { SurveyModule } from './survey/survey.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true}),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         uri: configService.get('MONGODB_URI'),

@@ -12,7 +12,6 @@ env:
 jobs:
 
   deploy:
-    needs: build
     runs-on: ubuntu-latest
     
     steps:
@@ -26,6 +25,10 @@ jobs:
             git fetch --all &&
             git reset --hard origin/main &&
             git pull origin main &&
-            echo "MONGODB_DB=${{ env.MONGODB_DB }}\nMONGODB_USERNAME=${{ secrets.MONGODB_USERNAME }}\nMONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}\nMONGODB_URI=mongodb://\${MONGODB_USERNAME}:\${MONGODB_PASSWORD}@mongodb:27017/\${MONGODB_DB}?authSource=admin&readPreference=primary\nSESSION_SECRET=${{ secrets.SESSION_SECRET }}\n" > .env
-            docker-compose -f docker-compose.prod.yml up -d --build 
+            echo "
+            MONGODB_DB=${{ env.MONGODB_DB }}
+            MONGODB_URI=mongodb://mongodb:27017/${{ env.MONGODB_DB }}
+            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            " > .env
+            docker-compose up -d --build 
           '

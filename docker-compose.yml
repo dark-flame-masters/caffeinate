@@ -6,8 +6,17 @@ services:
       context: ./nginx
     depends_on:
       - caffeinate
+      - certbot
     ports:
+      - "443:443"
       - "80:80"
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes: 
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email ${DOMAIN_EMAIL} -d caffeinate.page --agree-tos
   caffeinate:
     container_name: caffeinate
     build:
@@ -23,8 +32,6 @@ services:
     container_name: mongodb
     image: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGODB_DB}
     ports:
       - "27017:27017"

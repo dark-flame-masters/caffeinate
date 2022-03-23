@@ -52,6 +52,6 @@ export class UsersService {
   async updateSurveyCount(username, count) {
     // increase the journal count by param count
     let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {surveyCount : count}}).lean();
-    return {...user, journalCount: user.surveyCount+1};
+    return {...user, surveyCount: user.surveyCount+1};
   }
 }

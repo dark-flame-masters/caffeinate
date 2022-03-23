@@ -1,22 +1,33 @@
 version: "3.8"
 services:
-  nginx:
+  nginx-https:
+    container_name: nginx-https
     restart: always
-    build:
-      context: ./nginx
     depends_on:
       - caffeinate
-      - certbot
+      - nginx-http
     ports:
       - "443:443"
-      - "80:80"
+    volumes:
+      - ./nginx/https.conf:/etc/nginx/nginx.conf
   certbot:
     image: certbot/certbot
     container_name: certbot
+    depends_on:
+      - nginx-http
     volumes: 
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --force-renewal --email ${DOMAIN_EMAIL} -d caffeinate.page --agree-tos
+  nginx-http:
+    container_name: nginx-http
+    restart: always
+    depends_on:
+      - caffeinate
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/http.conf:/etc/nginx/nginx.conf
   caffeinate:
     container_name: caffeinate
     build:

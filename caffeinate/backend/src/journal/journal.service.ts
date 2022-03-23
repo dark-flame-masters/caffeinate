@@ -9,23 +9,23 @@ import { Journal, JournalDocument } from './journal.schema';
 export class JournalService {
     constructor(@InjectModel(Journal.name) private journalModel: Model<JournalDocument>) {}
      
-      async findJournalByAuthorIndex(username, idx) {
+      async findJournalByAuthorIndex(username: string, idx: number) {
         return await this.journalModel.find({ author: username }).sort({date: -1}).skip(idx).limit(1).findOne();
       }
 
-      /*async findById(id) {
-        return await this.journalModel.findById(id).lean();
-      }*/
-
-      async findJournalByAuthor(username) {
+      async findJournalByAuthor(username: string) {
         return await this.journalModel.find({ author: username }).sort({date: -1}).lean();
       } 
 
       async findMany() {
         return await this.journalModel.find().lean();
       }
+
+      async findJournalContent(username: string) {
+        return await this.journalModel.find({ author: username },{content: 1}).lean();
+      }
     
-      async createJournal(input) {
+      async createJournal(input: { content: string; author: string; }) {
         let newJournal = await this.journalModel.create(input);
         newJournal.date = new Date();
         await newJournal.save();

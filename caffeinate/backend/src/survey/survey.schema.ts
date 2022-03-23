@@ -18,16 +18,17 @@ export class Survey {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/g)
+    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     answer1: string;
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/g)
+    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     answer2: string;
 
     @Prop()
     @Field()
+    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     sentiment: string;
 
     @Prop()
@@ -36,6 +37,7 @@ export class Survey {
 
     @Prop()
     @Field()
+    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     author: string;
   
 }
@@ -60,10 +62,12 @@ export class CreateSurveyInput {
 
     @Field()
     @IsNotEmpty()
+    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     sentiment: string;
   
     @Field()
     @IsNotEmpty()
+    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     author: string;
 }
 
@@ -71,6 +75,7 @@ export class CreateSurveyInput {
 export class FindSurveyInput {
 
   @Field()
+  @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
   author: string;
 
   @Field()

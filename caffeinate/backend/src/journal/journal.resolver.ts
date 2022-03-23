@@ -15,15 +15,40 @@ export class JournalResolver {
   }
 
   @Query(() => [Journal])
-  async findJournalByAuthor(@Args('input') author : string, @Context() context) {
+  async findJournalByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
     return await this.journalService.findJournalByAuthor(author);
   }
 
   @Query(() => Journal, {nullable: true})
-  async findJournalByAuthorIndex(@Args('input') { author, index }: FindJournalInput, @Context() context) {
+  async findJournalByAuthorIndex(@Args('input') { author, index }: FindJournalInput, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
     return await this.journalService.findJournalByAuthorIndex(author, index);
+  }
+
+  @Query(() => [String])
+  async findJournalWordByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
+    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
+
+    // find the target content from all the journals of the user and store then in an array
+    let contentLst = await this.journalService.findJournalContent(author);
+    let stringLst = []
+    for(let i = 0; i < contentLst.length; i++) {
+      stringLst.push(contentLst[i].content);
+    }
+    //now we want to convert the string in the array to words
+    let wordLst = [];
+    for(let i = 0; i < stringLst.length; i++) {
+      let tempArr = this.convertStringToWords(stringLst[i]);
+      wordLst = wordLst.concat(tempArr);
+    }
+    return wordLst;
+  }
+
+  convertStringToWords(text: string){
+    let alphaNumeric = text.replace(/[^A-Za-z0-9]+/g, " ");
+    let wordArr = alphaNumeric.trim().split(" ");
+    return wordArr;
   }
 
 

@@ -11,6 +11,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx/https.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
   certbot:
     image: certbot/certbot
     container_name: certbot
@@ -30,6 +32,8 @@ services:
       - "80:80"
     volumes:
       - ./nginx/http.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
   caffeinate:
     container_name: caffeinate
     build:

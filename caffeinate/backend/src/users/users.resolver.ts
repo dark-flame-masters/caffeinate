@@ -14,7 +14,7 @@ export class UsersResolver {
   }
 
   @Query(() => User, {nullable: true})
-  findUserByName(@Args('username') username: string, @Context() context) {
+  findUserByName(@Args('username') username: string, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != username) {throw new UnauthorizedException();}
     return this.usersService.findOne(username);
   }

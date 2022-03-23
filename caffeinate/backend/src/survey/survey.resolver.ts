@@ -11,23 +11,29 @@ export class SurveyResolver {
     constructor(private readonly surveyService: SurveyService, private readonly usersService: UsersService) {}
 
   @Query(() => [Survey])
-  async findSurveyByAuthor(@Args('input') author : string, @Context() context) {
+  async findSurveyByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
     return await this.surveyService.findSurveyByAuthor(author);
   }
 
   @Query(() => Survey, {nullable: true})
-  async findSurveyByAuthorIndex(@Args('input') { author, index }: FindSurveyInput, @Context() context) {
+  async findSurveyByAuthorIndex(@Args('input') { author, index }: FindSurveyInput, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
     return await this.surveyService.findSurveyByAuthorIndex(author, index);
   }
 
   @Mutation(() => CreateSurveyResponse)
-  async createSurvey(@Args('input') survey: CreateSurveyInput, @Context() context) {
+  async createSurvey(@Args('input') survey: CreateSurveyInput, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != survey.author) {throw new UnauthorizedException();}
     return{
       user: await this.usersService.updateSurveyCount(survey.author, 1),
       survey: await this.surveyService.createSurvey({...survey})
     }
+  }
+
+  @Query(() => [Survey])
+  async find30RatesByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
+    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
+    return await this.surveyService.find30ratesByAuthor(author);
   }
 }

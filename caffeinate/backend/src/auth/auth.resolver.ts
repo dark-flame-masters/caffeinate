@@ -12,12 +12,12 @@ export class AuthResolver {
 
     @Mutation(() => LoginResponse)  //(post: req res)
     @UseGuards(GqlAuthGuard)
-    async login(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context){
+    async login(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context: { req: { session: { username: string; }; }; }){
         return await this.authService.login(loginUserInput, context);
     }
 
     @Mutation(() => User)  
-    signup(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context){
+    signup(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context: { req: { session: { username: string; }; }; }){
         return this.authService.signup(loginUserInput, context);
     }
 

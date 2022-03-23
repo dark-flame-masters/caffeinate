@@ -13,17 +13,17 @@ export class UsersService {
   
 
 
-  async findById(id) {
+  async findById(id: any) {
     return await this.userModel.findById(id).lean();
   }
-  async findOne(username) {
+  async findOne(username: string) {
     return await this.userModel.findOne({ username: username }).lean();
   } 
   async findMany() {
     return await this.userModel.find().lean();
   }
 
-  async createUser(input) {
+  async createUser(input: { password: string; username: string; }) {
     let newUser = await this.userModel.create(input);
     newUser.treeDate = new Date();
     newUser.treeStatus = 0;
@@ -33,25 +33,25 @@ export class UsersService {
     return newUser;
   }
 
-  async updateStatus(username, amount) {
+  async updateStatus(username: string, amount: number) {
     let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {treeStatus : amount}}).lean();
     return user;
   }
 
-  async updateTreeDate(username, newDate) {
+  async updateTreeDate(username: string, newDate: number) {
     let user = await this.userModel.findOneAndUpdate({ username: username }, {treeDate : newDate}).lean();
     return user;
   }
 
-  async updateJournalCount(username, count) {
+  async updateJournalCount(username: string, count: number) {
     // increase the journal count by param count
     let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {journalCount : count}}).lean();
     return {...user, journalCount: user.journalCount+1};
   }
 
-  async updateSurveyCount(username, count) {
+  async updateSurveyCount(username: string, count: number) {
     // increase the journal count by param count
     let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {surveyCount : count}}).lean();
-    return {...user, journalCount: user.surveyCount+1};
+    return {...user, surveyCount: user.surveyCount+1};
   }
 }

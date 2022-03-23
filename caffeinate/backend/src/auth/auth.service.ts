@@ -23,7 +23,7 @@ export class AuthService {
         return null; // this means not authenticated user or user DNE
     }
 
-    async login(loginUserInput: LoginUserInput, context){
+    async login(loginUserInput: LoginUserInput, context: { req: { session: { username: string; }; }; }){
         const user = await this.usersService.findOne(loginUserInput.username);
 
         const {password, ...result } = user;
@@ -44,7 +44,7 @@ export class AuthService {
         
     }
 
-    async signup(loginUserInput: LoginUserInput, context){
+    async signup(loginUserInput: LoginUserInput, context: { req: { session: { username: string; }; }; }){
         const user = await this.usersService.findOne(loginUserInput.username);
         if(user){
             throw new Error('User already exists');
@@ -57,7 +57,7 @@ export class AuthService {
         return await this.usersService.createUser({...loginUserInput,password,});
     }
 
-    async logout(context){
+    async logout(context: { req: { session: { destroy: () => void; }; }; }){
         //login user input is to test in playground
         //should be "include" for request credentials
         context.req.session.destroy();
@@ -65,7 +65,7 @@ export class AuthService {
         return true;
     }
 
-    async checkUpdateTreeAndDate(user, lastDate, newDate){
+    async checkUpdateTreeAndDate(user: User, lastDate: number, newDate: number){
         //get newest 5 svy rates within this time
         let lst = await this.surveyService.findRecentRatesByAuthor(user.username, lastDate, newDate);
             

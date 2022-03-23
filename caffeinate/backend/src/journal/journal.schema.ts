@@ -40,6 +40,7 @@ export class CreateJournalInput {
   
   @Field()
   @IsNotEmpty()
+  @Matches(/[A-Za-z0-9\s\-':()!.,;?]+/)
   author: string;
 }
 
@@ -47,8 +48,11 @@ export class CreateJournalInput {
 export class FindJournalInput {
 
   @Field()
+  @IsNotEmpty()
+  @Matches(/[A-Za-z0-9\s\-':()!.,;?]+/)
   author: string;
 
   @Field()
+  @IsNotEmpty()
   index: number;
 }

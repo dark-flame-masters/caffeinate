@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   nginx_https:
+    image: nginx
     container_name: nginx_https
     restart: always
     depends_on:
@@ -20,6 +21,7 @@ services:
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --force-renewal --email ${DOMAIN_EMAIL} -d caffeinate.page --agree-tos
   nginx_http:
+    image: nginx
     container_name: nginx_http
     restart: always
     depends_on:

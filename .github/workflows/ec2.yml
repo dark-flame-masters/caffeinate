@@ -31,8 +31,6 @@ jobs:
             SESSION_SECRET=${{ secrets.SESSION_SECRET }}
             DOMAIN_EMAIL=${{ secrets.DOMAIN_EMAIL }}
             " > .env
-            docker-compose -f docker-compose.yml up -d --build --remove-orphans
-            docker-compose -f docker-compose.certbot.yml up -d --build --remove-orphans
-            docker-compose down 
-            docker-compose -f docker-compose.https.yml up -d --build --remove-orphans
+            sh generate-certs.sh
+            docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans
           '

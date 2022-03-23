@@ -6,7 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+
   //session here
   // somewhere in your initialization file
   app.use(
@@ -19,6 +19,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   app.setGlobalPrefix('api', { exclude: [{ path: 'graphql', method: RequestMethod.POST }] })
-  await app.listen(process.env.PORT || 3000);
+
+  await app.listen(process.env.PORT || 3000)
 }
 bootstrap();

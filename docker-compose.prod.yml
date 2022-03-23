@@ -1,15 +1,15 @@
 version: "3.8"
 services:
-  nginx-http:
+  nginx-https:
     image: nginx
-    container_name: nginx-http
+    container_name: nginx-https
     restart: always
     depends_on:
       - caffeinate
     ports:
-      - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/http.conf:/etc/nginx/nginx.conf
+      - ./nginx/https.conf:/etc/nginx/nginx.conf
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
   caffeinate:

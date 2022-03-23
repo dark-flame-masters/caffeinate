@@ -29,6 +29,8 @@ jobs:
             MONGODB_DB=${{ env.MONGODB_DB }}
             MONGODB_URI=mongodb://mongodb:27017/${{ env.MONGODB_DB }}
             SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            DOMAIN_EMAIL=${{ secrets.DOMAIN_EMAIL }}
             " > .env
-            docker-compose up -d --build 
+            sh generate-certs.sh
+            docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans
           '

@@ -29,8 +29,16 @@ export class UsersService {
     newUser.treeStatus = 0;
     newUser.journalCount = 0;
     newUser.surveyCount = 0;
+    newUser.journalDict = JSON.stringify({});
     await newUser.save();
     return newUser;
+  }
+
+  async findUserDict(username: string) {
+    let user = await this.userModel.findOne({ username: username }).lean();
+    let dict = user.journalDict; 
+    return dict;
+
   }
 
   async updateStatus(username: string, amount: number) {
@@ -46,12 +54,17 @@ export class UsersService {
   async updateJournalCount(username: string, count: number) {
     // increase the journal count by param count
     let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {journalCount : count}}).lean();
-    return {...user, journalCount: user.journalCount+1};
+    return {...user, journalCount: user.journalCount+count};
   }
 
   async updateSurveyCount(username: string, count: number) {
     // increase the journal count by param count
     let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {surveyCount : count}}).lean();
-    return {...user, surveyCount: user.surveyCount+1};
+    return {...user, surveyCount: user.surveyCount+count};
+  }
+
+  async updateJournalDict(username: string, newDict: string) {
+    let user = await this.userModel.findOneAndUpdate({ username: username }, {journalDict : newDict}).lean();
+    return {...user, journalDict: newDict};
   }
 }

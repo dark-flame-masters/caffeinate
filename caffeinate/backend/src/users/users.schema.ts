@@ -34,6 +34,10 @@ export class User {
     @Prop()
     @Field()
     surveyCount: number;
+
+    @Prop()
+    @Field()
+    journalDict: string; // a dictionary in json
   
 }
   

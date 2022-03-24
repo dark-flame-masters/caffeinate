@@ -26,12 +26,14 @@ export class JournalResolver {
     return await this.journalService.findJournalByAuthorIndex(author, index);
   }
 
+
   @Query(() => String)
   async findJournalDictByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
 
     // find the target content from all the journals of the user and store then in an array
     return await this.usersService.findUserDict(author);
+
   }
 
 

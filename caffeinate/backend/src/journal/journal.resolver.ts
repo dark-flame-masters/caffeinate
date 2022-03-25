@@ -33,6 +33,7 @@ export class JournalResolver {
 
     // find the target content from all the journals of the user and store then in an array
     return await this.usersService.findUserDict(author);
+
   }
 
 

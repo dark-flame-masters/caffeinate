@@ -34,6 +34,7 @@ export class UsersService {
     return newUser;
   }
 
+
   async findUserDict(username: string) {
     let user = await this.userModel.findOne({ username: username }).lean();
     let dict = JSON.parse(user.journalDict); 

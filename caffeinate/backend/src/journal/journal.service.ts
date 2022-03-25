@@ -21,7 +21,7 @@ export class JournalService {
         return await this.journalModel.find().lean();
       }
 
-    
+
       async createJournal(input: { content: string; author: string; }) {
         //we first create the journal and save the journal
         let newJournal = await this.journalModel.create(input);

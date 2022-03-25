@@ -49,3 +49,13 @@ export class CreateUserInput {
   @IsAlphanumeric()
   username: string;
 }
+
+@ObjectType()
+export class WordDictionaryResponse{
+
+    @Field()
+    text: string;
+
+    @Field()
+    value: number;
+}

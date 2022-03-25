@@ -31,5 +31,7 @@ jobs:
             SESSION_SECRET=${{ secrets.SESSION_SECRET }}
             DOMAIN_EMAIL=${{ secrets.DOMAIN_EMAIL }}
             " > .env
+            docker-compose down
+            docker-compose system prune --all -f --volumes
             docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans
           '

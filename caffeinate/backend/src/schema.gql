@@ -81,5 +81,5 @@ type User {
   surveyCount: Float!
   treeDate: DateTime!
   treeStatus: Float!
-  username: String!
+  username: String! 
 }

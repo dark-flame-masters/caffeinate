@@ -11,6 +11,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JournalModule } from './journal/journal.module';
 import { SurveyModule } from './survey/survey.module';
+import { TodoModule } from './todo/todo.module';
 
 
 @Module({
@@ -37,7 +38,8 @@ import { SurveyModule } from './survey/survey.module';
     UsersModule,
     AuthModule,
     JournalModule,
-    SurveyModule
+    SurveyModule,
+    TodoModule
   ],
   controllers: [AppController],
   providers: [AppService],

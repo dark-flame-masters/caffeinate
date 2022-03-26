@@ -79,6 +79,7 @@ export default function AnalyticsPage(props) {
       })
       .then(res => {
         console.log(res.data);
+        setWords(res.data.data.findJournalDictByAuthor);
       })
       .catch(error => {
         console.log(error);

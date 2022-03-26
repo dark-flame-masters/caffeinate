@@ -22,6 +22,7 @@ export default function CreditsPage() {
                 <li>https://www.codesdope.com/blog/article/getting-notebook-paper-effect-with-css/, https://codepen.io/magnificode/pen/rQpaBO</li>
                 <li>https://forum.freecodecamp.org/t/newline-in-react-string-solved/68484</li>
                 <li>https://react-chartjs-2.js.org/examples/line-chart</li>
+                <li>https://react-wordcloud.netlify.app/props</li>
             </ul>
 
         </div>

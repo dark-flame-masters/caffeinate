@@ -34,6 +34,10 @@ export class User {
     @Prop()
     @Field()
     surveyCount: number;
+
+    @Prop()
+    @Field()
+    journalDict: string; // a dictionary in json
   
 }
   
@@ -44,4 +48,14 @@ export class CreateUserInput {
   @Field()
   @IsAlphanumeric()
   username: string;
+}
+
+@ObjectType()
+export class WordDictionaryResponse{
+
+    @Field()
+    text: string;
+
+    @Field()
+    value: number;
 }

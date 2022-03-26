@@ -37,8 +37,20 @@ export class UsersService {
 
   async findUserDict(username: string) {
     let user = await this.userModel.findOne({ username: username }).lean();
-    let dict = user.journalDict; 
-    return dict;
+    let dict = JSON.parse(user.journalDict); 
+
+    let result = [];
+    // we loop over the dict and convert the format
+    Object.keys(dict).forEach(function(key) {
+      //convert then to one object
+      let obj = {
+        text: key.toString(),
+        value: dict[key],
+      }
+      result.push(obj);
+    });
+
+    return result;
 
   }
 

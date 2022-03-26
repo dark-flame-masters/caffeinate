@@ -4,6 +4,7 @@ import { CreateJournalInput, FindJournalInput, Journal } from './journal.schema'
 import { UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateJournalResponse } from 'src/auth/dto/create-journal-response';
+import { WordDictionaryResponse } from 'src/users/users.schema';
 
 @Resolver()
 export class JournalResolver {
@@ -26,8 +27,7 @@ export class JournalResolver {
     return await this.journalService.findJournalByAuthorIndex(author, index);
   }
 
-
-  @Query(() => String)
+  @Query(() => [WordDictionaryResponse])
   async findJournalDictByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
 
@@ -38,7 +38,7 @@ export class JournalResolver {
 
 
   @Mutation(() => CreateJournalResponse)
-  async createJournal(@Args('input') journal: CreateJournalInput, @Context() context) {
+  async createJournal(@Args('input') journal: CreateJournalInput, @Context() context: { req: { session: { username: string; }; }; }) {
     if(context.req.session === undefined || context.req.session.username != journal.author) {throw new UnauthorizedException();}
     return{
       user: await this.usersService.updateJournalCount(journal.author, 1),

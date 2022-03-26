@@ -2,3 +2,4 @@
 /venv
 /templates
 __pycache__
+/data

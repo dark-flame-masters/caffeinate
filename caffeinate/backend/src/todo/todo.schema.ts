@@ -13,7 +13,7 @@ export class Todo {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s]+$/)
     item: string;
 
     @Prop()
@@ -26,7 +26,7 @@ export class Todo {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[\w\-]+$/)
     author: string;
   
 }
@@ -37,7 +37,7 @@ export const TodoSchema = SchemaFactory.createForClass(Todo);
 export class CreateTodoInput {
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s]+$/)
     item: string;
 
     @Prop()
@@ -46,7 +46,7 @@ export class CreateTodoInput {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[\w\-]+$/)
     author: string;
 }
 
@@ -54,7 +54,7 @@ export class CreateTodoInput {
 export class FindTodoInput {
 
   @Field()
-  @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+  @Matches(/^[\w\-]+$/)
   author: string;
 
   @Field()
@@ -68,7 +68,7 @@ export class UpdateTodoInput {
 
   @Prop()
   @Field()
-  @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+  @Matches(/^[\w\-]+$/)
   author: string;
 
 }

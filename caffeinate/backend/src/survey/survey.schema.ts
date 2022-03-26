@@ -18,17 +18,17 @@ export class Survey {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     answer1: string;
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     answer2: string;
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     sentiment: string;
 
     @Prop()
@@ -37,7 +37,7 @@ export class Survey {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[\w\-]+$/)
     author: string;
   
 }
@@ -52,22 +52,22 @@ export class CreateSurveyInput {
 
     @Field()
     @IsNotEmpty()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     answer1: string;
 
     @Field()
     @IsNotEmpty()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     answer2: string;
 
     @Field()
     @IsNotEmpty()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[\w\-]+$/)
     sentiment: string;
   
     @Field()
     @IsNotEmpty()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[\w\-]+$/)
     author: string;
 }
 
@@ -75,7 +75,7 @@ export class CreateSurveyInput {
 export class FindSurveyInput {
 
   @Field()
-  @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+  @Matches(/^[\w\-]+$/)
   author: string;
 
   @Field()

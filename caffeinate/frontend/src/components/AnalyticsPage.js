@@ -12,8 +12,8 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import ReactWordcloud from 'react-wordcloud';
 
 ChartJS.register(
     CategoryScale,
@@ -30,6 +30,8 @@ export default function AnalyticsPage(props) {
     const [ratingsNum, setRatingsNum] = useState(0);
     const [ratingLabels, setRatingLabels] = useState([]);
     const [ratingData, setRatingData] = useState([]);
+    const [words, setWords] = useState([]);
+    
     useEffect(() => {
         axios({
           url: Constants.GRAPHQL_ENDPOINT,
@@ -57,6 +59,30 @@ export default function AnalyticsPage(props) {
           console.log(error);
         });  
 
+    }, []);
+
+    useEffect(() => {
+      axios({
+        url: Constants.GRAPHQL_ENDPOINT,
+        method: "post",
+        headers: Constants.HEADERS,
+        data: { "operationName": "findJournalDictByAuthor",
+                "query": 
+                  `query findJournalDictByAuthor($input: String!){
+                    findJournalDictByAuthor(input: $input){
+                      text
+                      value
+                    }
+                  }`,
+                "variables": {'input': user},
+              }
+      })
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });  
     }, []);
 
   
@@ -112,7 +138,11 @@ export default function AnalyticsPage(props) {
           backgroundColor: '#865439',
       }],
   };
-  console.log(ratingSetup);
+  
+  const wordOptions = {
+    colors: ['#AD8B73', '#CEAB93', '#E3CAA5', '#FFFBE9'],
+    fontFamily: 'Krub',
+  }
   
   return (
       <div className="analytics">
@@ -120,15 +150,16 @@ export default function AnalyticsPage(props) {
               My Analytics
           </div>
           <div className="journal-section">
-              Your Journal Entries
-              word cloud
-              <div className="journal-section_sub">
+            <h2 className="analytics-subsection">Your Journal</h2>
+
+            <div className="journal-section_sub">
+              {words.length ? <ReactWordcloud words={words} options={wordOptions}/> : <div>No data to show.</div> }
                   bar graph
               </div>
           </div>
 
           <div className="survey-section">
-              <h2>Your Surveys </h2>
+              <h2 className="analytics-subsection">Your Surveys</h2>
               <div className="survey-section_sub">
                   {ratingsNum ? <Line data={ratingSetup} options={ratingOptions}/> : <div>No data to show.</div> }
               </div>

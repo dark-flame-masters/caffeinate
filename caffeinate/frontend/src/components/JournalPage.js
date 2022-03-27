@@ -4,6 +4,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import axios from "axios";
 import * as Constants from '../constants'
+import ErrorMessage from './ErrorMessage';
 
 export default function JournalPage(props) {
   const { user } = props;
@@ -13,8 +14,8 @@ export default function JournalPage(props) {
   const [idx, setIDX] = useState(0);
   const [count, setCount] = useState(0);
   const [currentJournalEntry, setCurrentJournalEntry] = useState({});
-  console.log('render');
-  console.log(count);
+  const [error, setError] = useState('');
+  const emojis = ['😁', '🙂', '😕', '😞', '😭', '😡'];
 
   useEffect(() => {
     axios({
@@ -35,7 +36,7 @@ export default function JournalPage(props) {
       console.log(res.data);
       setCount(res.data.data.findUserByName.journalCount);
     }).catch(error => {
-      console.log(error);
+      setError("There was a problem fetching journal entries.");
     })
   }, []);
 
@@ -70,12 +71,12 @@ export default function JournalPage(props) {
       if (res.data.data.findJournalByAuthorIndex) {
         setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
       } else {
-        if (idx !== 0) alert( "Reached beginning of journal!");
+        if (idx !== 0) setError("You do not have any journal entries to view.");
         setIDX(idx === 0 ? idx : idx => idx - 1);
       }
     })
     .catch(error => {
-      console.log(error);
+      setError("There was a problem fetching journal entries.");
     });  
   };
 
@@ -106,6 +107,10 @@ export default function JournalPage(props) {
 
   const editContent = (e) => {
     setContent(e.target.value);
+  };
+
+  const addEmoji = (emoji) => {
+    setContent(prevContent => prevContent + emoji);
   };
 
   const resetContent = () => {
@@ -143,7 +148,12 @@ export default function JournalPage(props) {
       resetContent();
     })
     .catch(error => {
-      alert("Error saving journal entry");
+      if (error.response.status === 400) {
+        setError("Journal entry could not be saved. Make sure your entry only contains" +
+        "alphanumeric characters and does not include any illegal characters or emojis.");
+      } else {
+        setError("Journal entry could not be saved. Try again later.")
+      } 
     });  
   }
 
@@ -160,6 +170,7 @@ export default function JournalPage(props) {
 
   return (
     <div className="journal">
+      {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
       {!view ? (
         <>
           <div className="paper">
@@ -176,6 +187,10 @@ export default function JournalPage(props) {
 
             <div className="settings" onClick={() => setViewMode(1)}>
               Read previous entries
+            </div>
+
+            <div className="emoji-section">
+              {emojis.map((emoji) => <button key={Math.random()} onClick={() => addEmoji(emoji)} className="emoji">{emoji}</button>)}
             </div>
           
           </div>

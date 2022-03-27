@@ -8,6 +8,7 @@ import HomePage from "./components/HomePage";
 import TopBar from "./components/TopBar";
 import CreditsPage from "./components/CreditsPage";
 import AnalyticsPage from "./components/AnalyticsPage";
+import AgendaPage from "./components/AgendaPage";
 
 export default function App() {
   const [user, setUser] = useState(sessionStorage.getItem('user'));
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="surveys" element={<SurveyPage user={user}/>}/>
               <Route path="tree" element={<TreePage user={user}/>}/>
               <Route path="analytics" element={<AnalyticsPage user={user}/>}/>
+              <Route path="agenda" element={<AgendaPage user={user}/>}/>
               <Route path="signin" element={<Navigate to="/" replace={true}/>}/>
               <Route path="credits" element={<CreditsPage/>}/>
             </Routes>

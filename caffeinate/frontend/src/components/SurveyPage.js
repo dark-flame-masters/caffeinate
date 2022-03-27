@@ -3,7 +3,8 @@ import '../styling/SurveyPage.css';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import axios from "axios";
-import * as Constants from '../constants'
+import * as Constants from '../constants';
+import ErrorMessage from './ErrorMessage';
 
 export default function SurveyPage(props) {
   const { user } = props;
@@ -27,6 +28,7 @@ export default function SurveyPage(props) {
 
   const [date, setDate] = useState(new Date());
   const [currentSurvey, setCurrentSurvey] = useState({});
+  const [error, setError] = useState('');
 
   useEffect(() => {
     axios({
@@ -47,7 +49,7 @@ export default function SurveyPage(props) {
       console.log(res.data);
       setCount(res.data.data.findUserByName.surveyCount);
     }).catch(error => {
-      console.log(error);
+      setError("There was a problem fetching survey responses.");
     })
   }, []);
 
@@ -122,12 +124,12 @@ export default function SurveyPage(props) {
           } 
         }
       } else {
-        if (idx !== 0) alert( "Reached beginning of surveys!");
+        if (idx !== 0) setError("You do not have any survey responses to view.");
         setIDX(idx === 0 ? idx : idx => idx - 1);
       }
     })
     .catch(error => {
-      console.log(error);
+      setError("There was a problem fetching survey responses.");
     });  
   };
 
@@ -170,7 +172,12 @@ export default function SurveyPage(props) {
         setIDX(0);
       })
       .catch(error => {
-        alert("Error completing survey");
+        if (error.response.status === 400) {
+          setError("Survey response could not be saved. Make sure your entries only contain" +
+          "alphanumeric characters and does not include any illegal characters.");
+        } else {
+          setError("Survey response could not be saved. Try again later.")
+        } 
       });  
     }
   }
@@ -261,10 +268,12 @@ export default function SurveyPage(props) {
 
   return (
     <div className="survey">
+      {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
+      <span className="survey-settings" onClick={() => setViewMode(1)}>Read previous entries</span>
       {surveyCompleted || view ? 
       <>
         <div className="completed-message"> 
-          You completed today's survey. Check back in tomorrow for another one. <span className="survey-settings" onClick={() => setViewMode(1)}>Read previous entries</span>
+          You completed today's survey. Check back in tomorrow for another one.
         </div> 
       </>
       :

@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import '../styling/TopBar.css';
 import axios from "axios";
-import * as Constants from '../constants'
+import * as Constants from '../constants';
+import ErrorMessage from './ErrorMessage';
 
 export default function TopBar(props) {
   const {user, setUser, navigate } = props;
+  const [error, setError] = useState('');
 
   const signOut = () => {
     axios({
@@ -25,12 +28,13 @@ export default function TopBar(props) {
       navigate('/');
     })
     .catch(error => {
-      alert("Error signing out");
+      setError("There was a problem signing out.");
     });
   };
 
   return (
     <div className="topbar-full">
+      {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
       <div className="appname">
         <Link className="brand" to="/credits">Caffeinate</Link>
       </div>

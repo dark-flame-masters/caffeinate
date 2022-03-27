@@ -1,12 +1,14 @@
 import '../styling/TreePage.css';
 import { useEffect, useState } from "react";
 import axios from "axios";
-import * as Constants from '../constants'
+import * as Constants from '../constants';
+import ErrorMessage from './ErrorMessage';
 
 export default function TreePage(props) {
   const { user } = props;
   const [treeStatus, setTreeStatus] = useState(0);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     console.log(treeStatus);
@@ -41,7 +43,7 @@ export default function TreePage(props) {
         setMessage(status[3]);
       }
     }).catch(error => {
-      console.log(error);
+      setError("There was a problem fetching tree data.");
     })
   }, []);
 
@@ -59,6 +61,7 @@ export default function TreePage(props) {
 
   return (
     <div className="tree-page">
+      {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
       <div className="tree-image">
         {showTreeImage(treeStatus)}
       </div>

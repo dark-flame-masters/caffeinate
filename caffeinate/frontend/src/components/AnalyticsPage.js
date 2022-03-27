@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { useState, useEffect } from 'react';
 import ReactWordcloud from 'react-wordcloud';
+import ErrorMessage from './ErrorMessage';
 
 ChartJS.register(
     CategoryScale,
@@ -31,6 +32,7 @@ export default function AnalyticsPage(props) {
     const [ratingLabels, setRatingLabels] = useState([]);
     const [ratingData, setRatingData] = useState([]);
     const [words, setWords] = useState([]);
+    const [error, setError] = useState('');
     
     useEffect(() => {
         axios({
@@ -56,7 +58,7 @@ export default function AnalyticsPage(props) {
           setRatingLabels(res.data.data.find30RatesByAuthor.map(elem => new Date(elem.date).toDateString().split(' ')[1] + ' ' + new Date(elem.date).toDateString().split(' ')[2]).reverse());
         })
         .catch(error => {
-          console.log(error);
+          setError("There was a problem fetching survey data.");
         });  
 
     }, []);
@@ -82,7 +84,7 @@ export default function AnalyticsPage(props) {
         setWords(res.data.data.findJournalDictByAuthor);
       })
       .catch(error => {
-        console.log(error);
+        setError("There was a problem fetching journal data.");
       });  
     }, []);
 
@@ -147,15 +149,16 @@ export default function AnalyticsPage(props) {
   
   return (
       <div className="analytics">
+          {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
+          
           <div className="analytics-title">
               My Analytics
           </div>
+          
           <div className="journal-section">
             <h2 className="analytics-subsection">Your Journal</h2>
-
             <div className="journal-section_sub">
               {words.length ? <ReactWordcloud words={words} options={wordOptions}/> : <div>No data to show.</div> }
-                  bar graph
               </div>
           </div>
 

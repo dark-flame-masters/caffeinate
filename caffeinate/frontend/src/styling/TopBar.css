@@ -1,5 +1,8 @@
 .topbar-full {
     margin-top: 0.7em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .brand {
@@ -20,7 +23,7 @@
     font-family: 'Krub';
     justify-content: right;
     color: #edcdbbc2;
-    margin-top: -2.5em;
+    margin-top: -0.3em;
 }
 
 .topbar_button {

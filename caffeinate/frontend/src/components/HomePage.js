@@ -10,8 +10,10 @@ export default function HomePage(props) {
             navigate('/journal');
         } else if (page === 2) {
             navigate('/surveys');
-        } else {
+        } else if (page === 3) {
             navigate('/tree');
+        } else {
+            navigate('/agenda');
         }
     };
     
@@ -49,7 +51,7 @@ export default function HomePage(props) {
                         <h2 className="section-text">Daily Survey</h2>
                     </div>
                     <div className="nav_text_generic">
-                        <h2 className="section-slogan">Complete your daily check-in.</h2>
+                        <h2 className="section-slogan" id="survey-slogan">Complete your daily wellness check-in.</h2>
                     </div>
                 </div>
 
@@ -59,6 +61,15 @@ export default function HomePage(props) {
                     </div>
                     <div className="nav_text_generic">
                         <h2 className="section-slogan">Check how your tree is growing.</h2>
+                    </div>
+                </div>
+
+                <div className="nav" onClick={() => nav(4)}>
+                    <div className="nav_text">
+                        <h2 className="section-text">My Agenda</h2>
+                    </div>
+                    <div className="nav_text_generic">
+                        <h2 className="section-slogan">What do you need to do today?</h2>
                     </div>
                 </div>
             </div>

@@ -5,7 +5,8 @@ import Button from '@mui/material/Button';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import styled from "styled-components";
 import axios from "axios";
-import * as Constants from '../constants'
+import * as Constants from '../constants';
+import ErrorMessage from './ErrorMessage';
 
 const StyledTextField = styled(TextField)`
 label.focused {
@@ -29,6 +30,8 @@ export default function SignInPage(props) {
     const [option, setOption] = useState(1);
     const UsernameRef = useRef(null);
     const PassRef = useRef(null);
+    const EmailRef = useRef(null);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         if (user) {
@@ -56,7 +59,12 @@ export default function SignInPage(props) {
             setUser(res.data.data.signup.username);
         })
         .catch(error => {
-            alert("Error signing up. Try a different username");
+            if (error.response.status === 400) {
+                setError("Could not create an account. Either an invalid email was provided or username is already taken." +
+                "Try a different username.");
+            } else {
+              setError("Could not create account. Try again later.")
+            } 
         });    
     };
 
@@ -84,7 +92,11 @@ export default function SignInPage(props) {
             setUser(res.data.data.login.user.username);
         })
         .catch(error => {
-            alert("Error signing in");
+            if (error.response.status === 400) {
+                setError("Could not sign in due to incorrect or nonexisting sign in information.");
+            } else {
+                setError("Could not sign in. Try again later.")
+            } 
         });
     };
 
@@ -123,6 +135,7 @@ export default function SignInPage(props) {
 
     return (
         <div id="signin-page">   
+            {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
             <div className="entry-page">
                 <div className="entry-page_logo">
                     <h1 id="logo"><span className="logo-special">Caffeine</span> for the mind and soul</h1>
@@ -132,8 +145,9 @@ export default function SignInPage(props) {
                     <h3 className="form-message">Sign in to <span className="name">Caffeinate</span></h3>
                     <ThemeProvider theme={theme}>
                         <form className="entry-page_form" onSubmit={handleSubmit}>
-                            <StyledTextField sx={{ my: "1em" }} className="TextField" id="outlined-basic" label="Username" variant="outlined" inputRef={UsernameRef} required/>                                <a className="forgot-password-message">Forgot password?</a>
-                            <StyledTextField sx={{ mb: "5em" }} className="TextField" id="outlined-basic" label="Password" variant="outlined" inputRef={PassRef} required/>
+                            {/* <StyledTextField sx={{ my: "1em" }} className="TextField" label="Email" variant="outlined" inputRef={EmailRef} required/> */}
+                            <StyledTextField sx={{ mb: "1em" }} className="TextField" label="Username" variant="outlined" inputRef={UsernameRef} required/>
+                            <StyledTextField sx={{ mb: "5em" }} className="TextField" label="Password" variant="outlined" inputRef={PassRef} type="password" required/>
                             <Button id="signin" color="test" className="Button" type="submit" onClick={(e) => setOption(1)} variant="contained" disableElevation>Sign in</Button>
                             or
                             <Button id="signup" color="test" className="Button" type="submit" onClick={(e) => setOption(0)} variant="outlined" disableElevation>Sign up</Button>

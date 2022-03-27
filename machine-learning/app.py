@@ -13,9 +13,11 @@ def predict():
     res = {'emotion': roberta.predict(query_text)}
     return jsonify(res)
 
-roberta = Roberta('data/models/roberta_tf',
-                      'data/datasets/spelling/aspell.txt',
-                      'data/datasets/contractions/contractions.csv')
+roberta = Roberta('./data/models/roberta_pt/roberta_fold10.pth',
+                  './data/datasets/roberta-base/vocab.json',
+                  './data/datasets/roberta-base/merges.txt',
+                  './data/datasets/roberta-base/config.json',
+                  './data/datasets/roberta-base/pytorch_model.bin')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

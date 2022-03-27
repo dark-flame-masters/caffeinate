@@ -1,41 +1,51 @@
-import pandas as pd
-import tensorflow as tf
+import torch
 import numpy as np
-import transformers
-from transformers import TFAutoModel, AutoTokenizer
-from .preprocessing import EmotionTextPreprocessor
+from .tweet_dataset import TweetDataset
+from .tweet_model import TweetModel
 
 # original predict function from:
-# https://www.kaggle.com/code/ishivinal/tweet-emotions-analysis-using-lstm-glove-roberta
+# https://www.kaggle.com/code/shoheiazuma/tweet-sentiment-roberta-pytorch/notebook
 
 class Roberta:
-    infer = None
-    preprocessor = None
-    tokenizer = None
-    max_len = 160
+    model = None
+    vocab_file = ''
+    merges_file = ''
 
-    def __init__(self, model_filename, aspell_filename, contractions_filename):
+    def __init__(self, model_file, vocab_file, merges_file, config_file, bin_file):
         # build model
-        userObject = tf.saved_model.load(model_filename)
-        self.infer = userObject.signatures["serving_default"]
-
-        # setup for preprocessors
-        self.preprocessor = EmotionTextPreprocessor(aspell_filename, contractions_filename)
-        self.tokenizer = AutoTokenizer.from_pretrained('roberta_tf-base')
-
-    def preprocess(self, text):
-        text = self.preprocessor.clean_text(text)
-        # tokenize
-        x_test1 = self.preprocessor.regular_encode([text], self.tokenizer, maxlen=self.max_len)[0]
-        # test1 = (tf.data.Dataset.from_tensor_slices(x_test1).batch(1))
-        tensor_test1 = tf.cast(tf.constant(x_test1), tf.int32)
-        return tensor_test1
+        self.model = TweetModel(config_file, bin_file)
+        self.model.cpu()
+        self.model.load_state_dict(torch.load(model_file, map_location=torch.device('cpu')))
+        self.model.eval()
+        self.vocab_file = vocab_file
+        self.merges_file = merges_file
 
     def predict(self, text):
-        preprocessed_text = self.preprocess(text)
-        sentiment = infer(tf.constant(preprocessed_text))
-        sent = np.round(np.dot(sentiment, 100).tolist(), 0)[0]
-        result = pd.DataFrame([sent_to_id.keys(), sent]).T
-        result.columns = ["sentiment", "percentage"]
-        result = result[result.percentage != 0]
-        return result
+        loader = torch.utils.data.DataLoader(
+            TweetDataset([text], self.vocab_file, self.merges_file),
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=2)[0]
+        ids = data['ids'].cpu()
+        masks = data['masks'].cpu()
+        tweet = data['tweet']
+        offsets = data['offsets'].numpy()
+
+        start_logits = []
+        end_logits = []
+
+        with torch.no_grad():
+            output = self.model(ids, masks)
+            start_logits.append(torch.softmax(output[0], dim=1).cpu().detach().numpy())
+            end_logits.append(torch.softmax(output[1], dim=1).cpu().detach().numpy())
+
+        start_logits = np.mean(start_logits, axis=0)
+        end_logits = np.mean(end_logits, axis=0)
+
+        start_pred = np.argmax(start_logits[i])
+        end_pred = np.argmax(end_logits[i])
+        if start_pred > end_pred:
+            pred = tweet[i]
+        else:
+            pred = get_selected_text(tweet[i], start_pred, end_pred, offsets[i])
+        return pred

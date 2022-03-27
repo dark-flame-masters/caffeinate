@@ -10,11 +10,10 @@ def hello_world():  # put application's code here
 @app.route('/nlp/emotion', methods = ['GET'])
 def predict():
     query_text = request.args.get('text')
-    print(query_text)
     res = {'emotion': roberta.predict(query_text)}
     return jsonify(res)
 
-roberta = Roberta('data/models/roberta',
+roberta = Roberta('data/models/roberta_tf',
                       'data/datasets/spelling/aspell.txt',
                       'data/datasets/contractions/contractions.csv')
 

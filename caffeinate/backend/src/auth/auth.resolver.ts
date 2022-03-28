@@ -4,6 +4,7 @@ import { User } from 'src/users/users.schema';
 import { AuthService } from './auth.service';
 import { LoginResponse } from './dto/login-response';
 import { LoginUserInput } from './dto/login-user.input';
+import { GoogleAuthGuard } from './google.guard';
 import { GqlAuthGuard } from './gql-auth.guard';
 
 @Resolver()
@@ -16,8 +17,10 @@ export class AuthResolver {
         return await this.authService.login(loginUserInput, context);
     }
 
-    @Mutation(() => User)  
+    @Mutation(() => User)
+    @UseGuards(GoogleAuthGuard)
     signup(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context: { req: { session: { username: string; }; }; }){
+        console.log("sign up yea")
         return this.authService.signup(loginUserInput, context);
     }
 

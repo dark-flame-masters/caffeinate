@@ -12,7 +12,6 @@ input CreateSurveyInput {
   answer2: String!
   author: String!
   rate: Float!
-  sentiment: String!
 }
 
 """
@@ -71,7 +70,6 @@ type Survey {
   author: String!
   date: DateTime!
   rate: Float!
-  sentiment: String!
 }
 
 type User {

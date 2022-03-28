@@ -8,13 +8,9 @@ import ErrorMessage from './ErrorMessage';
 
 export default function SurveyPage(props) {
   const { user } = props;
-  const videoRef = useRef(null);
-
-  const [cam, setCam] = useState(true);
   const [surveyCompleted, setSurveyCompleted] = useState(false);
 
   const [rating, setRating] = useState(0);
-  const [sentiment, setSentiment] = useState('');
   
   const [qOneContent, setQOneContent] = useState('');
   const [qTwoContent, setQTwoContent] = useState('');
@@ -46,8 +42,11 @@ export default function SurveyPage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      setCount(res.data.data.findUserByName.surveyCount);
+      if (res.data.data) {
+        setCount(res.data.data.findUserByName.surveyCount);
+      } else {
+        setError("There was a problem fetching survey responses.");
+      }
     }).catch(error => {
       setError("There was a problem fetching survey responses.");
     })
@@ -63,12 +62,7 @@ export default function SurveyPage(props) {
     }
   }, [surveyCompleted]);
 
-  useEffect(() => {
-    console.log(currentSurvey);
-  }, [currentSurvey])
-
   const resetSurvey = () => {
-    setSentiment(null);
     setQOneContent('');
     setQTwoContent('');
     setQOne(0);
@@ -82,17 +76,15 @@ export default function SurveyPage(props) {
     getSurvey();
     if (viewMode) {
       if (!Object.keys(currentSurvey).length) {
-        alert("No survey entries yet!");
+        setError("No survey entries yet!");
         return;
       }
     } 
-    console.log("arrived");
     setIDX(0);
     setView(viewMode);
   }
 
   const getSurvey = () => {
-    console.log(idx);
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
@@ -104,7 +96,6 @@ export default function SurveyPage(props) {
                     rate
                     answer1
                     answer2
-                    sentiment
                     author
                     date
                   }
@@ -113,19 +104,22 @@ export default function SurveyPage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      if (res.data.data.findSurveyByAuthorIndex) {
-        setCurrentSurvey(res.data.data.findSurveyByAuthorIndex);
-        setDate(new Date());
-        if (!idx) {
-          let time = Math.abs(date.getTime() - new Date(res.data.data.findSurveyByAuthorIndex.date).getTime());
-          if (time < 10000) {
-            setSurveyCompleted(true);
-          } 
+      if (res.data.data) {
+        if (res.data.data.findSurveyByAuthorIndex) {
+          setCurrentSurvey(res.data.data.findSurveyByAuthorIndex);
+          setDate(new Date());
+          if (!idx) {
+            let time = Math.abs(date.getTime() - new Date(res.data.data.findSurveyByAuthorIndex.date).getTime());
+            if (time < 10000) {
+              setSurveyCompleted(true);
+            } 
+          }
+        } else {
+          if (idx !== 0) setError("You do not have any survey responses to view.");
+          setIDX(idx === 0 ? idx : idx => idx - 1);
         }
       } else {
-        if (idx !== 0) setError("You do not have any survey responses to view.");
-        setIDX(idx === 0 ? idx : idx => idx - 1);
+        setError("There was a problem fetching survey responses.");
       }
     })
     .catch(error => {
@@ -133,9 +127,10 @@ export default function SurveyPage(props) {
     });  
   };
 
-  const submitSurvey = () => {
-    if (!qOne || !rating || !qTwo ) {
-      console.log("something wrong...");
+  const submitSurvey = (e) => {
+    e.preventDefault();
+    if (!qOne || !rating || !qTwoContent.length) {
+      setError("At least one question was not completed. Please redo the survey.");
     } else {
       axios({
         url: Constants.GRAPHQL_ENDPOINT,
@@ -152,32 +147,30 @@ export default function SurveyPage(props) {
                         rate
                         answer1
                         answer2
-                        sentiment
                         author
                         date
                       }
                     }
                   }`,
-                "variables": {'input': {answer1: qOneContent, answer2: qTwoContent, rate: rating, sentiment: 'happy', author: user}},
+                "variables": {'input': {answer1: qOneContent, answer2: qTwoContent, rate: rating, author: user}},
               }
       })
       .then(res => {
-        console.log(res.data);
-        let newSurvey = {'date': res.data.data.createSurvey.survey.date, 'author': res.data.data.createSurvey.survey.author, 
+        if (res.data.data) {
+          let newSurvey = {'date': res.data.data.createSurvey.survey.date, 'author': res.data.data.createSurvey.survey.author, 
             'rate': res.data.data.createSurvey.survey.rate, 'answer1': res.data.data.createSurvey.survey.answer1, 
-            'sentiment': res.data.data.createSurvey.survey.sentiment, 'answer2': res.data.data.createSurvey.survey.answer2};
-        setCurrentSurvey(newSurvey);
-        setSurveyCompleted(true);
-        setCount(res.data.data.createSurvey.user.surveyCount);
-        setIDX(0);
-      })
-      .catch(error => {
-        if (error.response.status === 400) {
+            'answer2': res.data.data.createSurvey.survey.answer2};
+          setCurrentSurvey(newSurvey);
+          setSurveyCompleted(true);
+          setCount(res.data.data.createSurvey.user.surveyCount);
+          setIDX(0);
+        } else {
           setError("Survey response could not be saved. Make sure your entries only contain" +
           "alphanumeric characters and does not include any illegal characters.");
-        } else {
-          setError("Survey response could not be saved. Try again later.")
-        } 
+        }
+      })
+      .catch(error => {
+        setError("Survey response could not be saved. Try again later.")
       });  
     }
   }
@@ -196,19 +189,15 @@ export default function SurveyPage(props) {
 
   const editContent = (e, q) => {
     if (q) {
-      setQOneContent(e.target.value);
-    } else {
       setQTwoContent(e.target.value);
+    } else {
+      setQOneContent(e.target.value);
     }
   };
 
-  const finishQuestion = (e, q) => {
+  const finishQuestion = (e) => {
     e.preventDefault();
-    if (q) {
-      setQTwo(1);
-    } else {
-      setQOne(1);
-    }
+    setQOne(1);
   }
 
   function showSurveyQuestions(question=1) {
@@ -231,7 +220,7 @@ export default function SurveyPage(props) {
             <p className="question_text">What made you feel this way today?</p>
             <p className="question_subtext">Did something influence your mood?</p>
           </div>
-          <form className="quesion_form" onSubmit={(e) => finishQuestion(e, 0)}>
+          <form className="quesion_form" onSubmit={(e) => finishQuestion(e)}>
             <textarea className="question_entry" onChange={(e) => editContent(e, 0)} required></textarea>
             <button className="question_submit" type="submit">submit</button>
           </form>
@@ -244,58 +233,35 @@ export default function SurveyPage(props) {
             <p className="question_text">How are you going to have a better day tomorrow?</p>
             <p className="question_subtext">Write down something you can do to be happier.</p>
           </div>
-          <form className="quesion_form" onSubmit={(e) => finishQuestion(e, 1)}>
+          <form className="quesion_form" onSubmit={(e) => submitSurvey(e)}>
             <textarea className="question_entry" onChange={(e) => editContent(e, 1)} required></textarea>
             <button className="question_submit" type="submit">submit</button>
           </form>
         </>
       );
-    } else if (question === 4) {
-      return (
-        <>
-          <div className="question">
-            <p className="question_text">Let your face reflect your true feelings.</p>
-            <p className="question_subtext">Let it alllll out.</p>
-          </div>
-
-          <div className="submit-survey" onClick={submitSurvey}>
-            Finish
-          </div>
-        </>
-      );
-    }
+    } 
   }
 
   return (
     <div className="survey">
       {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
       <span className="survey-settings" onClick={() => setViewMode(1)}>Read previous entries</span>
-      {surveyCompleted || view ? 
+
+      {surveyCompleted && !view ?
       <>
         <div className="completed-message"> 
           You completed today's survey. Check back in tomorrow for another one.
         </div> 
       </>
-      :
+      : ''}
+      
+      {!surveyCompleted && !view ?
         <div className="daily-survey">
           {!rating ? showSurveyQuestions(1): ""}
           {rating && !qOne ? showSurveyQuestions(2) : ""}
           {rating && qOne && !qTwo ? showSurveyQuestions(3) : ""}
-          {qTwo && !sentiment ? showSurveyQuestions(4) : ""}
         </div>
-      }
-
-      {/* {cam ? (
-      <video 
-        className="selfie"
-        ref={videoRef}
-        autoPlay
-      /> 
-       )
-      
-      
-      : <div>hi</div>} */}
-      {/* {expression ? <div> You look {expression} </div>: ( <div> You look ugly </div>)} */}
+      : ''}
 
       {!view ? "" :
         <div className="view-surveys">
@@ -305,7 +271,6 @@ export default function SurveyPage(props) {
             <p className="survey-response">I rated this day a {currentSurvey.rate}/5</p>
             <p className="survey-response">I felt this way because: {currentSurvey.answer1}</p>
             <p className="survey-response">I planned to improve the day like the following: {currentSurvey.answer2}</p>
-            <p className="survey-response">On that day, I looked: {currentSurvey.sentiment}</p>
           </div>
           {idx !== 0 ? <div className="next" onClick={() => changeSurvey(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing"></div>}
         </div>

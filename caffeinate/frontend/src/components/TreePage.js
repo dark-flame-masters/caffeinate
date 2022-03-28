@@ -31,16 +31,19 @@ export default function TreePage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      setTreeStatus(res.data.data.findUserByName.treeStatus);
-      if (res.data.data.findUserByName.treeStatus === 0) {
-        setMessage(status[0]);
-      } else if (res.data.data.findUserByName.treeStatus === 1) {
-        setMessage(status[1]);
-      } else if (res.data.data.findUserByName.treeStatus === 2) {
-        setMessage(status[2]);
+      if (res.data.data) {
+        setTreeStatus(res.data.data.findUserByName.treeStatus);
+        if (res.data.data.findUserByName.treeStatus === 0) {
+          setMessage(status[0]);
+        } else if (res.data.data.findUserByName.treeStatus === 1) {
+          setMessage(status[1]);
+        } else if (res.data.data.findUserByName.treeStatus === 2) {
+          setMessage(status[2]);
+        } else {
+          setMessage(status[3]);
+        }
       } else {
-        setMessage(status[3]);
+        setError("There was a problem fetching tree data.");
       }
     }).catch(error => {
       setError("There was a problem fetching tree data.");

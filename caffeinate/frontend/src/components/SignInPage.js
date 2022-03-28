@@ -55,16 +55,22 @@ export default function SignInPage(props) {
                     "variables": {username, password},}
         })
         .then(res => {
-            sessionStorage.setItem('user', username);
-            setUser(res.data.data.signup.username);
+            if (res.data.data) {
+                sessionStorage.setItem('user', username);
+                setUser(res.data.data.signup.username);
+            } else {
+                if (res.data.errors[0].message === "User already exists") {
+                    setError("Username already taken. Try a different one!");
+                } else if (res.data.errors[0].message === "Bad Request Exception") {
+                    setError("Invalid characters were entered as input. Make sure your username " +
+                    "and password only contain alphanumeric characters.");
+                } else {
+                    setError("Could not create account. Try again later.")
+                }
+            }
         })
         .catch(error => {
-            if (error.response.status === 400) {
-                setError("Could not create an account. Either an invalid email was provided or username is already taken." +
-                "Try a different username.");
-            } else {
-              setError("Could not create account. Try again later.")
-            } 
+            setError("Could not create account. Try again later.")
         });    
     };
 
@@ -87,16 +93,19 @@ export default function SignInPage(props) {
                     "variables": {username, password},}
         })
         .then(res => {
-            sessionStorage.setItem('treeStatus', res.data.data.login.user.treeStatus);
-            sessionStorage.setItem('user', username);
-            setUser(res.data.data.login.user.username);
+            if (res.data.data) {
+                sessionStorage.setItem('user', username);
+                setUser(res.data.data.login.user.username);
+            } else {
+                if (res.data.errors[0].message === "Unauthorized") {
+                    setError("Could not sign in due to incorrect or nonexisting sign in information.");
+                } else {
+                    setError("Could not sign in. Try again later.")
+                }
+            }
         })
         .catch(error => {
-            if (error.response.status === 400) {
-                setError("Could not sign in due to incorrect or nonexisting sign in information.");
-            } else {
-                setError("Could not sign in. Try again later.")
-            } 
+            setError("Could not sign in. Try again later.")
         });
     };
 

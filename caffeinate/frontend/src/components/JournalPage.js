@@ -33,8 +33,9 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      setCount(res.data.data.findUserByName.journalCount);
+      if (res.data.data) {
+        setCount(res.data.data.findUserByName.journalCount);
+      }
     }).catch(error => {
       setError("There was a problem fetching journal entries.");
     })
@@ -67,12 +68,13 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      if (res.data.data.findJournalByAuthorIndex) {
-        setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
-      } else {
-        if (idx !== 0) setError("You do not have any journal entries to view.");
-        setIDX(idx === 0 ? idx : idx => idx - 1);
+      if (res.data.data) {
+        if (res.data.data.findJournalByAuthorIndex) {
+          setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
+        } else {
+          if (idx !== 0) setError("You do not have any journal entries to view.");
+          setIDX(idx === 0 ? idx : idx => idx - 1);
+        }
       }
     })
     .catch(error => {
@@ -81,7 +83,6 @@ export default function JournalPage(props) {
   };
 
   const changeJournal = (direction) => {
-    console.log(idx);
     if (direction) {
       setIDX(idx => idx - 1);
     } else {
@@ -92,15 +93,12 @@ export default function JournalPage(props) {
 
   const setViewMode = (viewMode) => {
     getJournal();
-    console.log(currentJournalEntry);
     if (viewMode) {
       if (!Object.keys(currentJournalEntry).length) {
-        console.log("h");
-        alert("No journal entries yet!");
+        setError("You do not have any journal entries to view.");
         return;
       }
     } 
-    console.log("arrived");
     setIDX(0);
     setView(viewMode);
   }
@@ -140,31 +138,33 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      let newJournal = {'date': res.data.data.createJournal.journal.date, 'author': res.data.data.createJournal.journal.author, 'content': res.data.data.createJournal.journal.content};
-      setCurrentJournalEntry(newJournal);
-      setIDX(0);
-      setCount(res.data.data.createJournal.user.journalCount);
-      resetContent();
+      if (res.data.data) {
+        let newJournal = {'date': res.data.data.createJournal.journal.date, 'author': res.data.data.createJournal.journal.author, 'content': res.data.data.createJournal.journal.content};
+        setCurrentJournalEntry(newJournal);
+        setIDX(0);
+        setCount(res.data.data.createJournal.user.journalCount);
+        resetContent();
+      } else {
+        if (res.data.errors[0].message === "Bad Request Exception") {
+          setError("Journal entry could not be saved. Make sure your entry only contains" +
+          " alphanumeric characters and does not include any illegal characters or emojis.");
+        } else {
+          setError("Journal entry could not be saved. Try again later.")
+        }
+      }
     })
     .catch(error => {
-      if (error.response.status === 400) {
-        setError("Journal entry could not be saved. Make sure your entry only contains" +
-        "alphanumeric characters and does not include any illegal characters or emojis.");
-      } else {
-        setError("Journal entry could not be saved. Try again later.")
-      } 
+      setError("Journal entry could not be saved. Try again later.")
     });  
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!content) {
-      alert("Write something first!");
+      setError("You must write something before your survey can be saved.");
     } else {
       addJournal();
       setDate(Date());
-      console.log(content);
     }
   };
 

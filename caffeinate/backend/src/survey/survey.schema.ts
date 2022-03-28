@@ -28,11 +28,6 @@ export class Survey {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    sentiment: string;
-
-    @Prop()
-    @Field()
     date: Date;
 
     @Prop()
@@ -60,11 +55,6 @@ export class CreateSurveyInput {
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     answer2: string;
 
-    @Field()
-    @IsNotEmpty()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    sentiment: string;
-  
     @Field()
     @IsNotEmpty()
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)

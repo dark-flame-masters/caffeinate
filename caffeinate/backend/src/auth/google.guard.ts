@@ -1,6 +1,7 @@
 import {
     CanActivate, ExecutionContext, Injectable, applyDecorators,
     UseGuards,
+    UnauthorizedException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { GqlExecutionContext } from "@nestjs/graphql";
@@ -12,8 +13,12 @@ export class GoogleAuthGuard implements CanActivate {
     constructor(private readonly configService: ConfigService) { }
 
     public async canActivate(context: ExecutionContext): Promise<boolean> {
+        let status: boolean = true;
         const ctx = GqlExecutionContext.create(context);
         const request = ctx.getContext().req;
+
+        // clear user info just in case
+        request.userInfo = {};
 
         // verify CSRF token
         // TODO: Uncomment once frontend has implemented this + security has been addressed
@@ -33,12 +38,22 @@ export class GoogleAuthGuard implements CanActivate {
                 audience: CLIENT_ID,
             });
             const payload = ticket.getPayload();
-            const userId = payload['sub'];
-            request.userId = userId; // sets request to userId  
-            return true
+
+            // add user information to request
+            request.userInfo = {
+                userId: payload['sub'],
+                firstName: payload['given_name'],
+                email: payload['email']
+            }
         } catch (e) {
             console.error(e);
-            return false;
+            status = false;
+        } finally {
+            // TODO: Fix exception issue, should be thrown outside of this function
+            if (!status) {
+                throw new UnauthorizedException();
+            }
+            return status;
         }
 
 

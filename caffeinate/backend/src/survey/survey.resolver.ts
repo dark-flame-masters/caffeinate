@@ -1,9 +1,11 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { SurveyService } from './survey.service';
 import { CreateSurveyInput, FindSurveyInput, Survey } from './survey.schema';
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateSurveyResponse } from 'src/auth/dto/create-survey-response';
+import { GoogleAuthGuard } from 'src/auth/google.guard';
+import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 
 
 @Resolver()
@@ -11,29 +13,29 @@ export class SurveyResolver {
     constructor(private readonly surveyService: SurveyService, private readonly usersService: UsersService) {}
 
   @Query(() => [Survey])
-  async findSurveyByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
-    return await this.surveyService.findSurveyByAuthor(author);
+  @UseGuards(GoogleAuthGuard)
+  async findSurveyByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
+    return await this.surveyService.findSurveyByAuthor(userInfo.googleId);
   }
 
   @Query(() => Survey, {nullable: true})
-  async findSurveyByAuthorIndex(@Args('input') { author, index }: FindSurveyInput, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
-    return await this.surveyService.findSurveyByAuthorIndex(author, index);
+  @UseGuards(GoogleAuthGuard)
+  async findSurveyByAuthorIndex(@Args('index') index: number, @GoogleUserInfo() userInfo: UserInfo) {
+    return await this.surveyService.findSurveyByAuthorIndex(userInfo.googleId, index);
   }
 
   @Mutation(() => CreateSurveyResponse)
-  async createSurvey(@Args('input') survey: CreateSurveyInput, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != survey.author) {throw new UnauthorizedException();}
+  @UseGuards(GoogleAuthGuard)
+  async createSurvey(@Args('input') survey: CreateSurveyInput, @GoogleUserInfo() userInfo: UserInfo) {
     return{
-      user: await this.usersService.updateSurveyCount(survey.author, 1),
-      survey: await this.surveyService.createSurvey({...survey})
+      user: await this.usersService.updateSurveyCount(userInfo.googleId, 1),
+      survey: await this.surveyService.createSurvey({...survey, authorGoogleId: userInfo.googleId})
     }
   }
 
   @Query(() => [Survey])
-  async find30RatesByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
-    return await this.surveyService.find30ratesByAuthor(author);
+  @UseGuards(GoogleAuthGuard)
+  async find30RatesByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
+    return await this.surveyService.find30ratesByAuthor(userInfo.googleId);
   }
 }

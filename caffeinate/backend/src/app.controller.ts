@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { User, UserDocument } from './users/users.schema';
-import { LoginUserInput } from './auth/dto/login-user.input';
 import { copyFileSync } from 'fs';
 import { CreateJournalInput } from './journal/journal.schema';
 import { JournalService } from './journal/journal.service';

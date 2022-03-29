@@ -1,4 +1,4 @@
-import { Field, ObjectType, ID, InputType, Int } from '@nestjs/graphql';
+import { Field, ObjectType, InputType, Int } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsNotEmpty, Matches } from 'class-validator';
 import * as mongoose from 'mongoose';
@@ -9,8 +9,8 @@ export type JournalDocument = Journal & mongoose.Document;
 @Schema()
 @ObjectType()
 export class Journal {
-    @Field(() => Int)
-    _id: number;
+    @Field()
+    _id: string;
   
     @Prop()
     @Field()
@@ -20,12 +20,9 @@ export class Journal {
     @Field()
     date: Date;
 
-    /*@Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    @Field(() => User)
-    author: User | number;*/
     @Prop()
     @Field()
-    author: string;
+    authorGoogleId: string;
   
 }
   
@@ -40,8 +37,7 @@ export class CreateJournalInput {
   
   @Field()
   @IsNotEmpty()
-  @Matches(/[A-Za-z0-9\s\-':()!.,;?]+/)
-  author: string;
+  authorGoogleId: string;
 }
 
 @InputType()
@@ -50,7 +46,7 @@ export class FindJournalInput {
   @Field()
   @IsNotEmpty()
   @Matches(/[A-Za-z0-9\s\-':()!.,;?]+/)
-  author: string;
+  authorGoogleId: string;
 
   @Field()
   @IsNotEmpty()

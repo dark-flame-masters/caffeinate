@@ -12,6 +12,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JournalModule } from './journal/journal.module';
 import { SurveyModule } from './survey/survey.module';
 import { TodoModule } from './todo/todo.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { NotifierService } from './notifier/notifier.service';
+import { NotifierModule } from './notifier/notifier.module';
+
 
 
 @Module({
@@ -35,13 +39,15 @@ import { TodoModule } from './todo/todo.module';
       driver: ApolloDriver,
       outputAs: 'class',
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
     JournalModule,
     SurveyModule,
-    TodoModule
+    TodoModule,
+    NotifierModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, NotifierService],
 })
 export class AppModule { }

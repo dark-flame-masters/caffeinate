@@ -7,40 +7,40 @@ import { Model } from 'mongoose';
 export class TodoService {
     constructor(@InjectModel(Todo.name) private todoModel: Model<TodoDocument>) {}
 
-    async findTodoByAuthorIndex(username: string, idx: number) {
-        return await this.todoModel.find({ author: username }).sort({dueDate: -1}).skip(idx).limit(1).findOne();
+    async findTodoByAuthorIndex(googleId: string, idx: number) {
+        return await this.todoModel.find({ authorGoogleId: googleId }).sort({dueDate: -1}).skip(idx).limit(1).findOne();
     }
 
-    async findTodoByAuthor(username: string) {
-        return await this.todoModel.find({ author: username }).sort({dueDate: -1}).lean();
+    async findTodoByAuthor(googleId: string) {
+        return await this.todoModel.find({ authorGoogleId: googleId }).sort({dueDate: -1}).lean();
     } 
 
     async findTodoById(id: String) {
         return await this.todoModel.findOne({ _id: id }).lean();
     } 
 
-    async markComplete(id){
+    async markComplete(id: String){
         //we also turn off notifier here
         let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {completed : true, notifyMe : false}).lean();
         return {...todo, completed: true, notifyMe : false};
     }
     
-    async markIncomplete(id){
+    async markIncomplete(id: String){
         let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {completed : false}).lean();
         return {...todo, completed: false};
     }
 
-    async notifyMeOn(id){
+    async notifyMeOn(id: String){
         let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {notifyMe : true}).lean();
         return {...todo, notifyMe : true};
     }
 
-    async notifyMeOff(id){
+    async notifyMeOff(id: String){
         let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {notifyMe : false}).lean();
         return {...todo, notifyMe: false};
     }
     
-    async createTodo(input: { item: string; dueDate: Date; author: string; }) {
+    async createTodo(input: { item: string; dueDate: Date; authorGoogleId: string; }) {
         let newItem = await this.todoModel.create(input);
         newItem.completed = false;
         newItem.notifyMe = false;
@@ -48,11 +48,11 @@ export class TodoService {
         return newItem;
     }
     
-    async deleteTodo(id) {
+    async deleteTodo(id: String) {
         let res = await this.todoModel.deleteOne({ _id: id }).lean();
         if(res) { return true; }
         return false;
-        //do I need to return anything?
+        //do I need to return anything? :)
     }
 
 }

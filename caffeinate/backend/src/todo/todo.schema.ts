@@ -31,7 +31,7 @@ export class Todo {
     @Prop()
     @Field()
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    author: string;
+    authorGoogleId: string;
   
 }
   
@@ -51,18 +51,7 @@ export class CreateTodoInput {
     @Prop()
     @Field()
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    author: string;
-}
-
-@InputType()
-export class FindTodoInput {
-
-  @Field()
-  @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-  author: string;
-
-  @Field()
-  index: number;
+    authorGoogleId: string;
 }
 
 @InputType()
@@ -73,6 +62,6 @@ export class UpdateTodoInput {
   @Prop()
   @Field()
   @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-  author: string;
+  authorGoogleId: string;
 
 }

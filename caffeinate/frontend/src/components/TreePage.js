@@ -1,12 +1,14 @@
 import '../styling/TreePage.css';
 import { useEffect, useState } from "react";
 import axios from "axios";
-import * as Constants from '../constants'
+import * as Constants from '../constants';
+import ErrorMessage from './ErrorMessage';
 
 export default function TreePage(props) {
   const { user } = props;
   const [treeStatus, setTreeStatus] = useState(0);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     console.log(treeStatus);
@@ -29,19 +31,22 @@ export default function TreePage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      setTreeStatus(res.data.data.findUserByName.treeStatus);
-      if (res.data.data.findUserByName.treeStatus === 0) {
-        setMessage(status[0]);
-      } else if (res.data.data.findUserByName.treeStatus === 1) {
-        setMessage(status[1]);
-      } else if (res.data.data.findUserByName.treeStatus === 2) {
-        setMessage(status[2]);
+      if (res.data.data) {
+        setTreeStatus(res.data.data.findUserByName.treeStatus);
+        if (res.data.data.findUserByName.treeStatus === 0) {
+          setMessage(status[0]);
+        } else if (res.data.data.findUserByName.treeStatus === 1) {
+          setMessage(status[1]);
+        } else if (res.data.data.findUserByName.treeStatus === 2) {
+          setMessage(status[2]);
+        } else {
+          setMessage(status[3]);
+        }
       } else {
-        setMessage(status[3]);
+        setError("There was a problem fetching tree data.");
       }
     }).catch(error => {
-      console.log(error);
+      setError("There was a problem fetching tree data.");
     })
   }, []);
 
@@ -59,6 +64,7 @@ export default function TreePage(props) {
 
   return (
     <div className="tree-page">
+      {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
       <div className="tree-image">
         {showTreeImage(treeStatus)}
       </div>

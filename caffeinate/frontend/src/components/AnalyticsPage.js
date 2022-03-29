@@ -3,26 +3,27 @@ import axios from "axios";
 import * as Constants from '../constants';
 import { Line } from 'react-chartjs-2';
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
 } from 'chart.js';
 import { useState, useEffect } from 'react';
 import ReactWordcloud from 'react-wordcloud';
+import ErrorMessage from './ErrorMessage';
 
 ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
 );
   
 export default function AnalyticsPage(props) {
@@ -31,6 +32,7 @@ export default function AnalyticsPage(props) {
     const [ratingLabels, setRatingLabels] = useState([]);
     const [ratingData, setRatingData] = useState([]);
     const [words, setWords] = useState([]);
+    const [error, setError] = useState('');
     
     useEffect(() => {
         axios({
@@ -49,14 +51,16 @@ export default function AnalyticsPage(props) {
                 }
         })
         .then(res => {
-          console.log(res.data);
-          console.log(res.data.data.find30RatesByAuthor);
-          setRatingsNum(res.data.data.find30RatesByAuthor.length);
-          setRatingData(res.data.data.find30RatesByAuthor.map(elem => elem.rate).reverse());
-          setRatingLabels(res.data.data.find30RatesByAuthor.map(elem => new Date(elem.date).toDateString().split(' ')[1] + ' ' + new Date(elem.date).toDateString().split(' ')[2]).reverse());
+          if (res.data.data) {
+            setRatingsNum(res.data.data.find30RatesByAuthor.length);
+            setRatingData(res.data.data.find30RatesByAuthor.map(elem => elem.rate).reverse());
+            setRatingLabels(res.data.data.find30RatesByAuthor.map(elem => new Date(elem.date).toDateString().split(' ')[1] + ' ' + new Date(elem.date).toDateString().split(' ')[2]).reverse());
+          } else {
+            setError("There was a problem fetching survey data.");
+          }
         })
         .catch(error => {
-          console.log(error);
+          setError("There was a problem fetching survey data.");
         });  
 
     }, []);
@@ -78,11 +82,14 @@ export default function AnalyticsPage(props) {
               }
       })
       .then(res => {
-        console.log(res.data);
-        setWords(res.data.data.findJournalDictByAuthor);
+        if (res.data.data) {
+          setWords(res.data.data.findJournalDictByAuthor);
+        } else {
+          setError("There was a problem fetching journal data.");
+        }
       })
       .catch(error => {
-        console.log(error);
+        setError("There was a problem fetching journal data.");
       });  
     }, []);
 
@@ -147,15 +154,16 @@ export default function AnalyticsPage(props) {
   
   return (
       <div className="analytics">
+          {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
+          
           <div className="analytics-title">
               My Analytics
           </div>
+          
           <div className="journal-section">
             <h2 className="analytics-subsection">Your Journal</h2>
-
             <div className="journal-section_sub">
               {words.length ? <ReactWordcloud words={words} options={wordOptions}/> : <div>No data to show.</div> }
-                  bar graph
               </div>
           </div>
 

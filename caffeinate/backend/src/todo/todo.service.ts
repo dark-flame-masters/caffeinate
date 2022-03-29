@@ -15,19 +15,35 @@ export class TodoService {
         return await this.todoModel.find({ author: username }).sort({dueDate: -1}).lean();
     } 
 
+    async findTodoById(id: String) {
+        return await this.todoModel.findOne({ _id: id }).lean();
+    } 
+
     async markComplete(id){
-        let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {completed : true}).lean();
-        return {...todo, completed: true};
+        //we also turn off notifier here
+        let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {completed : true, notifyMe : false}).lean();
+        return {...todo, completed: true, notifyMe : false};
     }
     
     async markIncomplete(id){
         let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {completed : false}).lean();
         return {...todo, completed: false};
     }
+
+    async notifyMeOn(id){
+        let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {notifyMe : true}).lean();
+        return {...todo, notifyMe : true};
+    }
+
+    async notifyMeOff(id){
+        let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {notifyMe : false}).lean();
+        return {...todo, notifyMe: false};
+    }
     
     async createTodo(input: { item: string; dueDate: Date; author: string; }) {
         let newItem = await this.todoModel.create(input);
         newItem.completed = false;
+        newItem.notifyMe = false;
         await newItem.save();
         return newItem;
     }

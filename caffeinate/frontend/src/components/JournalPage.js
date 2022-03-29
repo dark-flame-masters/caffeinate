@@ -4,6 +4,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import axios from "axios";
 import * as Constants from '../constants'
+import ErrorMessage from './ErrorMessage';
 
 export default function JournalPage(props) {
   const { user } = props;
@@ -13,8 +14,8 @@ export default function JournalPage(props) {
   const [idx, setIDX] = useState(0);
   const [count, setCount] = useState(0);
   const [currentJournalEntry, setCurrentJournalEntry] = useState({});
-  console.log('render');
-  console.log(count);
+  const [error, setError] = useState('');
+  const emojis = ['😁', '🙂', '😕', '😞', '😭', '😡'];
 
   useEffect(() => {
     axios({
@@ -32,10 +33,11 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      setCount(res.data.data.findUserByName.journalCount);
+      if (res.data.data) {
+        setCount(res.data.data.findUserByName.journalCount);
+      }
     }).catch(error => {
-      console.log(error);
+      setError("There was a problem fetching journal entries.");
     })
   }, []);
 
@@ -66,21 +68,21 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      if (res.data.data.findJournalByAuthorIndex) {
-        setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
-      } else {
-        if (idx !== 0) alert( "Reached beginning of journal!");
-        setIDX(idx === 0 ? idx : idx => idx - 1);
+      if (res.data.data) {
+        if (res.data.data.findJournalByAuthorIndex) {
+          setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
+        } else {
+          if (idx !== 0) setError("You do not have any journal entries to view.");
+          setIDX(idx === 0 ? idx : idx => idx - 1);
+        }
       }
     })
     .catch(error => {
-      console.log(error);
+      setError("There was a problem fetching journal entries.");
     });  
   };
 
   const changeJournal = (direction) => {
-    console.log(idx);
     if (direction) {
       setIDX(idx => idx - 1);
     } else {
@@ -91,21 +93,22 @@ export default function JournalPage(props) {
 
   const setViewMode = (viewMode) => {
     getJournal();
-    console.log(currentJournalEntry);
     if (viewMode) {
       if (!Object.keys(currentJournalEntry).length) {
-        console.log("h");
-        alert("No journal entries yet!");
+        setError("You do not have any journal entries to view.");
         return;
       }
     } 
-    console.log("arrived");
     setIDX(0);
     setView(viewMode);
   }
 
   const editContent = (e) => {
     setContent(e.target.value);
+  };
+
+  const addEmoji = (emoji) => {
+    setContent(prevContent => prevContent + emoji);
   };
 
   const resetContent = () => {
@@ -135,31 +138,39 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res.data);
-      let newJournal = {'date': res.data.data.createJournal.journal.date, 'author': res.data.data.createJournal.journal.author, 'content': res.data.data.createJournal.journal.content};
-      setCurrentJournalEntry(newJournal);
-      setIDX(0);
-      setCount(res.data.data.createJournal.user.journalCount);
-      resetContent();
+      if (res.data.data) {
+        let newJournal = {'date': res.data.data.createJournal.journal.date, 'author': res.data.data.createJournal.journal.author, 'content': res.data.data.createJournal.journal.content};
+        setCurrentJournalEntry(newJournal);
+        setIDX(0);
+        setCount(res.data.data.createJournal.user.journalCount);
+        resetContent();
+      } else {
+        if (res.data.errors[0].message === "Bad Request Exception") {
+          setError("Journal entry could not be saved. Make sure your entry only contains" +
+          " alphanumeric characters and does not include any illegal characters or emojis.");
+        } else {
+          setError("Journal entry could not be saved. Try again later.")
+        }
+      }
     })
     .catch(error => {
-      alert("Error saving journal entry");
+      setError("Journal entry could not be saved. Try again later.")
     });  
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!content) {
-      alert("Write something first!");
+      setError("You must write something before your survey can be saved.");
     } else {
       addJournal();
       setDate(Date());
-      console.log(content);
     }
   };
 
   return (
     <div className="journal">
+      {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
       {!view ? (
         <>
           <div className="paper">
@@ -176,6 +187,10 @@ export default function JournalPage(props) {
 
             <div className="settings" onClick={() => setViewMode(1)}>
               Read previous entries
+            </div>
+
+            <div className="emoji-section">
+              {emojis.map((emoji) => <button key={Math.random()} onClick={() => addEmoji(emoji)} className="emoji">{emoji}</button>)}
             </div>
           
           </div>

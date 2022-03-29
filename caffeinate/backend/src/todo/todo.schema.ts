@@ -26,6 +26,10 @@ export class Todo {
 
     @Prop()
     @Field()
+    notifyMe: boolean;
+
+    @Prop()
+    @Field()
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     author: string;
   

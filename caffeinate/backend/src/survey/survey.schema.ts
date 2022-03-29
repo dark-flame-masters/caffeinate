@@ -10,7 +10,7 @@ export type SurveyDocument = Survey & mongoose.Document;
 @ObjectType()
 export class Survey {
     @Field()
-    _id: number;
+    _id?: string;
   
     @Prop()
     @Field()
@@ -28,17 +28,12 @@ export class Survey {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    sentiment: string;
-
-    @Prop()
-    @Field()
     date: Date;
 
     @Prop()
     @Field()
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    author: string;
+    authorGoogleId: string;
   
 }
   
@@ -68,7 +63,7 @@ export class CreateSurveyInput {
     @Field()
     @IsNotEmpty()
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    author: string;
+    authorGoogleId: string;
 }
 
 @InputType()
@@ -76,7 +71,7 @@ export class FindSurveyInput {
 
   @Field()
   @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-  author: string;
+  authorGoogleId: string;
 
   @Field()
   index: number;

@@ -1,7 +1,8 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
+import { UserInfo } from 'src/auth/user-info.param';
 
 @Injectable()
 export class UsersService {
@@ -11,20 +12,12 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
   
-
-
-  async findById(id: any) {
-    return await this.userModel.findById(id).lean();
-  }
-  async findOne(username: string) {
-    return await this.userModel.findOne({ username: username }).lean();
-  } 
-  async findMany() {
-    return await this.userModel.find().lean();
+  async findOne(googleId: string) {
+    return await this.userModel.findOne({ googleId }).lean();
   }
 
-  async createUser(input: { password: string; username: string; }) {
-    let newUser = await this.userModel.create(input);
+  async createUser(userInfo: UserInfo) {
+    let newUser = await this.userModel.create(userInfo);
     newUser.treeDate = new Date();
     newUser.treeStatus = 0;
     newUser.journalCount = 0;
@@ -35,8 +28,8 @@ export class UsersService {
   }
 
 
-  async findUserDict(username: string) {
-    let user = await this.userModel.findOne({ username: username }).lean();
+  async findUserDict(googleId: string) {
+    let user = await this.userModel.findOne({ googleId }).lean();
     let dict = JSON.parse(user.journalDict); 
 
     let result = [];
@@ -54,30 +47,30 @@ export class UsersService {
 
   }
 
-  async updateStatus(username: string, amount: number) {
-    let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {treeStatus : amount}}).lean();
+  async updateStatus(googleId: string, amount: number) {
+    let user = await this.userModel.findOneAndUpdate({ googleId }, {$inc : {treeStatus : amount}}).lean();
     return user;
   }
 
-  async updateTreeDate(username: string, newDate: number) {
-    let user = await this.userModel.findOneAndUpdate({ username: username }, {treeDate : newDate}).lean();
+  async updateTreeDate(googleId: string, newDate: number) {
+    let user = await this.userModel.findOneAndUpdate({ googleId }, {treeDate : newDate}).lean();
     return user;
   }
 
-  async updateJournalCount(username: string, count: number) {
+  async updateJournalCount(googleId: string, count: number) {
     // increase the journal count by param count
-    let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {journalCount : count}}).lean();
+    let user = await this.userModel.findOneAndUpdate({ googleId }, {$inc : {journalCount : count}}).lean();
     return {...user, journalCount: user.journalCount+count};
   }
 
-  async updateSurveyCount(username: string, count: number) {
+  async updateSurveyCount(googleId: string, count: number) {
     // increase the journal count by param count
-    let user = await this.userModel.findOneAndUpdate({ username: username }, {$inc : {surveyCount : count}}).lean();
+    let user = await this.userModel.findOneAndUpdate({ googleId }, {$inc : {surveyCount : count}}).lean();
     return {...user, surveyCount: user.surveyCount+count};
   }
 
-  async updateJournalDict(username: string, newDict: string) {
-    let user = await this.userModel.findOneAndUpdate({ username: username }, {journalDict : newDict}).lean();
+  async updateJournalDict(googleId: string, newDict: string) {
+    let user = await this.userModel.findOneAndUpdate({ googleId }, {journalDict : newDict}).lean();
     return {...user, journalDict: newDict};
   }
 }

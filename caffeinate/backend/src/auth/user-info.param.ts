@@ -2,7 +2,7 @@ import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import { GqlExecutionContext } from "@nestjs/graphql";
 
 export class UserInfo {
-    userId: string;
+    googleId: string;
     firstName: string;
     email: string;
 }
@@ -13,5 +13,4 @@ export const GoogleUserInfo = createParamDecorator(
         const request = gCtx.req;
         return request.userInfo;
     },
-  );
-  
+);

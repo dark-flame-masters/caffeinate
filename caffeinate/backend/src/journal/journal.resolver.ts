@@ -1,48 +1,44 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { JournalService } from './journal.service';
 import { CreateJournalInput, FindJournalInput, Journal } from './journal.schema';
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateJournalResponse } from 'src/auth/dto/create-journal-response';
 import { WordDictionaryResponse } from 'src/users/users.schema';
+import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
+import { GoogleAuthGuard } from 'src/auth/google.guard';
 
 @Resolver()
 export class JournalResolver {
     constructor(private readonly journalService: JournalService, private readonly usersService: UsersService) {}
 
   @Query(() => [Journal])
-  findMany() {
-    return this.journalService.findMany();
-  }
-
-  @Query(() => [Journal])
-  async findJournalByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
-    return await this.journalService.findJournalByAuthor(author);
+  @UseGuards(GoogleAuthGuard)
+  async findJournalByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
+    return await this.journalService.findJournalByAuthor(userInfo.googleId);
   }
 
   @Query(() => Journal, {nullable: true})
-  async findJournalByAuthorIndex(@Args('input') { author, index }: FindJournalInput, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
-    return await this.journalService.findJournalByAuthorIndex(author, index);
+  @UseGuards(GoogleAuthGuard)
+  async findJournalByAuthorIndex(@Args('index') index: number, @GoogleUserInfo() userInfo: UserInfo) {
+    return await this.journalService.findJournalByAuthorIndex(userInfo.googleId, index);
   }
 
   @Query(() => [WordDictionaryResponse])
-  async findJournalDictByAuthor(@Args('input') author : string, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != author) {throw new UnauthorizedException();}
-
+  @UseGuards(GoogleAuthGuard)
+  async findJournalDictByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
     // find the target content from all the journals of the user and store then in an array
-    return await this.usersService.findUserDict(author);
+    return await this.usersService.findUserDict(userInfo.googleId);
 
   }
 
 
   @Mutation(() => CreateJournalResponse)
-  async createJournal(@Args('input') journal: CreateJournalInput, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != journal.author) {throw new UnauthorizedException();}
+  @UseGuards(GoogleAuthGuard)
+  async createJournal(@Args('content') content: string, @GoogleUserInfo() userInfo: UserInfo) {
     return{
-      user: await this.usersService.updateJournalCount(journal.author, 1),
-      journal: await this.journalService.createJournal({...journal})
+      user: await this.usersService.updateJournalCount(userInfo.googleId, 1),
+      journal: await this.journalService.createJournal({content, authorGoogleId: userInfo.googleId})
     }
   }
 

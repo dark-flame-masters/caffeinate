@@ -1,6 +1,5 @@
 import {
-    CanActivate, ExecutionContext, Injectable, applyDecorators,
-    UseGuards,
+    CanActivate, ExecutionContext, Injectable,
     UnauthorizedException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -41,7 +40,7 @@ export class GoogleAuthGuard implements CanActivate {
 
             // add user information to request
             request.userInfo = {
-                userId: payload['sub'],
+                googleId: payload['sub'],
                 firstName: payload['given_name'],
                 email: payload['email']
             }

@@ -8,16 +8,20 @@ export type UserDocument = User & mongoose.Document;
 @Schema()
 @ObjectType()
 export class User {
-    @Field(() => Int)
-    _id: number;
-  
-    @Prop()
     @Field()
-    username: string;
+    _id: string;
 
     @Prop()
     @Field()
-    password: string;
+    googleId: string;
+
+    @Prop()
+    @Field()
+    email: string;
+
+    @Prop()
+    @Field()
+    firstName: string;
 
     @Prop()
     @Field()
@@ -42,13 +46,6 @@ export class User {
 }
   
 export const UserSchema = SchemaFactory.createForClass(User);
-
-@InputType()
-export class CreateUserInput {
-  @Field()
-  @IsAlphanumeric()
-  username: string;
-}
 
 @ObjectType()
 export class WordDictionaryResponse{

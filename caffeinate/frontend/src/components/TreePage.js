@@ -43,7 +43,11 @@ export default function TreePage(props) {
           setMessage(status[3]);
         }
       } else {
-        setError("There was a problem fetching tree data.");
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          setError("There was a problem fetching tree data.");
+        }
       }
     }).catch(error => {
       setError("There was a problem fetching tree data.");

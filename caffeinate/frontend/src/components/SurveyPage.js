@@ -45,7 +45,11 @@ export default function SurveyPage(props) {
       if (res.data.data) {
         setCount(res.data.data.findUserByName.surveyCount);
       } else {
-        setError("There was a problem fetching survey responses.");
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          setError("There was a problem fetching survey responses.");
+        }
       }
     }).catch(error => {
       setError("There was a problem fetching survey responses.");
@@ -119,7 +123,11 @@ export default function SurveyPage(props) {
           setIDX(idx === 0 ? idx : idx => idx - 1);
         }
       } else {
-        setError("There was a problem fetching survey responses.");
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          setError("There was a problem fetching survey responses.");
+        }
       }
     })
     .catch(error => {
@@ -165,12 +173,18 @@ export default function SurveyPage(props) {
           setCount(res.data.data.createSurvey.user.surveyCount);
           setIDX(0);
         } else {
-          setError("Survey response could not be saved. Make sure your entries only contain" +
-          "alphanumeric characters and does not include any illegal characters.");
+          if (res.data.errors[0].message === "Unauthorized") {
+            setError("You are not authorized to complete this action. Please sign out and sign in again.");
+          } else if (res.data.errors[0].message === "Bad Request Exception")  {
+            setError("Survey response could not be saved. Make sure your entries only contain" +
+            "alphanumeric characters and does not include any illegal characters.");
+          } else {
+            setError("Survey response could not be saved. Try again later.");
+          }
         }
       })
       .catch(error => {
-        setError("Survey response could not be saved. Try again later.")
+        setError("Survey response could not be saved. Try again later.");
       });  
     }
   }

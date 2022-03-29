@@ -56,7 +56,11 @@ export default function AnalyticsPage(props) {
             setRatingData(res.data.data.find30RatesByAuthor.map(elem => elem.rate).reverse());
             setRatingLabels(res.data.data.find30RatesByAuthor.map(elem => new Date(elem.date).toDateString().split(' ')[1] + ' ' + new Date(elem.date).toDateString().split(' ')[2]).reverse());
           } else {
-            setError("There was a problem fetching survey data.");
+            if (res.data.errors[0].message === "Unauthorized") {
+              setError("You are not authorized. Please sign out and sign in again.");
+            } else {
+              setError("There was a problem fetching survey data.");
+            }
           }
         })
         .catch(error => {
@@ -85,7 +89,11 @@ export default function AnalyticsPage(props) {
         if (res.data.data) {
           setWords(res.data.data.findJournalDictByAuthor);
         } else {
-          setError("There was a problem fetching journal data.");
+          if (res.data.errors[0].message === "Unauthorized") {
+            setError("You are not authorized. Please sign out and sign in again.");
+          } else {
+            setError("There was a problem fetching journal data.");
+          }
         }
       })
       .catch(error => {

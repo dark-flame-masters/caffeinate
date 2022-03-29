@@ -35,6 +35,12 @@ export default function JournalPage(props) {
     .then(res => {
       if (res.data.data) {
         setCount(res.data.data.findUserByName.journalCount);
+      } else {
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          setError("There was a problem fetching journal entries.");
+        }
       }
     }).catch(error => {
       setError("There was a problem fetching journal entries.");
@@ -74,6 +80,12 @@ export default function JournalPage(props) {
         } else {
           if (idx !== 0) setError("You do not have any journal entries to view.");
           setIDX(idx === 0 ? idx : idx => idx - 1);
+        }
+      } else {
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          setError("There was a problem fetching journal entries.");
         }
       }
     })
@@ -148,6 +160,8 @@ export default function JournalPage(props) {
         if (res.data.errors[0].message === "Bad Request Exception") {
           setError("Journal entry could not be saved. Make sure your entry only contains" +
           " alphanumeric characters and does not include any illegal characters or emojis.");
+        } else if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized to complete this action. Please sign out and sign in again.");
         } else {
           setError("Journal entry could not be saved. Try again later.")
         }
@@ -161,7 +175,7 @@ export default function JournalPage(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!content) {
-      setError("You must write something before your survey can be saved.");
+      setError("You must write something before your entry can be saved.");
     } else {
       addJournal();
       setDate(Date());

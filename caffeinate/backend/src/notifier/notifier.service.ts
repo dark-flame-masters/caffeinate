@@ -21,7 +21,7 @@ export class NotifierService {
         job.start();
     }
 
-    async deleteNotifierByTodo(todoId) {
+    async deleteNotifierByTodo(todoId: string) {
         const job = this.schedulerRegistry.getCronJob(String(todoId));
         job.stop();
         this.schedulerRegistry.deleteCronJob(String(todoId));
@@ -30,7 +30,7 @@ export class NotifierService {
 
 
     // helper function
-    async triggerScheduleEmail(targetEmail, task){
+    async triggerScheduleEmail(targetEmail: string, task: string){
         // we first configure the env variable
         let finaluser: string;
         let finalpw: string;

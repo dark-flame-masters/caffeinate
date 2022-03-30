@@ -1,29 +1,23 @@
-import { ExecutionContext, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { Args, Context, GqlExecutionContext, Mutation, Resolver } from '@nestjs/graphql';
-import { User } from 'src/users/users.schema';
+import { NotImplementedException, UseGuards } from '@nestjs/common';
+import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { LoginResponse } from './dto/login-response';
-import { LoginUserInput } from './dto/login-user.input';
-import { GqlAuthGuard } from './gql-auth.guard';
+import { GoogleAuthGuard } from './google.guard';
+import { GoogleUserInfo, UserInfo } from './user-info.param';
 
 @Resolver()
 export class AuthResolver {
     constructor(private authService: AuthService) {}
 
     @Mutation(() => LoginResponse)  //(post: req res)
-    @UseGuards(GqlAuthGuard)
-    async login(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context: { req: { session: { username: string; }; }; }){
-        return await this.authService.login(loginUserInput, context);
+    @UseGuards(GoogleAuthGuard)
+    public async login(@GoogleUserInfo() userInfo: UserInfo){
+        return await this.authService.login(userInfo);
     }
 
-    @Mutation(() => User)  
-    signup(@Args('loginUserInput') loginUserInput: LoginUserInput, @Context() context: { req: { session: { username: string; }; }; }){
-        return this.authService.signup(loginUserInput, context);
-    }
-
+    // todo: complete
     @Mutation(() => Boolean)  
-    logout(@Args('input') username : string, @Context() context) {
-        if(context.req.session === undefined || context.req.session.username != username) {throw new UnauthorizedException();}
-        return this.authService.logout(context);
+    public async logout() {
+        throw new NotImplementedException();
     }
 }

@@ -1,22 +1,18 @@
 import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from "src/users/users.schema";
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
+import { GoogleAuthGuard } from 'src/auth/google.guard';
 
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
-
-  @Query(() => [User])
-  findMany() {
-    return this.usersService.findMany();
-  }
-
   @Query(() => User, {nullable: true})
-  findUserByName(@Args('username') username: string, @Context() context: { req: { session: { username: string; }; }; }) {
-    if(context.req.session === undefined || context.req.session.username != username) {throw new UnauthorizedException();}
-    return this.usersService.findOne(username);
+  @UseGuards(GoogleAuthGuard)
+  findUserByName(@GoogleUserInfo() userInfo: UserInfo) {
+    return this.usersService.findOne(userInfo.googleId);
   }
 
 }

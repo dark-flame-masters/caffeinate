@@ -1,8 +1,7 @@
-import { Field, ObjectType, ID, InputType, Int } from '@nestjs/graphql';
+import { Field, ObjectType, InputType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsNotEmpty, Matches } from 'class-validator';
 import * as mongoose from 'mongoose';
-import { User } from 'src/users/users.schema';
 
 export type SurveyDocument = Survey & mongoose.Document;
 
@@ -10,7 +9,7 @@ export type SurveyDocument = Survey & mongoose.Document;
 @ObjectType()
 export class Survey {
     @Field()
-    _id: number;
+    _id?: string;
   
     @Prop()
     @Field()
@@ -33,7 +32,7 @@ export class Survey {
     @Prop()
     @Field()
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    author: string;
+    authorGoogleId: string;
   
 }
   
@@ -54,20 +53,4 @@ export class CreateSurveyInput {
     @IsNotEmpty()
     @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     answer2: string;
-
-    @Field()
-    @IsNotEmpty()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    author: string;
-}
-
-@InputType()
-export class FindSurveyInput {
-
-  @Field()
-  @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-  author: string;
-
-  @Field()
-  index: number;
 }

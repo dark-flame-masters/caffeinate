@@ -17,7 +17,7 @@ export class SurveyService {
         return await this.surveyModel.find({ authorGoogleId: googleId }).sort({date: -1}).skip(idx).limit(1).findOne();
     }
 
-    async createSurvey(input: CreateSurveyInput) {
+    async createSurvey(input: { authorGoogleId: string; rate: number; answer1: string; answer2: string; }) {
         let newSurvey = await this.surveyModel.create(input);
         newSurvey.date = new Date();
         await newSurvey.save();

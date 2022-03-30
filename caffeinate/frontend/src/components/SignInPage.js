@@ -25,10 +25,10 @@ export default function SignInPage(props) {
             data: { "operationName": "login",
                     "query": `
                         mutation login {
-                            user {
-                                googleId
-                                treeDate
-                                treeStatus
+                            login {
+                                user {
+                                    googleId
+                                }
                             }
                         }
                     `,
@@ -36,11 +36,21 @@ export default function SignInPage(props) {
             })
         .then(response => {
             console.log(response);
+            if (response.data.data) {
+                sessionStorage.setItem('user', res.tokenId);
+                setUser(res.tokenId);
+            } else {
+                setError("Something went wrong when signing in. Please try again later.");
+            }
         })
         .catch(error => {
-            console.log(error);
+            setError("Something went wrong when signing in. Please try again later.");
         }); 
     };
+
+    const showFailure = () => {
+        setError("Something went wrong when signing in with Google. Please try again later.");
+    }
 
     return (
         <div id="signin-page">   
@@ -51,10 +61,13 @@ export default function SignInPage(props) {
                 </div>
 
                 <div className="form-section">
-                    <h3 className="form-message">Sign up or sign in to <span className="name">Caffeinate</span></h3>
+                    <h3 className="form-message">Sign in to <span className="name">Caffeinate</span></h3>
                     <GoogleLogin
                         clientId={`${process.env.REACT_APP_CLIENT_ID}`}
+                        buttonText="Sign in with Google"
                         onSuccess={(r) => onSuccess(r)}
+                        onFailure={showFailure}
+                        theme='dark'
                     />
                 </div>
             </div>

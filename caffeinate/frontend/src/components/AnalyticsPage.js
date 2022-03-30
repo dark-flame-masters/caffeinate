@@ -39,16 +39,15 @@ export default function AnalyticsPage(props) {
         axios({
           url: Constants.GRAPHQL_ENDPOINT,
           method: "post",
-          headers: Constants.HEADERS,
+          headers: {...Constants.HEADERS, Authorization: user},
           data: { "operationName": "find30RatesByAuthor",
                   "query": 
-                    `query find30RatesByAuthor($input: String!){
-                        find30RatesByAuthor(input: $input){
+                    `query find30RatesByAuthor {
+                        find30RatesByAuthor {
                         rate
                         date
                       }
                     }`,
-                  "variables": {'input': user},
                 }
         })
         .then(res => {
@@ -74,16 +73,15 @@ export default function AnalyticsPage(props) {
       axios({
         url: Constants.GRAPHQL_ENDPOINT,
         method: "post",
-        headers: Constants.HEADERS,
+        headers: {...Constants.HEADERS, Authorization: user},
         data: { "operationName": "findJournalDictByAuthor",
                 "query": 
-                  `query findJournalDictByAuthor($input: String!){
-                    findJournalDictByAuthor(input: $input){
+                  `query findJournalDictByAuthor {
+                    findJournalDictByAuthor {
                       text
                       value
                     }
                   }`,
-                "variables": {'input': user},
               }
       })
       .then(res => {

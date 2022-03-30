@@ -1,4 +1,5 @@
 import '../styling/AgendaPage.css';
+import React from 'react';
 import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
@@ -7,6 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import DateAdapter from '@mui/lab/AdapterDayjs';
 import TextField from '@mui/material/TextField';
 import DateTimePicker from '@mui/lab/DateTimePicker';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
 export default function AgendaPage(props) {
     const { user } = props;
@@ -18,36 +20,36 @@ export default function AgendaPage(props) {
       setValue(newValue);
     };
 
-    useEffect(()=> {
-        axios({
-            url: Constants.GRAPHQL_ENDPOINT,
-            method: "post",
-            headers: Constants.HEADERS,
-            data: { "operationName": "findTodoByAuthor",
-                    "query": 
-                      `mutation findTodoByAuthor($input: UpdateTodoInput!){
-                        findTodoByAuthor(input: $input) {
-                            item
-                        }
-                      }`,
-                    "variables": {'input': {author: user, _id: tID}},
-                  }
-          })
-          .then(res => {
-            if (res.data.data) {
-                setTodos(prevTodos => prevTodos.filter((_, i) => i !== tIdx));
-            } else {
-                if (res.data.errors[0].message === "Unauthorized") {
-                    setError("You are not authorized to complete this action. Please sign out and sign in again.");
-                } else {
-                    setError("Could not complete todo. Try again later.")
-                }
-            }
-        })
-        .catch(error => {
-            setError("Could not fetch todos. Try again later.")
-        }); 
-    }, [])
+    // useEffect(()=> {
+    //     axios({
+    //         url: Constants.GRAPHQL_ENDPOINT,
+    //         method: "post",
+    //         headers: Constants.HEADERS,
+    //         data: { "operationName": "findTodoByAuthor",
+    //                 "query": 
+    //                   `mutation findTodoByAuthor($input: UpdateTodoInput!){
+    //                     findTodoByAuthor(input: $input) {
+    //                         item
+    //                     }
+    //                   }`,
+    //                 "variables": {'input': {author: user}},
+    //               }
+    //       })
+    //       .then(res => {
+    //         if (res.data.data) {
+    //             setTodos(prevTodos => prevTodos.filter((_, i) => i !== tIdx));
+    //         } else {
+    //             if (res.data.errors[0].message === "Unauthorized") {
+    //                 setError("You are not authorized to complete this action. Please sign out and sign in again.");
+    //             } else {
+    //                 setError("Could not complete todo. Try again later.")
+    //             }
+    //         }
+    //     })
+    //     .catch(error => {
+    //         setError("Could not fetch todos. Try again later.")
+    //     }); 
+    // }, [])
 
     const addTodo = (content, dueDate="") => {
         axios({
@@ -63,8 +65,8 @@ export default function AgendaPage(props) {
                   }
           })
           .then(res => {
+            console.log(res);
             if (res.data.data) {
-                setTodos(prevTodos => prevTodos.filter((_, i) => i !== tIdx));
             } else {
                 if (res.data.errors[0].message === "Unauthorized") {
                     setError("You are not authorized to complete this action. Please sign out and sign in again.");

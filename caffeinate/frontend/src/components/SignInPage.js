@@ -1,36 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import "../styling/SignInPage.css"
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import styled from "styled-components";
 import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
-
-const StyledTextField = styled(TextField)`
-label.focused {
-    color: #D7B19D;
-}
-.MuiOutlinedInput-root {
-    fieldset {
-        border-color: #D7B19D;
-    }
-    &:hover fieldset {
-        border-color: #D7B19D;
-    }
-    &.Mui-focused fieldset {
-        border-color: #483434;
-    }     
-}
-`;
+import GoogleLogin from "react-google-login";
 
 export default function SignInPage(props) {
     const { user, setUser, navigate } = props;
-    const [option, setOption] = useState(1);
-    const UsernameRef = useRef(null);
-    const PassRef = useRef(null);
-    const EmailRef = useRef(null);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -39,108 +16,31 @@ export default function SignInPage(props) {
         }
     }, [JSON.stringify(user)]);
 
-
-    const signUpUser = (username, password) => {
+    const onSuccess = (res) => {
+        console.log(res)
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
-            headers: Constants.HEADERS,
-            data: { "operationName": "signup",
-                    "query": 
-                        `mutation signup($username: String!, $password: String!){
-                            signup(loginUserInput: { username: $username, password: $password }){
-                                username
-                            }
-                        }`,
-                    "variables": {username, password},}
-        })
-        .then(res => {
-            if (res.data.data) {
-                sessionStorage.setItem('user', username);
-                setUser(res.data.data.signup.username);
-            } else {
-                if (res.data.errors[0].message === "User already exists") {
-                    setError("Username already taken. Try a different one!");
-                } else if (res.data.errors[0].message === "Bad Request Exception") {
-                    setError("Invalid characters were entered as input. Make sure your username " +
-                    "and password only contain alphanumeric characters.");
-                } else {
-                    setError("Could not create account. Try again later.")
-                }
-            }
-        })
-        .catch(error => {
-            setError("Could not create account. Try again later.")
-        });    
-    };
-
-    const signInUser = (username, password, onetime='') => {
-        axios({
-            url: Constants.GRAPHQL_ENDPOINT,
-            method: "post",
-            headers: Constants.HEADERS,
+            headers: {...Constants.HEADERS, Authorization: res.tokenId},
             data: { "operationName": "login",
-                    "query": 
-                        `mutation login($username: String!, $password: String!){
-                            login(loginUserInput: { username: $username, password: $password }){
-                                user {
-                                    username
-                                    treeStatus
-                                    treeDate
-                                }
+                    "query": `
+                        mutation login {
+                            user {
+                                googleId
+                                treeDate
+                                treeStatus
                             }
-                        }`,
-                    "variables": {username, password},}
-        })
-        .then(res => {
-            if (res.data.data) {
-                sessionStorage.setItem('user', username);
-                setUser(res.data.data.login.user.username);
-            } else {
-                if (res.data.errors[0].message === "Unauthorized") {
-                    setError("Could not sign in due to incorrect or nonexisting sign in information.");
-                } else {
-                    setError("Could not sign in. Try again later.")
+                        }
+                    `,
                 }
-            }
+            })
+        .then(response => {
+            console.log(response);
         })
         .catch(error => {
-            setError("Could not sign in. Try again later.")
-        });
+            console.log(error);
+        }); 
     };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const username = UsernameRef.current.value;
-        const password = PassRef.current.value;
-        if (option) {
-            signInUser(username, password);
-  
-        } else {
-            signUpUser(username, password)
-        }
-    };
-
-    const theme = createTheme({
-        typography: {
-            fontFamily: 'Noto',
-            fontSize: 16,
-            button: {
-                textTransform: 'none',
-                fontSize: 20,
-                fontWeight: 600,
-            }
-        },
-        palette: {
-            borderColor: '#D7B19D',
-            test: {
-                light: '#D7B19D',
-                main: '#EED6C4',
-                dark: '#D7B19D',
-                contrastText: '#483434',
-            },
-        },
-    });
 
     return (
         <div id="signin-page">   
@@ -151,17 +51,11 @@ export default function SignInPage(props) {
                 </div>
 
                 <div className="form-section">
-                    <h3 className="form-message">Sign in to <span className="name">Caffeinate</span></h3>
-                    <ThemeProvider theme={theme}>
-                        <form className="entry-page_form" onSubmit={handleSubmit}>
-                            {/* <StyledTextField sx={{ my: "1em" }} className="TextField" label="Email" variant="outlined" inputRef={EmailRef} required/> */}
-                            <StyledTextField sx={{ mb: "1em" }} className="TextField" label="Username" variant="outlined" inputRef={UsernameRef} required/>
-                            <StyledTextField sx={{ mb: "5em" }} className="TextField" label="Password" variant="outlined" inputRef={PassRef} type="password" required/>
-                            <Button id="signin" color="test" className="Button" type="submit" onClick={(e) => setOption(1)} variant="contained" disableElevation>Sign in</Button>
-                            or
-                            <Button id="signup" color="test" className="Button" type="submit" onClick={(e) => setOption(0)} variant="outlined" disableElevation>Sign up</Button>
-                        </form>
-                    </ThemeProvider>
+                    <h3 className="form-message">Sign up or sign in to <span className="name">Caffeinate</span></h3>
+                    <GoogleLogin
+                        clientId={`${process.env.REACT_APP_CLIENT_ID}`}
+                        onSuccess={(r) => onSuccess(r)}
+                    />
                 </div>
             </div>
         </div>

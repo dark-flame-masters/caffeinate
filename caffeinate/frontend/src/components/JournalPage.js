@@ -5,6 +5,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import axios from "axios";
 import * as Constants from '../constants'
 import ErrorMessage from './ErrorMessage';
+import React from 'react';
 
 export default function JournalPage(props) {
   const { user } = props;

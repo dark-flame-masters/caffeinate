@@ -1,4 +1,5 @@
 import '../styling/CreditsPage.css';
+import React from 'react';
 
 export default function CreditsPage() {
     return (

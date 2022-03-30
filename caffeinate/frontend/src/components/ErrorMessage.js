@@ -1,4 +1,5 @@
 import '../styling/ErrorMessage.css';
+import React from 'react';
 
 export default function ErrorMessage(props) {
     const { error, setError } = props;

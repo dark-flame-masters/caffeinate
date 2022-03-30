@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import '../styling/HomePage.css'
+import '../styling/HomePage.css';
+import React from 'react';
 
 export default function HomePage(props) {
     const { user, navigate } = props;

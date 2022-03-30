@@ -15,6 +15,7 @@ import {
 import { useState, useEffect } from 'react';
 import ReactWordcloud from 'react-wordcloud';
 import ErrorMessage from './ErrorMessage';
+import React from 'react';
 
 ChartJS.register(
   CategoryScale,

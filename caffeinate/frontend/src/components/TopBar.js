@@ -4,6 +4,7 @@ import '../styling/TopBar.css';
 import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
+import React from 'react';
 
 export default function TopBar(props) {
   const {user, setUser, navigate } = props;

@@ -1,8 +1,7 @@
-import { Field, ObjectType, InputType, Int } from '@nestjs/graphql';
+import { Field, ObjectType, InputType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsNotEmpty, Matches } from 'class-validator';
+import { IsNotEmpty, IsNumber, Matches } from 'class-validator';
 import * as mongoose from 'mongoose';
-import { User } from 'src/users/users.schema';
 
 export type JournalDocument = Journal & mongoose.Document;
 
@@ -14,6 +13,7 @@ export class Journal {
   
     @Prop()
     @Field()
+    @Matches(/^[\w\s\-':()!.,;?😁🙂😕😞😭😡]+$/)
     content: string;
 
     @Prop()
@@ -32,23 +32,10 @@ export const JournalSchema = SchemaFactory.createForClass(Journal);
 export class CreateJournalInput {
   @Field()
   @IsNotEmpty()
-  @Matches(/[A-Za-z0-9\s\-':()!.,;?]+/) // to avoid front end injection
+  @Matches(/^[\w\s\-':()!.,;?😁🙂😕😞😭😡]+$/) // to avoid front end injection
   content: string;
   
   @Field()
   @IsNotEmpty()
   authorGoogleId: string;
-}
-
-@InputType()
-export class FindJournalInput {
-
-  @Field()
-  @IsNotEmpty()
-  @Matches(/[A-Za-z0-9\s\-':()!.,;?]+/)
-  authorGoogleId: string;
-
-  @Field()
-  @IsNotEmpty()
-  index: number;
 }

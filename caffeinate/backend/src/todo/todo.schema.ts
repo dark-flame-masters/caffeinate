@@ -13,7 +13,8 @@ export class Todo {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s]+$/)
+    @IsNotEmpty()
     item: string;
 
     @Prop()
@@ -30,7 +31,6 @@ export class Todo {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     authorGoogleId: string;
   
 }
@@ -41,27 +41,12 @@ export const TodoSchema = SchemaFactory.createForClass(Todo);
 export class CreateTodoInput {
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s]+$/)
+    @IsNotEmpty()
     item: string;
 
     @Prop()
     @Field()
     dueDate: Date;
-
-    @Prop()
-    @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-    authorGoogleId: string;
-}
-
-@InputType()
-export class UpdateTodoInput {
-  @Field()
-  _id: String;
-
-  @Prop()
-  @Field()
-  @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
-  authorGoogleId: string;
 
 }

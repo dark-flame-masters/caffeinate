@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { JournalService } from './journal.service';
-import { CreateJournalInput, FindJournalInput, Journal } from './journal.schema';
-import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import {  Journal } from './journal.schema';
+import { UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateJournalResponse } from 'src/auth/dto/create-journal-response';
 import { WordDictionaryResponse } from 'src/users/users.schema';

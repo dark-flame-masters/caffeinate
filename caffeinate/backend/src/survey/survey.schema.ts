@@ -1,6 +1,6 @@
 import { Field, ObjectType, InputType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsNotEmpty, Matches } from 'class-validator';
+import { IsNotEmpty, IsNumber, Matches } from 'class-validator';
 import * as mongoose from 'mongoose';
 
 export type SurveyDocument = Survey & mongoose.Document;
@@ -13,16 +13,17 @@ export class Survey {
   
     @Prop()
     @Field()
+    @IsNumber()
     rate: number;
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     answer1: string;
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     answer2: string;
 
     @Prop()
@@ -31,7 +32,6 @@ export class Survey {
 
     @Prop()
     @Field()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
     authorGoogleId: string;
   
 }
@@ -42,15 +42,16 @@ export const SurveySchema = SchemaFactory.createForClass(Survey);
 export class CreateSurveyInput {
     @Field()
     @IsNotEmpty()
+    @IsNumber()
     rate: number;
 
     @Field()
     @IsNotEmpty()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     answer1: string;
 
     @Field()
     @IsNotEmpty()
-    @Matches(/([A-Za-z0-9\s\-':()!.,;?])+/)
+    @Matches(/^[A-Za-z0-9\s\-':()!.,;?]+$/)
     answer2: string;
 }

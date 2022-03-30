@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateSurveyInput, Survey, SurveyDocument } from './survey.schema';
+import { Survey, SurveyDocument } from './survey.schema';
 
 @Injectable()
 export class SurveyService {

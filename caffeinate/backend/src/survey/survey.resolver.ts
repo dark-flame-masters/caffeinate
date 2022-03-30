@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { SurveyService } from './survey.service';
-import { CreateSurveyInput, FindSurveyInput, Survey } from './survey.schema';
-import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import { CreateSurveyInput, Survey } from './survey.schema';
+import { UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateSurveyResponse } from 'src/auth/dto/create-survey-response';
 import { GoogleAuthGuard } from 'src/auth/google.guard';

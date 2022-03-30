@@ -1,11 +1,11 @@
 import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { NotifierService } from 'src/notifier/notifier.service';
 import { UsersService } from 'src/users/users.service';
-import { CreateTodoInput, Todo, UpdateTodoInput } from './todo.schema';
+import { CreateTodoInput, Todo} from './todo.schema';
 import { TodoService } from './todo.service';
 
 @Resolver()

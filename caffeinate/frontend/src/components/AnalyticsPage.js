@@ -116,14 +116,9 @@ export default function AnalyticsPage(props) {
           }
         },
       },
-      legend: {
-          labels: {
-              fontColor: 'orange'
-          }
-      },
       hover: {
-          mode: 'nearest',
-          intersect: true
+        mode: 'nearest',
+        intersect: true
       },
       scales: {
           y: {
@@ -170,6 +165,7 @@ export default function AnalyticsPage(props) {
           <div className="journal-section">
             <h2 className="analytics-subsection">Your Journal</h2>
             <div className="journal-section_sub">
+              Journal Word Cloud
               {words.length ? <ReactWordcloud words={words} options={wordOptions}/> : <div>No data to show.</div> }
               </div>
           </div>

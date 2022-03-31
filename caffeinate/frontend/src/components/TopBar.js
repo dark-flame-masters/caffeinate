@@ -14,13 +14,12 @@ export default function TopBar(props) {
     axios({
         url: Constants.GRAPHQL_ENDPOINT,
         method: "post",
-        headers: Constants.HEADERS,
+        headers: {...Constants.HEADERS, Authorization: user},
         data: { "operationName": "logout",
                 "query": 
-                    `mutation logout($input: String!){
-                      logout(input: $input)
+                    `mutation logout {
+                      logout
                     }`,
-                "variables": {'input': user},
               }
     })
     .then(res => {

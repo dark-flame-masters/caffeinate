@@ -3,18 +3,45 @@ import React from 'react';
 import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import DateAdapter from '@mui/lab/AdapterDayjs';
 import TextField from '@mui/material/TextField';
+import styled from "styled-components";
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import CheckIcon from '@mui/icons-material/Check';
+import ToggleButton from '@mui/material/ToggleButton';
+
+const StyledTextField = styled(TextField)`
+label.focused {
+    color: #D7B19D;
+}
+.MuiOutlinedInput-root {
+    fieldset {
+        border-color: #D7B19D;
+    }
+    &:hover fieldset {
+        border-color: #D7B19D;
+    }
+    &.Mui-focused fieldset {
+        border-color: #483434;
+    }     
+}
+`;
 
 export default function AgendaPage(props) {
     const { user } = props;
     const [todos, setTodos] = useState([]);
     const [error, setError] = useState('');
-    const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
+    const [value, setValue] = useState('');
+    
+    
+    const todoRef = useRef(null);
+    const [selected, setSelected] = useState(false);
+    const [deadline, setDeadline] = useState('');
+    const [dateError, setDateError] = useState(false);
+    
 
     const handleDate = (newValue) => {
       setValue(newValue);
@@ -55,13 +82,13 @@ export default function AgendaPage(props) {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
-            headers: Constants.HEADERS,
+            headers: {...Constants.HEADERS, Authorization: user},
             data: { "operationName": "createTodo",
                     "query": 
                       `mutation createTodo($input: CreateTodoInput!){
                         createTodo(input: $input)
                       }`,
-                    "variables": dueDate.length ? {'input': {author: user, item: content, dueDate}} : {'input': {author: user, item: content}},
+                    "variables": dueDate.length ? {'input': {item: content, dueDate}} : {'input': {item: content}},
                   }
           })
           .then(res => {
@@ -84,7 +111,7 @@ export default function AgendaPage(props) {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
-            headers: Constants.HEADERS,
+            headers: {...Constants.HEADERS, Authorization: user},
             data: { "operationName": "deleteTodo",
                     "query": 
                       `mutation deleteTodo($input: UpdateTodoInput!){
@@ -121,7 +148,7 @@ export default function AgendaPage(props) {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
-            headers: Constants.HEADERS,
+            headers: {...Constants.HEADERS, Authorization: user},
             data: { "operationName": "completeTodo",
                     "query": 
                       `mutation completeTodo($input: UpdateTodoInput!){
@@ -157,7 +184,7 @@ export default function AgendaPage(props) {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
-            headers: Constants.HEADERS,
+            headers: {...Constants.HEADERS, Authorization: user},
             data: { "operationName": "incompleteTodo",
                     "query": 
                       `mutation incompleteTodo($input: UpdateTodoInput!){
@@ -198,9 +225,24 @@ export default function AgendaPage(props) {
             </div>
 
             <div className="agenda-todo">
-                <form>
-                    <label for="fname">First name:</label>
-                    <input type="text" id="fname" name="fname" />
+                <form className="todo-form">
+                <div className="deadline">
+
+
+                <StyledTextField className="TextField" label="New Todo" variant="outlined" inputRef={todoRef} fullWidth/>
+                <ToggleButton
+                    value="check"
+                    selected={selected}
+                    onChange={() => {
+                        setSelected(!selected);
+                    }}
+                    sx={{ width: 1/3 }} 
+                >
+                Set a deadline
+                </ToggleButton> 
+                </div>
+
+                {selected ? 
                     <LocalizationProvider dateAdapter={DateAdapter}>
                         <DateTimePicker
                             label="Deadline"
@@ -208,19 +250,21 @@ export default function AgendaPage(props) {
                             onChange={handleDate}
                             renderInput={(params) => <TextField {...params} />}
                         />
-                    </LocalizationProvider>
+                    </LocalizationProvider> : ''}
+                
                 </form>
             </div>
 
             <div className="agenda-list">
                 <div className="agenda-list__title">
-                    Todo
+                    Your Todo List
                 </div>
                 
+                <div className="todo-list">
                 {todos.length ? 
-                    <div>
+                    <>
                         {todos.map((todo, idx) => 
-                            <div key={todo._id}>
+                            <div className="todo-item" key={todo._id}>
                                 <Checkbox
                                     checked={todo.checked}
                                     onChange={(e) => handleChange(e, todo._id, idx)}
@@ -229,8 +273,9 @@ export default function AgendaPage(props) {
                                 <div className="delete" onClick={(todo) => deleteTodo(todo._id, idx)}></div>
                             </div>
                         )} 
-                    </div>
-                : ''}
+                    </>
+                : 'No todos'}
+                </div>
 
             </div>
         </div>

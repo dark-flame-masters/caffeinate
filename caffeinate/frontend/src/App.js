@@ -11,8 +11,10 @@ import AnalyticsPage from "./components/AnalyticsPage";
 import AgendaPage from "./components/AgendaPage";
 
 export default function App() {
-  const [user, setUser] = useState(sessionStorage.getItem('user'));
+  // const [user, setUser] = useState(sessionStorage.getItem('user'));
+  const [user, setUser] = useState('user');
   const navigate = useNavigate();
+  
 
   return (
     <div>

@@ -8,6 +8,8 @@ on:
 
 env:
   MONGODB_DB: caffeinate
+  GOOGLE_AUTH_CLIENT_ID: 729040879505-7rq7he0a617qd9nnale5298d76fs8igr.apps.googleusercontent.com
+  EMAIL_USER: caffeinate.page@gmail.com
 
 jobs:
 
@@ -30,6 +32,9 @@ jobs:
             MONGODB_URI=mongodb://mongodb:27017/${{ env.MONGODB_DB }}
             SESSION_SECRET=${{ secrets.SESSION_SECRET }}
             DOMAIN_EMAIL=${{ secrets.DOMAIN_EMAIL }}
+            EMAIL_USER=${{ env.EMAIL_USER }}
+            EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
+            GOOGLE_AUTH_CLIENT_ID=${{ env.GOOGLE_AUTH_CLIENT_ID }}}
             " > .env
             docker stop $(docker ps -q)
             docker-compose down --rmi all --volumes

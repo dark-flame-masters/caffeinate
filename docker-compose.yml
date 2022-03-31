@@ -23,6 +23,12 @@ services:
     environment:
       MONGODB_URI: ${MONGODB_URI}
       SESSION_SECRET: ${SESSION_SECRET}
+      GOOGLE_AUTH_CLIENT_ID: ${GOOGLE_AUTH_CLIENT_ID}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      TRANS_HOST: ${TRANS_HOST}
+      TRANS_PORT: ${TRANS_PORT}
+      REJECT_UNAUTHORIZED: 'false'
   mongodb:
     container_name: mongodb
     image: mongo

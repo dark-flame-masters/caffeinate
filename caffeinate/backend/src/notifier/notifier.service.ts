@@ -57,7 +57,7 @@ export class NotifierService {
                 user: finaluser,
                 pass: finalpw,
             },
-            tls : { rejectUnauthorized: !(this.configService.get<string>('REJECT_UNAUTHORIZED') == 'false') }
+            tls : { rejectUnauthorized: !(this.configService.get<string>('REJECT_UNAUTHORIZED') === 'false') }
             //tls : { rejectUnauthorized: false }
         });
         // send mail with defined transport object

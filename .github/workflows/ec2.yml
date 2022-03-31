@@ -13,7 +13,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    
+    # TODO: update for email + google auth
     steps:
       - uses: actions/checkout@v2 
       - name: Deploy on AWS EC2

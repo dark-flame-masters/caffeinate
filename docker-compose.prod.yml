@@ -28,7 +28,7 @@ services:
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
       TRANS_HOST: ${TRANS_HOST}
       TRANS_PORT: ${TRANS_PORT}
-      REJECT_UNAUTHORIZED: 'false'
+      REJECT_UNAUTHORIZED: 'true'
   mongodb:
     container_name: mongodb
     image: mongo

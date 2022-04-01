@@ -4,13 +4,14 @@ import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
 import { useEffect, useState, useRef } from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Checkbox from '@mui/material/Checkbox';
 import DateAdapter from '@mui/lab/AdapterDayjs';
 import TextField from '@mui/material/TextField';
 import styled from "styled-components";
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import CheckIcon from '@mui/icons-material/Check';
+import Button from '@mui/material/Button';
 import ToggleButton from '@mui/material/ToggleButton';
 
 const StyledTextField = styled(TextField)`
@@ -31,93 +32,141 @@ label.focused {
 `;
 
 export default function AgendaPage(props) {
-    const { user } = props;
+    const { user, name } = props;
     const [todos, setTodos] = useState([]);
     const [error, setError] = useState('');
-    const [value, setValue] = useState('');
-    
     
     const todoRef = useRef(null);
     const [selected, setSelected] = useState(false);
-    const [deadline, setDeadline] = useState('');
+    const [dueDate, setDueDate] = useState('');
     const [dateError, setDateError] = useState(false);
-    
 
-    const handleDate = (newValue) => {
-      setValue(newValue);
+    const handleDate = (deadline) => {
+        setDueDate(deadline);
     };
 
-    // useEffect(()=> {
-    //     axios({
-    //         url: Constants.GRAPHQL_ENDPOINT,
-    //         method: "post",
-    //         headers: Constants.HEADERS,
-    //         data: { "operationName": "findTodoByAuthor",
-    //                 "query": 
-    //                   `mutation findTodoByAuthor($input: UpdateTodoInput!){
-    //                     findTodoByAuthor(input: $input) {
-    //                         item
-    //                     }
-    //                   }`,
-    //                 "variables": {'input': {author: user}},
-    //               }
-    //       })
-    //       .then(res => {
-    //         if (res.data.data) {
-    //             setTodos(prevTodos => prevTodos.filter((_, i) => i !== tIdx));
-    //         } else {
-    //             if (res.data.errors[0].message === "Unauthorized") {
-    //                 setError("You are not authorized to complete this action. Please sign out and sign in again.");
-    //             } else {
-    //                 setError("Could not complete todo. Try again later.")
-    //             }
-    //         }
-    //     })
-    //     .catch(error => {
-    //         setError("Could not fetch todos. Try again later.")
-    //     }); 
-    // }, [])
-
-    const addTodo = (content, dueDate="") => {
+    useEffect(()=> {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
             headers: {...Constants.HEADERS, Authorization: user},
-            data: { "operationName": "createTodo",
+            data: { "operationName": "findTodoByAuthor",
                     "query": 
-                      `mutation createTodo($input: CreateTodoInput!){
-                        createTodo(input: $input)
+                      `query findTodoByAuthor {
+                        findTodoByAuthor {
+                            item
+                            completed
+                            _id
+                        }
                       }`,
-                    "variables": dueDate.length ? {'input': {item: content, dueDate}} : {'input': {item: content}},
                   }
           })
           .then(res => {
-            console.log(res);
             if (res.data.data) {
+                setTodos(res.data.data.findTodoByAuthor);
             } else {
                 if (res.data.errors[0].message === "Unauthorized") {
                     setError("You are not authorized to complete this action. Please sign out and sign in again.");
                 } else {
-                    setError("Could not delete todo. Try again later.")
+                    setError("Could not complete todo. Try again later.")
                 }
             }
         })
         .catch(error => {
-            setError("Could not delete todo. Try again later.")
+            setError("Could not fetch todos. Try again later.")
         }); 
+    }, [])
+
+    const addTodo = (e) => {
+        e.preventDefault();
+        let content = todoRef.current.value;
+        if (content.length) {
+            axios({
+                url: Constants.GRAPHQL_ENDPOINT,
+                method: "post",
+                headers: {...Constants.HEADERS, Authorization: user},
+                data: { "operationName": "createTodo",
+                        "query": 
+                        `mutation createTodo($input: String!){
+                            createTodo(input: $input) {
+                                item
+                                completed
+                                _id
+                            }
+                        }`,
+                        "variables": {'input': content },
+                    }
+            })
+            .then(res => {
+                console.log(res);
+                if (res.data.data) {
+                    if (selected && dueDate) {
+                        let tID = res.data.data.createTodo._id;
+                        let now = new Date().getTime();
+                        console.log(dueDate, now, dueDate-now);
+                        axios({
+                            url: Constants.GRAPHQL_ENDPOINT,
+                            method: "post",
+                            headers: {...Constants.HEADERS, Authorization: user},
+                            data: { "operationName": "setDueDate",
+                                    "query": 
+                                    `mutation setDueDate($input: UpdateTodoInput!){
+                                        setDueDate(input: $input) {
+                                            item
+                                            completed
+                                            _id
+                                        }
+                                    }`,
+                                    "variables": {'input': {id: tID, dueDate}},
+                                }
+                        })
+                        .then(res => {
+                            console.log(res);
+                            if (res.data.data) {
+                                let newTodo = res.data.data.setDueDate;
+                                setTodos(prevTodos => [...prevTodos, newTodo]);
+                            } else {
+                                setError("Could not set a deadline for new todo. Try again later.");
+                            }
+                        })
+                        .catch(error => {
+                            setError("Could not set a deadline for new todo. Try again later.");
+                        })
+                    } else {
+                        let newTodo = res.data.data.createTodo;
+                        setTodos(prevTodos => [...prevTodos, newTodo]);
+                    }
+                    setSelected(false);
+                    setDueDate('');
+                    todoRef.current.value = '';
+                } else {
+                    if (res.data.errors[0].message === "Unauthorized") {
+                        setError("You are not authorized to complete this action. Please sign out and sign in again.");
+                    } else {
+                        setError("Could not add new todo. Try again later.");
+                    }
+                }
+            })
+            .catch(error => {
+                setError("Could not add new todo. Try again later.");
+            });
+        } else {
+            setError("Write a todo!");
+        } 
     };
 
     const deleteTodo = (tID, tIdx) => {
+        console.log(tID, tIdx);
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
             headers: {...Constants.HEADERS, Authorization: user},
             data: { "operationName": "deleteTodo",
                     "query": 
-                      `mutation deleteTodo($input: UpdateTodoInput!){
-                        deleteTodo(input: $input)
+                      `mutation deleteTodo($input: String!){
+                        deleteTodo(id: $input) 
                       }`,
-                    "variables": {'input': {author: user, _id: tID}},
+                    "variables": {'input': tID},
                   }
           })
           .then(res => {
@@ -127,16 +176,17 @@ export default function AgendaPage(props) {
                 if (res.data.errors[0].message === "Unauthorized") {
                     setError("You are not authorized to complete this action. Please sign out and sign in again.");
                 } else {
-                    setError("Could not delete todo. Try again later.")
+                    setError("Could not delete todo. Try again later.");
                 }
             }
         })
         .catch(error => {
-            setError("Could not delete todo. Try again later.")
+            setError("Could not delete todo. Try again later.");
         }); 
     };
 
     const handleChange = (e, tID, tIdx) => {
+        console.log(e.target.checked, tID, tIdx);
         if (e.target.checked) {
             setComplete(tID, tIdx);
         } else {
@@ -145,16 +195,19 @@ export default function AgendaPage(props) {
     }
 
     const setComplete = (tID, tIdx) => {
+        console.log(tID, tIdx);
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
             headers: {...Constants.HEADERS, Authorization: user},
             data: { "operationName": "completeTodo",
                     "query": 
-                      `mutation completeTodo($input: UpdateTodoInput!){
-                        completeTodo(input: $input)
+                      `mutation completeTodo($input: String!){
+                        completeTodo(id: $input) {
+                            item
+                        }
                       }`,
-                    "variables": {'input': {author: user, _id: tID}},
+                    "variables": {'input': tID},
                   }
           })
           .then(res => {
@@ -171,26 +224,29 @@ export default function AgendaPage(props) {
                 if (res.data.errors[0].message === "Unauthorized") {
                     setError("You are not authorized to complete this action. Please sign out and sign in again.");
                 } else {
-                    setError("Could not mark todo as complete. Try again later.")
+                    setError("Could not mark todo as complete. Try again later.");
                 }
             }
         })
         .catch(error => {
-            setError("Could not mark todo as complete. Try again later.")
+            setError("Could not mark todo as complete. Try again later.");
         }); 
     };
 
     const setIncomplete = (tID, tIdx) => {
+        console.log(tID, tIdx);
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
             headers: {...Constants.HEADERS, Authorization: user},
             data: { "operationName": "incompleteTodo",
                     "query": 
-                      `mutation incompleteTodo($input: UpdateTodoInput!){
-                        incompleteTodo(input: $input)
+                      `mutation incompleteTodo($input: String!){
+                        incompleteTodo(id: $input) {
+                            item
+                        }
                       }`,
-                    "variables": {'input': {author: user, _id: tID}},
+                    "variables": {'input': tID},
                   }
           })
           .then(res => {
@@ -207,51 +263,71 @@ export default function AgendaPage(props) {
                 if (res.data.errors[0].message === "Unauthorized") {
                     setError("You are not authorized to complete this action. Please sign out and sign in again.");
                 } else {
-                    setError("Could not mark todo as incomplete. Try again later.")
+                    setError("Could not mark todo as incomplete. Try again later.");
                 }
             }
         })
         .catch(error => {
-            setError("Could not mark todo as incomplete. Try again later.")
+            setError("Could not mark todo as incomplete. Try again later.");
         }); 
     };
+    
+    const theme = createTheme({
+        typography: {
+            fontFamily: 'Noto',
+            fontSize: 16,
+            button: {
+                textTransform: 'none',
+                fontSize: 20,
+            }
+        },
+        palette: {
+            borderColor: '#D7B19D',
+            test: {
+                light: '#D7B19D',
+                main: '#EED6C4',
+                dark: '#D7B19D',
+                contrastText: '#483434',
+            },
+        },
+    });
 
     return (
         <div className="agenda-page">
             {error.length ? <ErrorMessage error={error} setError={setError} /> : ''}
 
             <div className="agenda-slogan">
-                {user}, what do you need to do today?
+                {name}, what do you need to do today?
             </div>
 
             <div className="agenda-todo">
-                <form className="todo-form">
+                <form className="todo-form" onSubmit={(e) => addTodo(e)}>
+                <ThemeProvider theme={theme}>
                 <div className="deadline">
-
-
-                <StyledTextField className="TextField" label="New Todo" variant="outlined" inputRef={todoRef} fullWidth/>
-                <ToggleButton
+                <StyledTextField className="TextField" label="New Todo" variant="outlined" inputRef={todoRef} fullWidth sx={{ width: 4/8 }} />
+                <ToggleButton 
                     value="check"
                     selected={selected}
                     onChange={() => {
                         setSelected(!selected);
                     }}
-                    sx={{ width: 1/3 }} 
+                    sx={{ width: 3/8 }} 
                 >
                 Set a deadline
                 </ToggleButton> 
+                <Button color="test" className="Button" type="submit" variant="contained" disableElevation sx={{ width: 1/8 }} >Add</Button>
                 </div>
 
                 {selected ? 
                     <LocalizationProvider dateAdapter={DateAdapter}>
                         <DateTimePicker
                             label="Deadline"
-                            value={value}
+                            value={dueDate}
                             onChange={handleDate}
                             renderInput={(params) => <TextField {...params} />}
                         />
                     </LocalizationProvider> : ''}
-                
+                </ThemeProvider>
                 </form>
             </div>
 
@@ -266,11 +342,11 @@ export default function AgendaPage(props) {
                         {todos.map((todo, idx) => 
                             <div className="todo-item" key={todo._id}>
                                 <Checkbox
-                                    checked={todo.checked}
+                                    checked={todo.completed}
                                     onChange={(e) => handleChange(e, todo._id, idx)}
                                 />
                                 <div className="todo">{todo.item}</div>
-                                <div className="delete" onClick={(todo) => deleteTodo(todo._id, idx)}></div>
+                                <div className="delete" onClick={() => deleteTodo(todo._id, idx)}></div>
                             </div>
                         )} 
                     </>

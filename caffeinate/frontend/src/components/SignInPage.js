@@ -7,7 +7,7 @@ import ErrorMessage from './ErrorMessage';
 import GoogleLogin from "react-google-login";
 
 export default function SignInPage(props) {
-    const { user, setUser, navigate } = props;
+    const { user, setUser, setName, navigate } = props;
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -17,7 +17,7 @@ export default function SignInPage(props) {
     }, [JSON.stringify(user)]);
 
     const onSuccess = (res) => {
-        console.log(res)
+        console.log(res);
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
@@ -25,10 +25,10 @@ export default function SignInPage(props) {
             data: { "operationName": "login",
                     "query": `
                         mutation login {
-                            user {
-                                googleId
-                                treeDate
-                                treeStatus
+                            login {
+                                user {
+                                    googleId
+                                }
                             }
                         }
                     `,
@@ -37,8 +37,8 @@ export default function SignInPage(props) {
         .then(response => {
             console.log(response);
             if (response.data.data) {
-                sessionStorage.setItem('user', res.tokenId);
                 setUser(res.tokenId);
+                setName(res.profileObj.name);
             } else {
                 setError("Something went wrong when signing in. Please try again later.");
             }
@@ -68,6 +68,7 @@ export default function SignInPage(props) {
                         onSuccess={(r) => onSuccess(r)}
                         onFailure={showFailure}
                         theme='dark'
+                        isSignedIn
                     />
                 </div>
             </div>

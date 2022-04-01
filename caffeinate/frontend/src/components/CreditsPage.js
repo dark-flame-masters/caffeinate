@@ -24,6 +24,7 @@ export default function CreditsPage() {
                 <li>https://forum.freecodecamp.org/t/newline-in-react-string-solved/68484</li>
                 <li>https://react-chartjs-2.js.org/examples/line-chart</li>
                 <li>https://react-wordcloud.netlify.app/props</li>
+                <li>https://www.flaticon.com/free-icon/cancel_271203?k=1648786945015</li>
             </ul>
 
         </div>

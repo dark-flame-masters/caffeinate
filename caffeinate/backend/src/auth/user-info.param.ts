@@ -3,7 +3,6 @@ import { GqlExecutionContext } from "@nestjs/graphql";
 
 export class UserInfo {
     googleId: string;
-    firstName: string;
     email: string;
 }
 

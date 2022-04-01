@@ -39,7 +39,6 @@ export default function AgendaPage(props) {
     const todoRef = useRef(null);
     const [selected, setSelected] = useState(false);
     const [dueDate, setDueDate] = useState('');
-    const [dateError, setDateError] = useState(false);
 
     const handleDate = (deadline) => {
         setDueDate(deadline);
@@ -103,35 +102,40 @@ export default function AgendaPage(props) {
                     if (selected && dueDate) {
                         let tID = res.data.data.createTodo._id;
                         let now = new Date().getTime();
-                        console.log(dueDate, now, dueDate-now);
-                        axios({
-                            url: Constants.GRAPHQL_ENDPOINT,
-                            method: "post",
-                            headers: {...Constants.HEADERS, Authorization: user},
-                            data: { "operationName": "setDueDate",
-                                    "query": 
-                                    `mutation setDueDate($input: UpdateTodoInput!){
-                                        setDueDate(input: $input) {
-                                            item
-                                            completed
-                                            _id
-                                        }
-                                    }`,
-                                    "variables": {'input': {id: tID, dueDate}},
+                        let dif =  dueDate-now;
+                        console.log(Math.floor(dif));
+                        if (Math.floor(dif / 60000) >= 10) {
+                            axios({
+                                url: Constants.GRAPHQL_ENDPOINT,
+                                method: "post",
+                                headers: {...Constants.HEADERS, Authorization: user},
+                                data: { "operationName": "setDueDate",
+                                        "query": 
+                                        `mutation setDueDate($input: UpdateTodoInput!){
+                                            setDueDate(input: $input) {
+                                                item
+                                                completed
+                                                _id
+                                            }
+                                        }`,
+                                        "variables": {'input': {id: tID, dueDate}},
+                                    }
+                            })
+                            .then(res => {
+                                console.log(res);
+                                if (res.data.data) {
+                                    let newTodo = res.data.data.setDueDate;
+                                    setTodos(prevTodos => [...prevTodos, newTodo]);
+                                } else {
+                                    setError("Could not set a deadline for new todo. Try again later.");
                                 }
-                        })
-                        .then(res => {
-                            console.log(res);
-                            if (res.data.data) {
-                                let newTodo = res.data.data.setDueDate;
-                                setTodos(prevTodos => [...prevTodos, newTodo]);
-                            } else {
+                            })
+                            .catch(error => {
                                 setError("Could not set a deadline for new todo. Try again later.");
-                            }
-                        })
-                        .catch(error => {
-                            setError("Could not set a deadline for new todo. Try again later.");
-                        })
+                            })
+                        } else {
+                            setError("Deadline must be at least 10 minutes from now.");
+                        }
                     } else {
                         let newTodo = res.data.data.createTodo;
                         setTodos(prevTodos => [...prevTodos, newTodo]);
@@ -284,10 +288,10 @@ export default function AgendaPage(props) {
         palette: {
             borderColor: '#D7B19D',
             test: {
-                light: '#D7B19D',
-                main: '#EED6C4',
-                dark: '#D7B19D',
-                contrastText: '#483434',
+                light: '#6B4F4F',
+                main: '#483434',
+                dark: '#483434',
+                contrastText: '#D7B19D',
             },
         },
     });
@@ -344,6 +348,9 @@ export default function AgendaPage(props) {
                                 <Checkbox
                                     checked={todo.completed}
                                     onChange={(e) => handleChange(e, todo._id, idx)}
+                                    style ={{
+                                        color: "#6B4F4F",
+                                    }}
                                 />
                                 <div className="todo">{todo.item}</div>
                                 <div className="delete" onClick={() => deleteTodo(todo._id, idx)}></div>

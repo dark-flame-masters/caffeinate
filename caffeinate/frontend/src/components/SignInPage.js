@@ -5,6 +5,8 @@ import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
 import GoogleLogin from "react-google-login";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Button from '@mui/material/Button';
 
 export default function SignInPage(props) {
     const { user, setUser, setName, navigate } = props;
@@ -21,7 +23,7 @@ export default function SignInPage(props) {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
-            headers: {...Constants.HEADERS, Authorization: res.tokenId},
+            headers: {...Constants.HEADERS, Authorization: res.accessToken},
             data: { "operationName": "login",
                     "query": `
                         mutation login {
@@ -37,7 +39,7 @@ export default function SignInPage(props) {
         .then(response => {
             console.log(response);
             if (response.data.data) {
-                setUser(res.tokenId);
+                setUser(res.accessToken);
                 setName(res.profileObj.name);
             } else {
                 setError("Something went wrong when signing in. Please try again later.");
@@ -50,7 +52,27 @@ export default function SignInPage(props) {
 
     const showFailure = () => {
         setError("Something went wrong when signing in with Google. Please try again later.");
-    }
+    };
+        
+    const theme = createTheme({
+        typography: {
+            fontFamily: 'Noto',
+            fontSize: 16,
+            button: {
+                textTransform: 'none',
+                fontSize: 20,
+            }
+        },
+        palette: {
+            borderColor: '#D7B19D',
+            test: {
+                light: '#D7B19D',
+                main: '#EED6C4',
+                dark: '#D7B19D',
+                contrastText: '#483434',
+            },
+        },
+    });
 
     return (
         <div id="signin-page">   
@@ -67,7 +89,12 @@ export default function SignInPage(props) {
                         buttonText="Sign in with Google"
                         onSuccess={(r) => onSuccess(r)}
                         onFailure={showFailure}
-                        theme='dark'
+                        render={(prop) => (
+                            <ThemeProvider theme={theme}> 
+                                <Button id="signin" onClick={prop.onClick} disabled={prop.disabled} color="test" className="Button" variant="contained" disableElevation>Proceed via Google</Button>
+                            </ThemeProvider>
+                        )}
+                        cookiePolicy={"single_host_origin"}
                         isSignedIn
                     />
                 </div>

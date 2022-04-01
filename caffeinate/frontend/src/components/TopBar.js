@@ -5,10 +5,16 @@ import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
 import React from 'react';
+import { GoogleLogout } from 'react-google-login';
+
 
 export default function TopBar(props) {
   const {user, setUser, navigate } = props;
   const [error, setError] = useState('');
+
+  const setFailure = () => {
+    setError("There was a problem signing out.");
+  }
 
   const signOut = () => {
     axios({
@@ -23,7 +29,6 @@ export default function TopBar(props) {
               }
     })
     .then(res => {
-      sessionStorage.clear();
       setUser(null);
       navigate('/');
     })
@@ -46,7 +51,17 @@ export default function TopBar(props) {
               <Link className="link" to="/analytics">Analytics</Link>
           </div>
           <div className="topbar_button" id="signout">
-              <button onClick={signOut} className="link">Sign out</button>
+          <GoogleLogout
+            clientId={`${process.env.REACT_APP_CLIENT_ID}`}
+            render={(prop) => (
+              <button className="link" onClick={prop.onClick} disabled={prop.disabled}>
+                Sign out
+              </button>
+            )}
+            onLogoutSuccess={signOut}
+            onLogoutFailure={setFailure}
+            cookiePolicy={"single_host_origin"}
+          />
           </div>
       </div>
     </div>

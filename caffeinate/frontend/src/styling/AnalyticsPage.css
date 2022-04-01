@@ -26,6 +26,8 @@
 }
 
 .journal-section_sub {
-    font-size: 1em;
+    font-size: 1.1em;
+    margin-top: 0.5em;
+    font-weight: 600;
     color: #AD8B73;
 }

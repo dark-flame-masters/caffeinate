@@ -31,18 +31,13 @@ export class GoogleAuthGuard implements CanActivate {
         const CLIENT_ID = this.configService.get<string>('GOOGLE_AUTH_CLIENT_ID');
         const client = new OAuth2Client(CLIENT_ID);
         try {
-            const tokenId = request.headers['authorization'];
-            const ticket = await client.verifyIdToken({
-                idToken: tokenId,
-                audience: CLIENT_ID,
-            });
-            const payload = ticket.getPayload();
+            const accessToken = request.headers['authorization'];
+            const tokenInfo = await client.getTokenInfo(accessToken);
 
             // add user information to request
             request.userInfo = {
-                googleId: payload['sub'],
-                firstName: payload['given_name'],
-                email: payload['email']
+                googleId: tokenInfo['sub'],
+                email: tokenInfo['email']
             }
         } catch (e) {
             console.error(e);

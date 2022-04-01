@@ -21,8 +21,8 @@ export class TodoService {
 
     async markComplete(id: String){
         //we also turn off notifier here
-        let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {completed : true, notifyMe : false}).lean();
-        return {...todo, completed: true, notifyMe : false};
+        let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {completed : true, dueDate : null}).lean();
+        return {...todo, completed: true, dueDate : null};
     }
     
     async markIncomplete(id: String){
@@ -35,15 +35,6 @@ export class TodoService {
         return {...todo, dueDate : updateTodoInput.dueDate};
     }
     
-    /*async notifyMeOn(id: String){
-        let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {notifyMe : true}).lean();
-        return {...todo, notifyMe : true};
-    }
-
-    async notifyMeOff(id: String){
-        let todo = await this.todoModel.findOneAndUpdate({ _id: id }, {notifyMe : false}).lean();
-        return {...todo, notifyMe: false};
-    }*/
     
     async createTodo(input: { item: string; authorGoogleId: string; }) {
         let newItem = await this.todoModel.create(input);

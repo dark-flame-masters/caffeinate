@@ -25,10 +25,10 @@ export default function SignInPage(props) {
             data: { "operationName": "login",
                     "query": `
                         mutation login {
-                            login {
-                                user {
-                                    googleId
-                                }
+                            user {
+                                googleId
+                                treeDate
+                                treeStatus
                             }
                         }
                     `,

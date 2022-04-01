@@ -21,10 +21,6 @@ export class User {
 
     @Prop()
     @Field()
-    firstName: string;
-
-    @Prop()
-    @Field()
     treeDate: Date;
 
     @Prop()

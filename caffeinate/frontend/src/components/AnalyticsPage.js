@@ -16,6 +16,8 @@ import { useState, useEffect } from 'react';
 import ReactWordcloud from 'react-wordcloud';
 import ErrorMessage from './ErrorMessage';
 import React from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 ChartJS.register(
   CategoryScale,
@@ -34,7 +36,10 @@ export default function AnalyticsPage(props) {
     const [ratingData, setRatingData] = useState([]);
     const [words, setWords] = useState([]);
     const [error, setError] = useState('');
-    
+    const [donutLoading, setDonutLoading] = useState(true);    
+    const [lineLoading, setLineLoading] = useState(true);    
+    const [cloudLoading, setCloudLoading] = useState(true);    
+
     useEffect(() => {
         axios({
           url: Constants.GRAPHQL_ENDPOINT,
@@ -55,6 +60,7 @@ export default function AnalyticsPage(props) {
             setRatingsNum(res.data.data.find30RatesByAuthor.length);
             setRatingData(res.data.data.find30RatesByAuthor.map(elem => elem.rate).reverse());
             setRatingLabels(res.data.data.find30RatesByAuthor.map(elem => new Date(elem.date).toDateString().split(' ')[1] + ' ' + new Date(elem.date).toDateString().split(' ')[2]).reverse());
+            setLineLoading(false);
           } else {
             if (res.data.errors[0].message === "Unauthorized") {
               setError("You are not authorized. Please sign out and sign in again.");
@@ -87,6 +93,7 @@ export default function AnalyticsPage(props) {
       .then(res => {
         if (res.data.data) {
           setWords(res.data.data.findJournalDictByAuthor);
+          setCloudLoading(false);
         } else {
           if (res.data.errors[0].message === "Unauthorized") {
             setError("You are not authorized. Please sign out and sign in again.");
@@ -166,14 +173,18 @@ export default function AnalyticsPage(props) {
             <h2 className="analytics-subsection">Your Journal</h2>
             <div className="journal-section_sub">
               Journal Word Cloud
+              {cloudLoading ?  <CircularProgress color="inherit"/> : <>
               {words.length ? <ReactWordcloud words={words} options={wordOptions}/> : <div>No data to show.</div> }
+              </>}
               </div>
           </div>
 
           <div className="survey-section">
               <h2 className="analytics-subsection">Your Surveys</h2>
               <div className="survey-section_sub">
-                  {ratingsNum ? <Line data={ratingSetup} options={ratingOptions}/> : <div>No data to show.</div> }
+                {lineLoading ?  <CircularProgress color="inherit"/> : <>
+                {ratingsNum ? <Line data={ratingSetup} options={ratingOptions}/> : <div>No data to show.</div> }
+                </>}
               </div>
 
           </div>

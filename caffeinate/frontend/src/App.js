@@ -13,9 +13,7 @@ import AgendaPage from "./components/AgendaPage";
 export default function App() {
   const [user, setUser] = useState('');
   const [name, setName] = useState('');
-  // const [user, setUser] = useState('user');
   const navigate = useNavigate();
-  
 
   return (
     <div>

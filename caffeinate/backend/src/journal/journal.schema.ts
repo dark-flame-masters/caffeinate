@@ -32,7 +32,7 @@ export class Journal {
   
 export const JournalSchema = SchemaFactory.createForClass(Journal);
 
-@InputType()
+@ObjectType()
 export class CreateJournalInput {
   @Field()
   @IsNotEmpty()

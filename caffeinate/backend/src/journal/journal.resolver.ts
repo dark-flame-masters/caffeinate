@@ -1,12 +1,13 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { JournalService } from './journal.service';
-import {  Journal } from './journal.schema';
-import { UseGuards } from '@nestjs/common';
+import {  CreateJournalInput, Journal } from './journal.schema';
+import { BadRequestException, UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateJournalResponse } from 'src/auth/dto/create-journal-response';
 import { WordDictionaryResponse } from 'src/users/users.schema';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
+import { validate } from 'class-validator';
 
 @Resolver()
 export class JournalResolver {
@@ -36,10 +37,22 @@ export class JournalResolver {
   @Mutation(() => CreateJournalResponse)
   @UseGuards(GoogleAuthGuard)
   async createJournal(@Args('content') content: string, @GoogleUserInfo() userInfo: UserInfo) {
-    return{
-      user: await this.usersService.updateJournalCount(userInfo.googleId, 1),
-      journal: await this.journalService.createJournal({content, authorGoogleId: userInfo.googleId})
+    //manually validate by function and validate the entire input
+    let createJournalInput = new CreateJournalInput()
+    createJournalInput.authorGoogleId = userInfo.googleId;
+    createJournalInput.content = content;
+
+    const errors = await validate(createJournalInput)
+    if (errors.length > 0){
+        throw new BadRequestException();
     }
+    else{
+        return{
+          user: await this.usersService.updateJournalCount(userInfo.googleId, 1),
+          journal: await this.journalService.createJournal(createJournalInput)
+        }
+    }
+    
   }
 
   @Query(() => [Number])

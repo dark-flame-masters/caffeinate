@@ -1,11 +1,12 @@
-import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { validate } from 'class-validator';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { NotifierService } from 'src/notifier/notifier.service';
 import { UsersService } from 'src/users/users.service';
-import { Todo, UpdateTodoInput} from './todo.schema';
+import { CreateTodoInput, Todo, UpdateTodoInput} from './todo.schema';
 import { TodoService } from './todo.service';
 
 @Resolver()
@@ -27,8 +28,19 @@ export class TodoResolver {
   @Mutation(() => Todo)
   @UseGuards(GoogleAuthGuard)
   async createTodo(@Args('input') todo: string, @GoogleUserInfo() userInfo: UserInfo) {
-    let newItem = await this.todoService.createTodo({item: todo, authorGoogleId: userInfo.googleId});
-    return newItem;
+
+    let newItem = new CreateTodoInput()
+    newItem.authorGoogleId = userInfo.googleId;
+    newItem.item = todo;
+
+    const errors = await validate(newItem)
+    if (errors.length > 0){
+        throw new BadRequestException();
+    }
+    else{
+      newItem = await this.todoService.createTodo({item: todo, authorGoogleId: userInfo.googleId});
+      return newItem;
+    }
   }
 
   @Mutation(() => Boolean)

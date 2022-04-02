@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Todo, TodoDocument, UpdateTodoInput } from './todo.schema';
+import { CreateTodoInput, Todo, TodoDocument, UpdateTodoInput } from './todo.schema';
 import { Model } from 'mongoose';
 
 @Injectable()
@@ -36,7 +36,7 @@ export class TodoService {
     }
     
     
-    async createTodo(input: { item: string; authorGoogleId: string; }) {
+    async createTodo(input: CreateTodoInput) {
         let newItem = await this.todoModel.create(input);
         newItem.completed = false;
         newItem.dueDate = null;

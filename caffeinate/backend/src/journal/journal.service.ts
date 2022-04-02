@@ -19,7 +19,13 @@ export class JournalService {
       } 
 
       async find30SentimentsByAuthor(googleId: string) {
-        return await this.journalModel.find({ authorGoogleId: googleId }, {sentiment:1, date:1}).sort({date: -1}).limit(30).lean();
+        let veryHappyFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'very happy'}).count();
+        let happyFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'happy'}).count();
+        let neutralFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'neutral'}).count();
+        let disappointedFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'disappointed'}).count();
+        let angryFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'angry'}).count();
+        console.log([veryHappyFreq, happyFreq, neutralFreq, disappointedFreq, angryFreq]);
+        return [veryHappyFreq, happyFreq, neutralFreq, disappointedFreq, angryFreq];
       } 
 
       async createJournal(input: CreateJournalInput) {
@@ -36,7 +42,18 @@ export class JournalService {
         let wordLst = this.convertStringToWords(input.content);
 
         // getSentiment expects an array of strings
-        newJournal.sentiment = analyzer.getSentiment(wordLst);
+        var sentimentVal = analyzer.getSentiment(wordLst);
+        if (sentimentVal >= 0.5) {
+          newJournal.sentiment = "very happy";
+        } else if (sentimentVal >= 0.25) {
+          newJournal.sentiment = "happy";
+        } else if (sentimentVal >= -0.25) {
+          newJournal.sentiment = "neutral";
+        } else if (sentimentVal >= -0.6) {
+          newJournal.sentiment = "disappointed";
+        } else {
+          newJournal.sentiment = "angry";
+        }
 
         //finally we save the journal
         await newJournal.save();

@@ -22,7 +22,7 @@ export class Journal {
 
     @Prop()
     @Field()
-    sentiment: number;
+    sentiment: string;
 
     @Prop()
     @Field()
@@ -42,4 +42,11 @@ export class CreateJournalInput {
   @Field()
   @IsNotEmpty()
   authorGoogleId: string;
+}
+
+
+@ObjectType()
+export class SentimentOutput {
+  @Field()
+  freqs: [number];
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
+import React from 'react';
 
 export default function TreePage(props) {
   const { user } = props;
@@ -19,15 +20,14 @@ export default function TreePage(props) {
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
-      headers: Constants.HEADERS,
+      headers: {...Constants.HEADERS, Authorization: user},
       data: { "operationName": "findUserByName",
               "query": 
-                `query findUserByName($input: String!){
-                  findUserByName(username: $input){
+                `query findUserByName {
+                  findUserByName {
                     treeStatus
                   }
                 }`,
-              "variables": {'input': user},
             }
     })
     .then(res => {
@@ -43,7 +43,11 @@ export default function TreePage(props) {
           setMessage(status[3]);
         }
       } else {
-        setError("There was a problem fetching tree data.");
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          setError("There was a problem fetching tree data.");
+        }
       }
     }).catch(error => {
       setError("There was a problem fetching tree data.");
@@ -51,11 +55,11 @@ export default function TreePage(props) {
   }, []);
 
   function showTreeImage(stage) {
-    if (treeStatus === 0) {
+    if (stage === 0) {
       return (<div className="image" id="stage-zero"></div>);
-    } else if (treeStatus === 1) {
+    } else if (stage === 1) {
       return (<div className="image" id="stage-one"></div>);
-    } else if (treeStatus === 2) {
+    } else if (stage === 2) {
       return (<div className="image" id="stage-two"></div>);
     } else {
       return (<div className="image" id="stage-three"></div>);

@@ -24,3 +24,9 @@
     margin: auto;
     margin-top: -2em;
 }
+
+.journal-section_sub {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #AD8B73;
+}

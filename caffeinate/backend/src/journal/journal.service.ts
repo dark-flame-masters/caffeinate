@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersService } from 'src/users/users.service';
 import { CreateJournalInput, Journal, JournalDocument } from './journal.schema';
+import natural = require('natural');
 
 
 @Injectable()
@@ -17,15 +18,29 @@ export class JournalService {
         return await this.journalModel.find({ authorGoogleId }).sort({date: -1}).lean();
       } 
 
+      async find30SentimentsByAuthor(googleId: string) {
+        return await this.journalModel.find({ authorGoogleId: googleId }, {sentiment:1, date:1}).sort({date: -1}).limit(30).lean();
+      } 
 
       async createJournal(input: CreateJournalInput) {
         //we first create the journal and save the journal
         let newJournal = await this.journalModel.create(input);
         newJournal.date = new Date();
-        await newJournal.save();
+
+        // then we add the sentiment to this journal
+        var Analyzer = natural.SentimentAnalyzer;
+        var stemmer = natural.PorterStemmer;
+        var analyzer = new Analyzer("English", stemmer, "afinn");
 
         //Then we convert the content to a list of single words
         let wordLst = this.convertStringToWords(input.content);
+
+        // getSentiment expects an array of strings
+        newJournal.sentiment = analyzer.getSentiment(wordLst);
+
+        //finally we save the journal
+        await newJournal.save();
+
 
         // now we want to count the occurance of each item
         let user = await this.usersService.findOne(input.authorGoogleId);

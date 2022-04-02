@@ -22,6 +22,10 @@ export class Journal {
 
     @Prop()
     @Field()
+    sentiment: number;
+
+    @Prop()
+    @Field()
     authorGoogleId: string;
   
 }

@@ -8,11 +8,11 @@ export class TodoService {
     constructor(@InjectModel(Todo.name) private todoModel: Model<TodoDocument>) {}
 
     async findTodoByAuthorIndex(googleId: string, idx: number) {
-        return await this.todoModel.find({ authorGoogleId: googleId }).sort({dueDate: 1}).skip(idx).limit(1).findOne();
+        return await this.todoModel.find({ authorGoogleId: googleId }).sort({}).skip(idx*10).limit(10).lean();
     }
 
     async findTodoByAuthor(googleId: string) {
-        return await this.todoModel.find({ authorGoogleId: googleId }).sort({dueDate: 1}).lean();
+        return await this.todoModel.find({ authorGoogleId: googleId }).sort({}).lean();
     } 
 
     async findTodoById(id: String) {

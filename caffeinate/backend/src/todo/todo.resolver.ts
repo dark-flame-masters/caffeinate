@@ -18,7 +18,7 @@ export class TodoResolver {
     return await this.todoService.findTodoByAuthor(userInfo.googleId);
   }
 
-  @Query(() => Todo, {nullable: true})
+  @Query(() => [Todo], {nullable: true})
   @UseGuards(GoogleAuthGuard)
   async findTodoByAuthorIndex(@Args('index') index: number, @GoogleUserInfo() userInfo: UserInfo) {
     return await this.todoService.findTodoByAuthorIndex(userInfo.googleId, index);

@@ -67,7 +67,7 @@ export class NotifierService {
             subject: `Caffeinate: Notification for your agenda`,
             html: `
             <p style="font-size: 14px; line-height: 140%;">
-                Dear Caffeinate users,
+                Dear Caffeinate user,
                 <br>
                 You need to do your task:
                 <br>

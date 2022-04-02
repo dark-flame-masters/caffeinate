@@ -42,4 +42,10 @@ export class JournalResolver {
     }
   }
 
+  @Query(() => [Number])
+  @UseGuards(GoogleAuthGuard)
+  async find30SentimentsByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
+    return await this.journalService.find30SentimentsByAuthor(userInfo.googleId);
+  }
+
 }

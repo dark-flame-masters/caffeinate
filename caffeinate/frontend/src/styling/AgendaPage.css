@@ -1,0 +1,62 @@
+.agenda-page {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    background-color: #ecc8ac;
+    color: #361500;
+    border-radius: 3em;
+    margin: auto;
+    margin-top: 1.5em;
+    width: 65em;
+    align-self: center;
+    justify-self: center;
+    min-height: 40em;
+}
+
+.todo-list {
+    margin-top: 0.5em;
+    font-size: 1.2em;
+}
+
+.agenda-slogan {
+    margin-top: 0.5em;
+    font-weight: 800;
+    font-size: 1.8em;
+    padding-bottom: 1em;
+}
+
+.agenda-list__title {
+    color: #5c3826;
+    font-weight: 700;
+    margin-top: 1em;
+    font-size: 1.5em;
+}
+
+.agenda-todo, .agenda-list {
+    width: 40em;
+}
+
+.todo-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.deadline {
+    display: flex;
+    flex-direction: row;
+}
+
+.todo-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.delete{
+    background: url('../media/close.png') no-repeat;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}

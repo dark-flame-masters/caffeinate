@@ -18,7 +18,7 @@ export class TodoResolver {
     return await this.todoService.findTodoByAuthor(userInfo.googleId);
   }
 
-  @Query(() => Todo, {nullable: true})
+  @Query(() => [Todo], {nullable: true})
   @UseGuards(GoogleAuthGuard)
   async findTodoByAuthorIndex(@Args('index') index: number, @GoogleUserInfo() userInfo: UserInfo) {
     return await this.todoService.findTodoByAuthorIndex(userInfo.googleId, index);
@@ -76,25 +76,5 @@ export class TodoResolver {
     return todo;
   }
 
-  /*@Mutation(() => Todo)
-  @UseGuards(GoogleAuthGuard)
-  async notifyMeOn(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
-    const todo = await this.todoService.findTodoById(id);
-    if (todo.authorGoogleId !== userInfo.googleId) throw new UnauthorizedException();
-    // turn on the notifier
-    let user = await this.usersService.findOne(todo.authorGoogleId);
-    let item = await this.todoService.findTodoById(todo._id);
-    await this.notifierService.createNotifierByTodo(item, userInfo.email);//should be user.email
-    return await this.todoService.notifyMeOn(todo._id);
-  }
-
-  @Mutation(() => Todo)
-  @UseGuards(GoogleAuthGuard)
-  async notifyMeOff(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
-    const todo = await this.todoService.findTodoById(id);
-    if (todo.authorGoogleId !== userInfo.googleId) throw new UnauthorizedException();
-    // turn off the notifier
-    await this.notifierService.deleteNotifierByTodo(todo._id);
-    return await this.todoService.notifyMeOff(todo._id);
-  }*/
+  
 }

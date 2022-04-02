@@ -5,6 +5,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import axios from "axios";
 import * as Constants from '../constants';
 import ErrorMessage from './ErrorMessage';
+import React from 'react';
 
 export default function SurveyPage(props) {
   const { user } = props;
@@ -30,24 +31,30 @@ export default function SurveyPage(props) {
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
-      headers: Constants.HEADERS,
+      headers: {...Constants.HEADERS, Authorization: user},
       data: { "operationName": "findUserByName",
               "query": 
-                `query findUserByName($input: String!){
-                  findUserByName(username: $input){
+                `query findUserByName {
+                  findUserByName {
                     surveyCount
                   }
                 }`,
-              "variables": {'input': user},
             }
     })
     .then(res => {
+      console.log(res);
       if (res.data.data) {
         setCount(res.data.data.findUserByName.surveyCount);
       } else {
-        setError("There was a problem fetching survey responses.");
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          console.log("!");
+          setError("There was a problem fetching survey responses.");
+        }
       }
     }).catch(error => {
+      console.log("!");
       setError("There was a problem fetching survey responses.");
     })
   }, []);
@@ -88,19 +95,18 @@ export default function SurveyPage(props) {
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
-      headers: Constants.HEADERS,
+      headers: {...Constants.HEADERS, Authorization: user},
       data: { "operationName": "findSurveyByAuthorIndex",
               "query": 
-                `query findSurveyByAuthorIndex($input: FindSurveyInput!){
-                  findSurveyByAuthorIndex(input: $input){
+                `query findSurveyByAuthorIndex($input: Float!){
+                  findSurveyByAuthorIndex(index: $input){
                     rate
                     answer1
                     answer2
-                    author
                     date
                   }
                 }`,
-              "variables": {'input': {index: idx, author: user}},
+              "variables": {'input': idx},
             }
     })
     .then(res => {
@@ -119,7 +125,11 @@ export default function SurveyPage(props) {
           setIDX(idx === 0 ? idx : idx => idx - 1);
         }
       } else {
-        setError("There was a problem fetching survey responses.");
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          setError("There was a problem fetching survey responses.");
+        }
       }
     })
     .catch(error => {
@@ -129,13 +139,14 @@ export default function SurveyPage(props) {
 
   const submitSurvey = (e) => {
     e.preventDefault();
-    if (!qOne || !rating || !qTwoContent.length) {
+    console.log(qOneContent, rating, qTwoContent);
+    if (!qOneContent.length || !rating || !qTwoContent.length) {
       setError("At least one question was not completed. Please redo the survey.");
     } else {
       axios({
         url: Constants.GRAPHQL_ENDPOINT,
         method: "post",
-        headers: Constants.HEADERS,
+        headers: {...Constants.HEADERS, Authorization: user},
         data: { "operationName": "createSurvey",
                 "query": 
                   `mutation createSurvey($input: CreateSurveyInput!){
@@ -147,17 +158,17 @@ export default function SurveyPage(props) {
                         rate
                         answer1
                         answer2
-                        author
                         date
                       }
                     }
                   }`,
-                "variables": {'input': {answer1: qOneContent, answer2: qTwoContent, rate: rating, author: user}},
+                "variables": {'input': {rate: rating, answer1: qOneContent, answer2: qTwoContent }},
               }
       })
       .then(res => {
+        console.log(res);
         if (res.data.data) {
-          let newSurvey = {'date': res.data.data.createSurvey.survey.date, 'author': res.data.data.createSurvey.survey.author, 
+          let newSurvey = {'date': res.data.data.createSurvey.survey.date, 
             'rate': res.data.data.createSurvey.survey.rate, 'answer1': res.data.data.createSurvey.survey.answer1, 
             'answer2': res.data.data.createSurvey.survey.answer2};
           setCurrentSurvey(newSurvey);
@@ -165,12 +176,20 @@ export default function SurveyPage(props) {
           setCount(res.data.data.createSurvey.user.surveyCount);
           setIDX(0);
         } else {
-          setError("Survey response could not be saved. Make sure your entries only contain" +
-          "alphanumeric characters and does not include any illegal characters.");
+          if (res.data.errors[0].message === "Unauthorized") {
+            setError("You are not authorized to complete this action. Please sign out and sign in again.");
+          } else if (res.data.errors[0].message === "Bad Request Exception")  {
+            setError("Survey response could not be saved. Make sure your entries only contain" +
+            "alphanumeric characters and does not include any illegal characters.");
+          } else {
+            console.log("!!");
+            setError("Survey response could not be saved. Try again later.");
+          }
         }
       })
       .catch(error => {
-        setError("Survey response could not be saved. Try again later.")
+        console.log("!!");
+        setError("Survey response could not be saved. Try again later.");
       });  
     }
   }

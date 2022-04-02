@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import '../styling/HomePage.css'
+import '../styling/HomePage.css';
+import React from 'react';
 
 export default function HomePage(props) {
-    const { user, navigate } = props;
+    const { user, name, navigate } = props;
     const [greeting, setGreeting] = useState('');
     
     const nav = (page) => {
@@ -32,7 +33,7 @@ export default function HomePage(props) {
     return (
         <div className="homepage">
             <div className="greeting-section">
-                <h1 className="greeting-message">{greeting}<span className="username">{user}</span></h1>
+                <h1 className="greeting-message">{greeting}<span className="username">{name}</span></h1>
                 <h3 className="greeting-message_generic">What are you up to?</h3>
             </div>
 

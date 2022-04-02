@@ -5,6 +5,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import axios from "axios";
 import * as Constants from '../constants'
 import ErrorMessage from './ErrorMessage';
+import React from 'react';
 
 export default function JournalPage(props) {
   const { user } = props;
@@ -21,22 +22,31 @@ export default function JournalPage(props) {
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
-      headers: Constants.HEADERS,
+      headers: {...Constants.HEADERS, Authorization: user},
       data: { "operationName": "findUserByName",
               "query": 
-                `query findUserByName($input: String!){
-                  findUserByName(username: $input){
+                `query findUserByName {
+                  findUserByName {
                     journalCount
                   }
                 }`,
-              "variables": {'input': user},
             }
     })
     .then(res => {
+      console.log(res);
       if (res.data.data) {
+        console.log(res.data.data);
         setCount(res.data.data.findUserByName.journalCount);
+      } else {
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          console.log("1");
+          setError("There was a problem fetching journal entries.");
+        }
       }
     }).catch(error => {
+      console.log("1");
       setError("There was a problem fetching journal entries.");
     })
   }, []);
@@ -54,30 +64,39 @@ export default function JournalPage(props) {
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
-      headers: Constants.HEADERS,
+      headers: {...Constants.HEADERS, Authorization: user},
       data: { "operationName": "findJournalByAuthorIndex",
               "query": 
-                `query findJournalByAuthorIndex($input: FindJournalInput!){
-                  findJournalByAuthorIndex(input: $input){
+                `query findJournalByAuthorIndex($input: Float!){
+                  findJournalByAuthorIndex(index: $input){
                     content
-                    author
                     date
                   }
                 }`,
-              "variables": {'input': {index: idx, author: user}},
+              "variables": {'input': idx },
             }
     })
     .then(res => {
+      console.log(res);
       if (res.data.data) {
+        console.log(res.data.data);
         if (res.data.data.findJournalByAuthorIndex) {
           setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
         } else {
           if (idx !== 0) setError("You do not have any journal entries to view.");
           setIDX(idx === 0 ? idx : idx => idx - 1);
         }
+      } else {
+        if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized. Please sign out and sign in again.");
+        } else {
+          console.log("1");
+          setError("There was a problem fetching journal entries.");
+        }
       }
     })
     .catch(error => {
+      console.log("1");
       setError("There was a problem fetching journal entries.");
     });  
   };
@@ -119,27 +138,26 @@ export default function JournalPage(props) {
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
-      headers: Constants.HEADERS,
+      headers: {...Constants.HEADERS, Authorization: user},
       data: { "operationName": "createJournal",
               "query": 
-                `mutation createJournal($input: CreateJournalInput!){
-                  createJournal(input: $input){
+                `mutation createJournal($input: String!){
+                  createJournal(content: $input){
                     user {
                       journalCount
                     }
                     journal {
                       content
-                      author
                       date
                     }
                   }
                 }`,
-              "variables": {'input': {content, author: user}},
+              "variables": {'input': content },
             }
     })
     .then(res => {
       if (res.data.data) {
-        let newJournal = {'date': res.data.data.createJournal.journal.date, 'author': res.data.data.createJournal.journal.author, 'content': res.data.data.createJournal.journal.content};
+        let newJournal = {'date': res.data.data.createJournal.journal.date, 'content': res.data.data.createJournal.journal.content};
         setCurrentJournalEntry(newJournal);
         setIDX(0);
         setCount(res.data.data.createJournal.user.journalCount);
@@ -148,6 +166,8 @@ export default function JournalPage(props) {
         if (res.data.errors[0].message === "Bad Request Exception") {
           setError("Journal entry could not be saved. Make sure your entry only contains" +
           " alphanumeric characters and does not include any illegal characters or emojis.");
+        } else if (res.data.errors[0].message === "Unauthorized") {
+          setError("You are not authorized to complete this action. Please sign out and sign in again.");
         } else {
           setError("Journal entry could not be saved. Try again later.")
         }
@@ -161,7 +181,7 @@ export default function JournalPage(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!content) {
-      setError("You must write something before your survey can be saved.");
+      setError("You must write something before your entry can be saved.");
     } else {
       addJournal();
       setDate(Date());

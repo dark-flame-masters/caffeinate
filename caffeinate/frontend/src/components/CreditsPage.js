@@ -25,6 +25,7 @@ export default function CreditsPage() {
                 <li>https://react-chartjs-2.js.org/examples/line-chart</li>
                 <li>https://react-wordcloud.netlify.app/props</li>
                 <li>https://www.flaticon.com/free-icon/cancel_271203?k=1648786945015</li>
+                <li>https://react-chartjs-2.js.org/examples/doughnut-chart</li>
             </ul>
 
         </div>

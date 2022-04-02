@@ -26,7 +26,7 @@ export default function App() {
           <div>
             <TopBar user={user} setUser={setUser} navigate={navigate} />
             <Routes>
-              <Route exact path="*" element={<HomePage user={user} name={name} navigate={navigate}/>}/>
+              <Route exact path="*" element={<HomePage name={name} navigate={navigate}/>}/>
               <Route path="journal" element={<JournalPage user={user}/>}/>
               <Route path="surveys" element={<SurveyPage user={user}/>}/>
               <Route path="tree" element={<TreePage user={user}/>}/>

@@ -1,10 +1,11 @@
 import '../styling/AnalyticsPage.css';
 import axios from "axios";
 import * as Constants from '../constants';
-import { Line } from 'react-chartjs-2';
+import { Line, Doughnut} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
+  ArcElement,
   LinearScale,
   PointElement,
   LineElement,
@@ -12,10 +13,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactWordcloud from 'react-wordcloud';
 import ErrorMessage from './ErrorMessage';
-import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 
 
@@ -24,6 +24,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend
@@ -34,11 +35,13 @@ export default function AnalyticsPage(props) {
     const [ratingsNum, setRatingsNum] = useState(0);
     const [ratingLabels, setRatingLabels] = useState([]);
     const [ratingData, setRatingData] = useState([]);
+    const [sentimentData, setSentimentData] = useState([]);
     const [words, setWords] = useState([]);
     const [error, setError] = useState('');
     const [donutLoading, setDonutLoading] = useState(true);    
     const [lineLoading, setLineLoading] = useState(true);    
-    const [cloudLoading, setCloudLoading] = useState(true);    
+    const [cloudLoading, setCloudLoading] = useState(true);  
+    const sentimentLabels = ["very happy", "happy", "neutral", "disappointed", "angry"];  
 
     useEffect(() => {
         axios({
@@ -107,6 +110,37 @@ export default function AnalyticsPage(props) {
       });  
     }, []);
 
+    useEffect(() => {
+      axios({
+        url: Constants.GRAPHQL_ENDPOINT,
+        method: "post",
+        headers: {...Constants.HEADERS, Authorization: user},
+        data: { "operationName": "find30SentimentsByAuthor",
+                "query": 
+                  `query find30SentimentsByAuthor {
+                    find30SentimentsByAuthor
+                  }`,
+              }
+      })
+      .then(res => {
+        if (res.data.data) {
+          if (res.data.data.find30SentimentsByAuthor.filter(freq => freq > 0).length) {
+            setSentimentData(res.data.data.find30SentimentsByAuthor);
+          }
+          setDonutLoading(false);
+        } else {
+          if (res.data.errors[0].message === "Unauthorized") {
+            setError("You are not authorized. Please sign out and sign in again.");
+          } else {
+            setError("There was a problem fetching sentiment data.");
+          }
+        }
+      })
+      .catch(error => {
+        setError("There was a problem fetching sentiment data.");
+      });  
+    }, []);
+
   
     const ratingOptions = {
       responsive: true,
@@ -116,10 +150,10 @@ export default function AnalyticsPage(props) {
         },
         title: {
           display: true,
-          text: 'Survey ratings (showing last ' + ratingsNum + ')',
+          text: 'Survey Ratings (showing last ' + ratingsNum + ')',
           color: "#AD8B73",
           font: {
-              size: 17
+            size: 17
           }
         },
       },
@@ -145,6 +179,30 @@ export default function AnalyticsPage(props) {
           }
       },
   };
+
+  const sentimentSetup = {
+    labels: sentimentLabels,
+    datasets: [
+      {
+        data: sentimentData,
+        backgroundColor: [
+          'rgba(38, 27, 27, 0.2)',
+          'rgba(120, 76, 76, 0.2)',
+          'rgba(107, 79, 79, 0.2)',
+          'rgba(238, 214, 196, 0.2)',
+          'rgba(255, 243, 228, 0.2)'
+        ],
+        borderColor: [
+          'rgba(38, 27, 27, 1)',
+          'rgba(120, 76, 76, 1)',
+          'rgba(107, 79, 79, 1)',
+          'rgba(238, 214, 196, 1)',
+          'rgba(255, 243, 228, 1)'
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
   
   const ratingSetup = {
       labels: ratingLabels,
@@ -159,6 +217,7 @@ export default function AnalyticsPage(props) {
   const wordOptions = {
     colors: ['#AD8B73', '#CEAB93', '#E3CAA5', '#FFFBE9'],
     fontFamily: 'Krub',
+    fontSizes: [10, 50],
   }
   
   return (
@@ -176,7 +235,14 @@ export default function AnalyticsPage(props) {
               {cloudLoading ?  <CircularProgress color="inherit"/> : <>
               {words.length ? <ReactWordcloud words={words} options={wordOptions}/> : <div>No data to show.</div> }
               </>}
-              </div>
+            </div>
+
+            <div className="journal-section_sub">
+              Sentiment Breakdown of Last 30 Entries
+              {donutLoading ?  <CircularProgress color="inherit"/> : <div className="donut">
+              {sentimentData.length ? <Doughnut data={sentimentSetup} /> : <div>No data to show.</div> }
+              </div>}
+            </div>
           </div>
 
           <div className="survey-section">

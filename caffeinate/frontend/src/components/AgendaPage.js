@@ -126,6 +126,9 @@ export default function AgendaPage(props) {
                                 if (res.data.data) {
                                     let newTodo = res.data.data.setDueDate;
                                     setTodos(prevTodos => [...prevTodos, newTodo]);
+                                    setSelected(false);
+                                    setDueDate('');
+                                    todoRef.current.value = '';
                                 } else {
                                     setError("Could not set a deadline for new todo. Try again later.");
                                 }
@@ -139,10 +142,10 @@ export default function AgendaPage(props) {
                     } else {
                         let newTodo = res.data.data.createTodo;
                         setTodos(prevTodos => [...prevTodos, newTodo]);
+                        setSelected(false);
+                        setDueDate('');
+                        todoRef.current.value = '';
                     }
-                    setSelected(false);
-                    setDueDate('');
-                    todoRef.current.value = '';
                 } else {
                     if (res.data.errors[0].message === "Unauthorized") {
                         setError("You are not authorized to complete this action. Please sign out and sign in again.");

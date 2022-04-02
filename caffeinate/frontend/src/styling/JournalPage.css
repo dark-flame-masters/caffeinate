@@ -143,3 +143,10 @@
 .emoji:hover {
     background-color: #865439;
 }
+
+.sentiment {
+    font-weight: 200;
+    font-size: 1.2em;
+    text-align: left;
+    margin-left: -2em;
+}

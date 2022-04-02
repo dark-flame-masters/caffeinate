@@ -71,6 +71,7 @@ export default function JournalPage(props) {
                   findJournalByAuthorIndex(index: $input){
                     content
                     date
+                    sentiment
                   }
                 }`,
               "variables": {'input': idx },
@@ -149,6 +150,7 @@ export default function JournalPage(props) {
                     journal {
                       content
                       date
+                      sentiment
                     }
                   }
                 }`,
@@ -157,7 +159,8 @@ export default function JournalPage(props) {
     })
     .then(res => {
       if (res.data.data) {
-        let newJournal = {'date': res.data.data.createJournal.journal.date, 'content': res.data.data.createJournal.journal.content};
+        let newJournal = {'date': res.data.data.createJournal.journal.date, 'content': res.data.data.createJournal.journal.content, 
+          'sentiment': res.data.data.createJournal.journal.sentiment};
         setCurrentJournalEntry(newJournal);
         setIDX(0);
         setCount(res.data.data.createJournal.user.journalCount);
@@ -224,8 +227,11 @@ export default function JournalPage(props) {
             </div>
           </div>
           {idx !== 0 ? <div className="next" onClick={() => changeJournal(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing"></div>}
-          <div className="journal-settings" onClick={() => setViewMode(0)}>
-            Write a journal entry
+          <div className="journal-sidebar">
+            <h2 className="sentiment"> You seemed {currentJournalEntry.sentiment} in this entry.</h2>
+            <div className="journal-settings" onClick={() => setViewMode(0)}>
+              Write a journal entry
+            </div>
           </div>
         </div>
       )}

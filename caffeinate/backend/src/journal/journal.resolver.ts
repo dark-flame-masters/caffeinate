@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { JournalService } from './journal.service';
-import {  Journal, SentimentOutput } from './journal.schema';
+import {  Journal } from './journal.schema';
 import { UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateJournalResponse } from 'src/auth/dto/create-journal-response';
@@ -42,7 +42,7 @@ export class JournalResolver {
     }
   }
 
-  @Query(() => SentimentOutput)
+  @Query(() => [Number])
   @UseGuards(GoogleAuthGuard)
   async find30SentimentsByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
     return await this.journalService.find30SentimentsByAuthor(userInfo.googleId);

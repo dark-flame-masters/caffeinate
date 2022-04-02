@@ -24,7 +24,6 @@ export class JournalService {
         let neutralFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'neutral'}).count();
         let disappointedFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'disappointed'}).count();
         let angryFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'angry'}).count();
-        console.log([veryHappyFreq, happyFreq, neutralFreq, disappointedFreq, angryFreq]);
         return [veryHappyFreq, happyFreq, neutralFreq, disappointedFreq, angryFreq];
       } 
 

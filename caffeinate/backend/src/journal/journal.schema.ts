@@ -43,10 +43,3 @@ export class CreateJournalInput {
   @IsNotEmpty()
   authorGoogleId: string;
 }
-
-
-@ObjectType()
-export class SentimentOutput {
-  @Field()
-  freqs: [number];
-}

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Request } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { SurveyService } from 'src/survey/survey.service';
 import { User } from 'src/users/users.schema';
@@ -8,15 +9,29 @@ import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UsersService, private surveyService: SurveyService, private configService: ConfigService) { }
+
+    private authClient: OAuth2Client;
+
+    constructor(private usersService: UsersService, 
+        private surveyService: SurveyService, 
+        private configService: ConfigService) { 
+            const CLIENT_ID = this.configService.get<string>('GOOGLE_AUTH_CLIENT_ID');
+            this.authClient = new OAuth2Client(CLIENT_ID);
+    }
+
+    public async validate(accessToken: string) {
+        const tokenInfo = await this.authClient.getTokenInfo(accessToken);
+        return {
+            googleId: tokenInfo['sub'],
+            email: tokenInfo['email']
+        }
+    }
 
     public async login(userInfo: UserInfo) {
         let user = await this.usersService.findOne(userInfo.googleId);
         if (!user) {
             user = await this.signup(userInfo);
         }
-
-        // TODO: Ask yara if she needs sessions/cookies for googleId
 
         // update tree on login
         const dateDist = 600000; //600000 ms = 10 mins
@@ -36,11 +51,9 @@ export class AuthService {
         return await this.usersService.createUser(userInfo);
     }
 
-    public async logout(request: { headers: { [x: string]: any; }; }) {
-        const CLIENT_ID = this.configService.get<string>('GOOGLE_AUTH_CLIENT_ID');
-        const client = new OAuth2Client(CLIENT_ID);
+    public async logout(request: Request) {
         const accessToken = request.headers['authorization'];
-        await client.revokeToken(accessToken);
+        await this.authClient.revokeToken(accessToken);
     }
 
     async checkUpdateTreeAndDate(user: User, lastDate: number, newDate: number) {

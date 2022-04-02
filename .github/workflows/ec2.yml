@@ -30,7 +30,7 @@ jobs:
             echo "
             MONGODB_DB=${{ env.MONGODB_DB }}
             MONGODB_URI=mongodb://mongodb:27017/${{ env.MONGODB_DB }}
-            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            COOKIE_SECRET=${{ secrets.COOKIE_SECRET }}
             DOMAIN_EMAIL=${{ secrets.DOMAIN_EMAIL }}
             EMAIL_USER=${{ env.EMAIL_USER }}
             EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}

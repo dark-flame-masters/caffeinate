@@ -22,13 +22,14 @@ services:
       - "3000:3000"
     environment:
       MONGODB_URI: ${MONGODB_URI}
-      SESSION_SECRET: ${SESSION_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
       GOOGLE_AUTH_CLIENT_ID: ${GOOGLE_AUTH_CLIENT_ID}
       EMAIL_USER: ${EMAIL_USER}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
       TRANS_HOST: 'smtp.gmail.com'
       TRANS_PORT: 465
       REJECT_UNAUTHORIZED: 'false'
+      SECURE_COOKIES: 'false'
   mongodb:
     container_name: mongodb
     image: mongo

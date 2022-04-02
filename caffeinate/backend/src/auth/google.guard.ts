@@ -1,53 +1,33 @@
 import {
-    CanActivate, ExecutionContext, Injectable,
+    CanActivate, ExecutionContext, forwardRef, Inject, Injectable,
     UnauthorizedException,
 } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { GqlExecutionContext } from "@nestjs/graphql";
-import { OAuth2Client } from "google-auth-library";
+import { AuthService } from "./auth.service";
 
 @Injectable()
 export class GoogleAuthGuard implements CanActivate {
 
-    constructor(private readonly configService: ConfigService) { }
+    constructor(
+        private readonly authService: AuthService) { }
 
     public async canActivate(context: ExecutionContext): Promise<boolean> {
-        let status: boolean = true;
         const ctx = GqlExecutionContext.create(context);
         const request = ctx.getContext().req;
 
         // clear user info just in case
         request.userInfo = {};
 
-        // verify CSRF token
-        // TODO: Uncomment once frontend has implemented this + security has been addressed
-        // const csrfCookie = request.cookies['g_csrf_token'];
-        // const csrfBody = request.g_csrf_token;
-        // if ((!csrfCookie || !csrfBody) || csrfCookie !== csrfBody) {
-        //     return false;
-        // }
-
         // verify tokenId
-        const CLIENT_ID = this.configService.get<string>('GOOGLE_AUTH_CLIENT_ID');
-        const client = new OAuth2Client(CLIENT_ID);
         try {
-            const accessToken = request.headers['authorization'];
-            const tokenInfo = await client.getTokenInfo(accessToken);
+            const accessToken = request.cookies['googleAccessToken'];
 
             // add user information to request
-            request.userInfo = {
-                googleId: tokenInfo['sub'],
-                email: tokenInfo['email']
-            }
+            request.userInfo = await this.authService.validate(accessToken);
+            return true;
         } catch (e) {
             console.error(e);
-            status = false;
-        } finally {
-            // TODO: Fix exception issue, should be thrown outside of this function
-            if (!status) {
-                throw new UnauthorizedException();
-            }
-            return status;
+            throw new UnauthorizedException('Invalid access token in cookie.');
         }
 
 

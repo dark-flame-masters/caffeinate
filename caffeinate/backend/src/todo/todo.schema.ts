@@ -30,6 +30,19 @@ export class Todo {
     authorGoogleId: string;
   
 }
+
+@ObjectType()
+export class CreateTodoInput {
+  @Prop()
+  @Field()
+  @Matches(/^[A-Za-z0-9\s]+$/)
+  @IsNotEmpty()
+  item: string;
+  
+  @Field()
+  @IsNotEmpty()
+  authorGoogleId: string;
+}
   
 export const TodoSchema = SchemaFactory.createForClass(Todo);
 

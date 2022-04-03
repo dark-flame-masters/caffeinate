@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Todo, TodoDocument, UpdateTodoInput } from './todo.schema';
+import { CreateTodoInput, Todo, TodoDocument, UpdateTodoInput } from './todo.schema';
 import { UsersService } from 'src/users/users.service';
 import { Model } from 'mongoose';
 
@@ -37,13 +37,13 @@ export class TodoService {
     }
     
     
-    async createTodo(item: string, authorGoogleId: string ) {
-        let newItem = await this.todoModel.create(item);
-        let user = await this.usersService.findOne(authorGoogleId);
+    async createTodo(input: CreateTodoInput) {
+        let newItem = await this.todoModel.create(input);
+        let user = await this.usersService.findOne(input.authorGoogleId);
         newItem.completed = false;
         newItem.dueDate = null;
         let res = await newItem.save();
-        if (res && user) {
+        if (res && user) { 
             user.todoCount++;
         }
         return newItem;

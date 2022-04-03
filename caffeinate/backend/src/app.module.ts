@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose'
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { UsersModule } from './users/users.module';
@@ -47,7 +45,6 @@ import { NotifierModule } from './notifier/notifier.module';
     TodoModule,
     NotifierModule
   ],
-  controllers: [AppController],
-  providers: [AppService, NotifierService],
+  providers: [NotifierService],
 })
 export class AppModule { }

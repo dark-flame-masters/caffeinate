@@ -62,6 +62,12 @@ export class UsersService {
     return {...user, journalCount: user.journalCount+count};
   }
 
+  async updateTodoCount(googleId: string, count: number) {
+    // increase the todo count by param count
+    let user = await this.userModel.findOneAndUpdate({ googleId }, {$inc : {todoCount : count}}).lean();
+    return {...user, todoCount: user.todoCount+count};
+  }
+
   async updateSurveyCount(googleId: string, count: number) {
     // increase the journal count by param count
     let user = await this.userModel.findOneAndUpdate({ googleId }, {$inc : {surveyCount : count}}).lean();

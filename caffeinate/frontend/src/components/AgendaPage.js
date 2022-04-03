@@ -85,8 +85,8 @@ export default function AgendaPage(props) {
             headers: {...Constants.HEADERS, Authorization: user},
             data: { "operationName": "findTodoByAuthorIndex",
                     "query": 
-                      `query findTodoByAuthorIndex {
-                        findTodoByAuthorIndex {
+                      `query findTodoByAuthorIndex($input: Float!) {
+                        findTodoByAuthorIndex(index: $input) {
                             item
                             completed
                             _id

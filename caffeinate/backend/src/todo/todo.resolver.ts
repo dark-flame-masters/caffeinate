@@ -1,11 +1,13 @@
-import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { validate } from 'class-validator';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { NotifierService } from 'src/notifier/notifier.service';
 import { UsersService } from 'src/users/users.service';
-import { Todo, UpdateTodoInput} from './todo.schema';
+import { CreateTodoInput, Todo, UpdateTodoInput} from './todo.schema';
+import { CreateTodoResponse } from 'src/auth/dto/create-todo-response';
 import { TodoService } from './todo.service';
 
 @Resolver()
@@ -24,11 +26,24 @@ export class TodoResolver {
     return await this.todoService.findTodoByAuthorIndex(userInfo.googleId, index);
   }
 
-  @Mutation(() => Todo)
+  @Mutation(() => CreateTodoResponse)
   @UseGuards(GoogleAuthGuard)
   async createTodo(@Args('input') todo: string, @GoogleUserInfo() userInfo: UserInfo) {
-    let newItem = await this.todoService.createTodo(todo, userInfo.googleId);
-    return newItem;
+    let newItem = new CreateTodoInput()
+    newItem.authorGoogleId = userInfo.googleId;
+    newItem.item = todo;
+
+    const errors = await validate(newItem)
+    if (errors.length > 0){
+      throw new BadRequestException();
+    }
+    else{
+      newItem = await this.todoService.createTodo({item: todo, authorGoogleId: userInfo.googleId});
+      return {
+        user: await this.usersService.updateTodoCount(userInfo.googleId, 1),
+        todo: newItem
+      }
+    }
   }
 
   @Mutation(() => Boolean)
@@ -38,8 +53,9 @@ export class TodoResolver {
     if (todo.authorGoogleId !== userInfo.googleId) throw new UnauthorizedException();
     // delete the notifier iff not completed and not pass due date
     if(todo.dueDate !== null && todo.completed === false && todo.dueDate.valueOf() - new Date().valueOf() > 600000){
-        await this.notifierService.deleteNotifierByTodo(id);
+      await this.notifierService.deleteNotifierByTodo(id);
     }
+    await this.usersService.updateTodoCount(userInfo.googleId, -1);
     return await this.todoService.deleteTodo(userInfo.googleId, id);
   }
 

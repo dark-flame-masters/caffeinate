@@ -217,7 +217,7 @@ export default function AnalyticsPage(props) {
   const wordOptions = {
     colors: ['#AD8B73', '#CEAB93', '#E3CAA5', '#FFFBE9'],
     fontFamily: 'Krub',
-    fontSizes: [10, 50],
+    fontSizes: [20, 60],
   }
   
   return (

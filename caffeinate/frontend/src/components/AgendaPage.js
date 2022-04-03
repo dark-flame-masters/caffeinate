@@ -48,37 +48,45 @@ export default function AgendaPage(props) {
         setDueDate(deadline);
     };
 
-    useEffect(() => {
-        axios({
-          url: Constants.GRAPHQL_ENDPOINT,
-          method: "post",
-          headers: {...Constants.HEADERS, Authorization: user},
-          data: { "operationName": "findUserByName",
-                  "query": 
-                    `query findUserByName {
-                      findUserByName {
-                        todoCount
-                      }
-                    }`,
-                }
-        })
-        .then(res => {
-          console.log(res);
-          if (res.data.data) {
-            setCount(res.data.data.findUserByName.todoCount);
-          } else {
-            if (res.data.errors[0].message === "Unauthorized") {
-              setError("You are not authorized. Please sign out and sign in again.");
-            } else {
-              setError("There was a problem fetching todo items.");
-            }
-          }
-        }).catch(error => {
-          setError("There was a problem fetching todo items.");
-        })
-    }, []);
+    const changePage = (direction) => {
+        if (direction) {
+            getTodos(idx - 1, true);
+        } else {
+            getTodos(idx + 1, true);
+        }
+    }
 
     useEffect(()=> {
+        axios({
+            url: Constants.GRAPHQL_ENDPOINT,
+            method: "post",
+            headers: {...Constants.HEADERS, Authorization: user},
+                    data: { "operationName": "findUserByName",
+                    "query": 
+                      `query findUserByName {
+                        findUserByName {
+                          todoCount
+                        }
+                      }`,
+                  }
+                })
+        .then(res => {
+            if (res.data.data) {
+                getTodos(idx);
+                setCount(res.data.data.findUserByName.todoCount);
+            } else {
+                if (res.data.errors[0].message === "Unauthorized") {
+                    setError("You are not authorized. Please sign out and sign in again.");
+                } else {
+                    setError("There was a problem fetching todo items.");
+                }
+            }
+        }).catch(error => {
+            setError("There was a problem fetching todo items.");
+        })        
+    }, [])
+
+    const getTodos = (tIdx, page) => {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
@@ -92,24 +100,23 @@ export default function AgendaPage(props) {
                             _id
                         }
                     }`,
-                    "variables": {index: idx},
+                    "variables": {input: tIdx},
                 }
             })
         .then(res => {
             if (res.data.data) {
-                setTodos(res.data.data.findTodoByAuthor);
-            } else {
-                if (res.data.errors[0].message === "Unauthorized") {
-                    setError("You are not authorized to complete this action. Please sign out and sign in again.");
-                } else {
-                    setError("Could not complete todo. Try again later.")
+                setTodos(res.data.data.findTodoByAuthorIndex);
+                if (page) {
+                    setIDX(tIdx);
                 }
+            } else {
+                setError("There was a problem fetching todo items.");
             }
         })
-        .catch(error => {
-            setError("Could not fetch todos. Try again later.")
-        }); 
-    }, [])
+        .catch(err => {
+            setError("There was a problem fetching todo items.");
+        })
+    };
 
     const addTodo = (e) => {
         e.preventDefault();
@@ -121,24 +128,25 @@ export default function AgendaPage(props) {
                 headers: {...Constants.HEADERS, Authorization: user},
                 data: { "operationName": "createTodo",
                         "query": 
-                        `mutation createTodo($input: String!){
-                            createTodo(input: $input) {
-                                item
-                                completed
-                                _id
-                            }
+                            `mutation createTodo($input: String!){
+                                createTodo(input: $input) {
+                                    todo {
+                                        item
+                                        completed
+                                        _id
+                                    }
+                                }
                         }`,
-                        "variables": {'input': content },
+                        "variables": {input: content },
                     }
             })
             .then(res => {
-                console.log(res);
                 if (res.data.data) {
                     if (selected && dueDate) {
-                        let tID = res.data.data.createTodo._id;
+                        let tID = res.data.data.createTodo.todo._id;
                         let now = new Date().getTime();
-                        let dif =  dueDate-now;
-                        console.log(Math.floor(dif));
+                        let dif =  dueDate - now;
+                        console.log(Math.floor(dif/60000));
                         if (Math.floor(dif / 60000) >= 10) {
                             axios({
                                 url: Constants.GRAPHQL_ENDPOINT,
@@ -157,16 +165,14 @@ export default function AgendaPage(props) {
                                     }
                             })
                             .then(res => {
-                                console.log(res);
                                 if (res.data.data) {
-                                    let newTodo = res.data.data.setDueDate;
-                                    setTodos(prevTodos => [...prevTodos, newTodo]);
+                                    setCount(prevC => prevC + 1);
+                                    getTodos(idx);
                                     setSelected(false);
-                                    setDueDate('');
                                     todoRef.current.value = '';
                                 } else {
                                     console.log("bad1");
-                                    setError("Could not set a deadline for new todo. Try again later.");
+                                    setError("Could not set a deadline for the todo. Try again later.");
                                 }
                             })
                             .catch(error => {
@@ -174,14 +180,12 @@ export default function AgendaPage(props) {
                                 setError("Could not set a deadline for new todo. Try again later.");
                             })
                         } else {
-                            console.log("bad3");
-                            setError("Deadline must be at least 10 minutes from now.");
+                            setError("Adding todo without deadline: Deadline must be at least 10 minutes from now.");
                         }
                     } else {
-                        let newTodo = res.data.data.createTodo;
-                        setTodos(prevTodos => [...prevTodos, newTodo]);
+                        setCount(prevC => prevC + 1);
+                        getTodos(idx);
                         setSelected(false);
-                        setDueDate('');
                         todoRef.current.value = '';
                     }
                 } else {
@@ -216,7 +220,12 @@ export default function AgendaPage(props) {
           })
           .then(res => {
             if (res.data.data) {
-                setTodos(prevTodos => prevTodos.filter((_, i) => i !== tIdx));
+                setCount(prevCount => prevCount - 1);
+                if (todos.length == 1 && idx > 0) {
+                    changePage(1);
+                } else {
+                    getTodos(idx);
+                }
             } else {
                 if (res.data.errors[0].message === "Unauthorized") {
                     setError("You are not authorized to complete this action. Please sign out and sign in again.");
@@ -231,7 +240,6 @@ export default function AgendaPage(props) {
     };
 
     const handleChange = (e, tID, tIdx) => {
-        console.log(e.target.checked, tID, tIdx);
         if (e.target.checked) {
             setComplete(tID, tIdx);
         } else {
@@ -240,7 +248,6 @@ export default function AgendaPage(props) {
     }
 
     const setComplete = (tID, tIdx) => {
-        console.log(tID, tIdx);
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
@@ -279,7 +286,6 @@ export default function AgendaPage(props) {
     };
 
     const setIncomplete = (tID, tIdx) => {
-        console.log(tID, tIdx);
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
@@ -316,15 +322,6 @@ export default function AgendaPage(props) {
             setError("Could not mark todo as incomplete. Try again later.");
         }); 
     };
-
-    const changeTodos = (direction) => {
-        if (direction) {
-          setIDX(idx => idx - 1);
-        } else {
-          setIDX(idx => idx + 1);
-        }
-        console.log(idx);
-    }
     
     const theme = createTheme({
         typography: {
@@ -392,23 +389,25 @@ export default function AgendaPage(props) {
                 
                 <div className="todo-list">
                 {count ? 
-                    <>
-                        {idx * 10 + 1 < count ? <div className="previous" onClick={() => changeTodos(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div> : <div className="prev-spacing"></div>}
-                        {todos.map((todo, idx) => 
-                            <div className="todo-item" key={todo._id}>
-                                <Checkbox
-                                    checked={todo.completed}
-                                    onChange={(e) => handleChange(e, todo._id, idx)}
-                                    style ={{
-                                        color: "#6B4F4F",
-                                    }}
-                                />
-                                <div className="todo">{todo.item}</div>
-                                <div className="delete" onClick={() => deleteTodo(todo._id, idx)}></div>  
-                            </div>
-                        )} 
-                        {idx !== 0 ? <div className="next" onClick={() => changeTodos(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing"></div>}
-                    </>
+                    <div className="todo-section">
+                        {(idx + 1) * 10 < count ? <div className="previous-ap" onClick={() => changePage(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div> : <div className="prev-spacing-ap"></div>}
+                        <div className="todos">
+                            {todos.map((todo, tIdx) => 
+                                <div className="todo-item" key={todo._id}>
+                                    <Checkbox
+                                        checked={todo.completed}
+                                        onChange={(e) => handleChange(e, todo._id, tIdx)}
+                                        style ={{
+                                            color: "#6B4F4F",
+                                        }}
+                                    />
+                                    <div className="todo">{todo.item}</div>
+                                    <div className="delete" onClick={() => deleteTodo(todo._id, tIdx)}></div>  
+                                </div>
+                            )} 
+                        </div>
+                        {idx !== 0 ? <div className="next-ap" onClick={() => changePage(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing-ap"></div>}
+                    </div>
                 : 'No todos'}
                 </div>
 

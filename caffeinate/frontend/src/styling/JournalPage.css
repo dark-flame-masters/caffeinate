@@ -32,24 +32,26 @@
     height: 27em;
     padding-left: 1em;
     line-height: 1.37em;
+    padding-right: 1em;
 }
 
 .journal-entry {
-    margin-top: -0.2em;
     font-family: "Handlee";
     color: #483434;
     font-size: 1.1em;
     width: 28em;
     height: 27em;
     padding-left: 1em;
-    line-height: 0.35em;
+    margin-top: -0.7em;
+    line-height: 1.4em;
     word-wrap: break-word;
+    padding-right: 1em;
 }
 
 .paper-lines {
     margin-top: 2em;
     height: 33em;
-    background-image: repeating-linear-gradient(#EDCDBB 0px,  #EDCDBB 23px, #BF9270 24px);
+    background-image: repeating-linear-gradient(#edcdbb,#edcdbb 1.4em, #bf9270 1.5em);
 }
 
 .date {

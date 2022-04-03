@@ -54,9 +54,35 @@
     justify-content: space-between;
 }
 
-.delete{
+.delete {
     background: url('../media/close.png') no-repeat;
     width: 25px;
     height: 25px;
     cursor: pointer;
+}
+
+.todo-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.previous-ap, .next-ap {
+    cursor: pointer;
+    align-self: center;
+    justify-self: center;
+    margin-top: -1em;
+}
+
+.next-spacing-ap, .prev-spacing-ap {
+    margin: auto;
+}
+
+.previous-ap, .prev-spacing-ap, .next-ap, .next-spacing-ap {
+    flex: 1 1 0;
+}
+
+.todos {
+    flex: 4 1 0;
+    word-wrap: break-word;
 }

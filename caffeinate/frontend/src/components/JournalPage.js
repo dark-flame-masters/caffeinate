@@ -33,20 +33,16 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res);
       if (res.data.data) {
-        console.log(res.data.data);
         setCount(res.data.data.findUserByName.journalCount);
       } else {
         if (res.data.errors[0].message === "Unauthorized") {
           setError("You are not authorized. Please sign out and sign in again.");
         } else {
-          console.log("1");
           setError("There was a problem fetching journal entries.");
         }
       }
     }).catch(error => {
-      console.log("1");
       setError("There was a problem fetching journal entries.");
     })
   }, []);
@@ -56,11 +52,9 @@ export default function JournalPage(props) {
   }, [idx]);
 
   useEffect(() => {
-    console.log(currentJournalEntry);
   }, [currentJournalEntry])
 
   const getJournal = () => {
-    console.log(idx);
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
@@ -78,9 +72,7 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res);
       if (res.data.data) {
-        console.log(res.data.data);
         if (res.data.data.findJournalByAuthorIndex) {
           setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
         } else {
@@ -91,13 +83,11 @@ export default function JournalPage(props) {
         if (res.data.errors[0].message === "Unauthorized") {
           setError("You are not authorized. Please sign out and sign in again.");
         } else {
-          console.log("1");
           setError("There was a problem fetching journal entries.");
         }
       }
     })
     .catch(error => {
-      console.log("1");
       setError("There was a problem fetching journal entries.");
     });  
   };
@@ -108,7 +98,6 @@ export default function JournalPage(props) {
     } else {
       setIDX(idx => idx + 1);
     }
-    console.log(idx);
   }
 
   const setViewMode = (viewMode) => {
@@ -154,7 +143,7 @@ export default function JournalPage(props) {
                     }
                   }
                 }`,
-              "variables": {'input': content },
+              "variables": {input: content },
             }
     })
     .then(res => {
@@ -223,7 +212,7 @@ export default function JournalPage(props) {
           <div className="journal-paper">
             <div className="paper-lines">
               <p className="date">{Date(currentJournalEntry.date)}</p>
-              <div className="journal-entry">{currentJournalEntry.content.split('\n').map(str => <p key={Math.random()}>{str}</p>)}</div>
+              <div className="journal-entry">{currentJournalEntry.content}</div>
             </div>
           </div>
           {idx !== 0 ? <div className="next" onClick={() => changeJournal(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing"></div>}

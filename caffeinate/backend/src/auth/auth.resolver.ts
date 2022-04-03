@@ -20,7 +20,7 @@ export class AuthResolver {
                 ...this.cookieOptions,
                 httpOnly: true,
                 secure: true,
-                sameSite: true,
+                sameSite: 'strict',
             }
         }
     }

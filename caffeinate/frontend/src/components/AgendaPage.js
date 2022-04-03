@@ -13,6 +13,8 @@ import DateTimePicker from '@mui/lab/DateTimePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import Button from '@mui/material/Button';
 import ToggleButton from '@mui/material/ToggleButton';
+import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
 const StyledTextField = styled(TextField)`
 label.focused {
@@ -35,6 +37,8 @@ export default function AgendaPage(props) {
     const { user, name } = props;
     const [todos, setTodos] = useState([]);
     const [error, setError] = useState('');
+    const [idx, setIDX] = useState(0);
+    const [count, setCount] = useState(0);
     
     const todoRef = useRef(null);
     const [selected, setSelected] = useState(false);
@@ -44,23 +48,54 @@ export default function AgendaPage(props) {
         setDueDate(deadline);
     };
 
+    useEffect(() => {
+        axios({
+          url: Constants.GRAPHQL_ENDPOINT,
+          method: "post",
+          headers: {...Constants.HEADERS, Authorization: user},
+          data: { "operationName": "findUserByName",
+                  "query": 
+                    `query findUserByName {
+                      findUserByName {
+                        todoCount
+                      }
+                    }`,
+                }
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.data) {
+            setCount(res.data.data.findUserByName.todoCount);
+          } else {
+            if (res.data.errors[0].message === "Unauthorized") {
+              setError("You are not authorized. Please sign out and sign in again.");
+            } else {
+              setError("There was a problem fetching todo items.");
+            }
+          }
+        }).catch(error => {
+          setError("There was a problem fetching todo items.");
+        })
+    }, []);
+
     useEffect(()=> {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
             headers: {...Constants.HEADERS, Authorization: user},
-            data: { "operationName": "findTodoByAuthor",
+            data: { "operationName": "findTodoByAuthorIndex",
                     "query": 
-                      `query findTodoByAuthor {
-                        findTodoByAuthor {
+                      `query findTodoByAuthorIndex {
+                        findTodoByAuthorIndex {
                             item
                             completed
                             _id
                         }
-                      }`,
-                  }
-          })
-          .then(res => {
+                    }`,
+                    "variables": {index: idx},
+                }
+            })
+        .then(res => {
             if (res.data.data) {
                 setTodos(res.data.data.findTodoByAuthor);
             } else {
@@ -130,13 +165,16 @@ export default function AgendaPage(props) {
                                     setDueDate('');
                                     todoRef.current.value = '';
                                 } else {
+                                    console.log("bad1");
                                     setError("Could not set a deadline for new todo. Try again later.");
                                 }
                             })
                             .catch(error => {
+                                console.log("bad2");
                                 setError("Could not set a deadline for new todo. Try again later.");
                             })
                         } else {
+                            console.log("bad3");
                             setError("Deadline must be at least 10 minutes from now.");
                         }
                     } else {
@@ -278,6 +316,15 @@ export default function AgendaPage(props) {
             setError("Could not mark todo as incomplete. Try again later.");
         }); 
     };
+
+    const changeTodos = (direction) => {
+        if (direction) {
+          setIDX(idx => idx - 1);
+        } else {
+          setIDX(idx => idx + 1);
+        }
+        console.log(idx);
+    }
     
     const theme = createTheme({
         typography: {
@@ -344,8 +391,9 @@ export default function AgendaPage(props) {
                 </div>
                 
                 <div className="todo-list">
-                {todos.length ? 
+                {count ? 
                     <>
+                        {idx * 10 + 1 < count ? <div className="previous" onClick={() => changeTodos(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div> : <div className="prev-spacing"></div>}
                         {todos.map((todo, idx) => 
                             <div className="todo-item" key={todo._id}>
                                 <Checkbox
@@ -356,9 +404,10 @@ export default function AgendaPage(props) {
                                     }}
                                 />
                                 <div className="todo">{todo.item}</div>
-                                <div className="delete" onClick={() => deleteTodo(todo._id, idx)}></div>
+                                <div className="delete" onClick={() => deleteTodo(todo._id, idx)}></div>  
                             </div>
                         )} 
+                        {idx !== 0 ? <div className="next" onClick={() => changeTodos(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing"></div>}
                     </>
                 : 'No todos'}
                 </div>

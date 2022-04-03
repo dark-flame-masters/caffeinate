@@ -6,8 +6,6 @@ import { UserInfo } from 'src/auth/user-info.param';
 
 @Injectable()
 export class UsersService {
- 
-
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
@@ -22,6 +20,7 @@ export class UsersService {
     newUser.treeStatus = 0;
     newUser.journalCount = 0;
     newUser.surveyCount = 0;
+    newUser.todoCount = 0;
     newUser.journalDict = JSON.stringify({});
     await newUser.save();
     return newUser;

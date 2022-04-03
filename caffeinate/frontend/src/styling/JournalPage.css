@@ -43,6 +43,7 @@
     height: 27em;
     padding-left: 1em;
     line-height: 0.35em;
+    word-wrap: break-word;
 }
 
 .paper-lines {

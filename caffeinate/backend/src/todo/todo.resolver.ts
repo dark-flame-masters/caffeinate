@@ -27,7 +27,7 @@ export class TodoResolver {
   @Mutation(() => Todo)
   @UseGuards(GoogleAuthGuard)
   async createTodo(@Args('input') todo: string, @GoogleUserInfo() userInfo: UserInfo) {
-    let newItem = await this.todoService.createTodo({item: todo, authorGoogleId: userInfo.googleId});
+    let newItem = await this.todoService.createTodo(todo, userInfo.googleId);
     return newItem;
   }
 
@@ -40,7 +40,7 @@ export class TodoResolver {
     if(todo.dueDate !== null && todo.completed === false && todo.dueDate.valueOf() - new Date().valueOf() > 600000){
         await this.notifierService.deleteNotifierByTodo(id);
     }
-    return await this.todoService.deleteTodo(id);
+    return await this.todoService.deleteTodo(userInfo.googleId, id);
   }
 
   @Mutation(() => Todo)

@@ -15,6 +15,7 @@ import Button from '@mui/material/Button';
 import ToggleButton from '@mui/material/ToggleButton';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const StyledTextField = styled(TextField)`
 label.focused {
@@ -39,6 +40,7 @@ export default function AgendaPage(props) {
     const [error, setError] = useState('');
     const [idx, setIDX] = useState(0);
     const [count, setCount] = useState(0);
+    const [loading, setLoading] = useState(true);    
     
     const todoRef = useRef(null);
     const [selected, setSelected] = useState(false);
@@ -74,6 +76,7 @@ export default function AgendaPage(props) {
             if (res.data.data) {
                 getTodos(idx);
                 setCount(res.data.data.findUserByName.todoCount);
+                setLoading(false);
             } else {
                 if (res.data.errors[0].message === "Unauthorized") {
                     setError("You are not authorized. Please sign out and sign in again.");
@@ -146,7 +149,6 @@ export default function AgendaPage(props) {
                         let tID = res.data.data.createTodo.todo._id;
                         let now = new Date().getTime();
                         let dif =  dueDate - now;
-                        console.log(Math.floor(dif/60000));
                         if (Math.floor(dif / 60000) >= 10) {
                             axios({
                                 url: Constants.GRAPHQL_ENDPOINT,
@@ -165,47 +167,40 @@ export default function AgendaPage(props) {
                                     }
                             })
                             .then(res => {
-                                if (res.data.data) {
-                                    setCount(prevC => prevC + 1);
-                                    getTodos(idx);
-                                    setSelected(false);
-                                    todoRef.current.value = '';
-                                } else {
-                                    console.log("bad1");
-                                    setError("Could not set a deadline for the todo. Try again later.");
+                                if (!res.data.data) {
+                                    setError("Adding todo without deadline: Could not set a deadline for the todo.");
                                 }
                             })
                             .catch(error => {
-                                console.log("bad2");
-                                setError("Could not set a deadline for new todo. Try again later.");
+                                setError("Adding todo without deadline: Could not set a deadline for new todo.");
                             })
                         } else {
                             setError("Adding todo without deadline: Deadline must be at least 10 minutes from now.");
                         }
-                    } else {
-                        setCount(prevC => prevC + 1);
-                        getTodos(idx);
-                        setSelected(false);
-                        todoRef.current.value = '';
                     }
+                    setCount(prevC => prevC + 1);
+                    getTodos(idx);
+                    setSelected(false);
+                    todoRef.current.value = '';
                 } else {
                     if (res.data.errors[0].message === "Unauthorized") {
                         setError("You are not authorized to complete this action. Please sign out and sign in again.");
+                    } else if (res.data.errors[0].message === "Bad Request Exception") {
+                        setError("Could not add new todo. Make sure your input only consists of alphanumeric characters.");
                     } else {
                         setError("Could not add new todo. Try again later.");
                     }
                 }
             })
             .catch(error => {
-                setError("Could not add new todo. Try again later.");
+                setError("Could not add new todo. Check that your input only consists of alphanumeric characters, or try again later.");
             });
         } else {
             setError("Write a todo!");
         } 
     };
 
-    const deleteTodo = (tID, tIdx) => {
-        console.log(tID, tIdx);
+    const deleteTodo = (tID) => {
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
@@ -388,29 +383,30 @@ export default function AgendaPage(props) {
                 </div>
                 
                 <div className="todo-list">
-                {count ? 
-                    <div className="todo-section">
-                        {(idx + 1) * 10 < count ? <div className="previous-ap" onClick={() => changePage(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div> : <div className="prev-spacing-ap"></div>}
-                        <div className="todos">
-                            {todos.map((todo, tIdx) => 
-                                <div className="todo-item" key={todo._id}>
-                                    <Checkbox
-                                        checked={todo.completed}
-                                        onChange={(e) => handleChange(e, todo._id, tIdx)}
-                                        style ={{
-                                            color: "#6B4F4F",
-                                        }}
-                                    />
-                                    <div className="todo">{todo.item}</div>
-                                    <div className="delete" onClick={() => deleteTodo(todo._id, tIdx)}></div>  
-                                </div>
-                            )} 
+                {loading ? <CircularProgress color="inherit"/> : <>
+                    {count ? 
+                        <div className="todo-section">
+                            {(idx + 1) * 10 < count ? <div className="previous-ap" onClick={() => changePage(0)}> <NavigateBeforeIcon style={{ fontSize: 80 }}/></div> : <div className="prev-spacing-ap"></div>}
+                            <div className="todos">
+                                {todos.map((todo, tIdx) => 
+                                    <div className="todo-item" key={todo._id}>
+                                        <Checkbox
+                                            checked={todo.completed}
+                                            onChange={(e) => handleChange(e, todo._id, tIdx)}
+                                            style ={{
+                                                color: "#6B4F4F",
+                                            }}
+                                        />
+                                        <div className="todo">{todo.item}</div>
+                                        <div className="delete" onClick={() => deleteTodo(todo._id)}></div>  
+                                    </div>
+                                )} 
+                            </div>
+                            {idx !== 0 ? <div className="next-ap" onClick={() => changePage(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing-ap"></div>}
                         </div>
-                        {idx !== 0 ? <div className="next-ap" onClick={() => changePage(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing-ap"></div>}
-                    </div>
-                : 'No todos'}
+                    : 'No todos'}
+                    </>}
                 </div>
-
             </div>
         </div>
     );

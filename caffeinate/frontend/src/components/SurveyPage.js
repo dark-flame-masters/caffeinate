@@ -42,19 +42,16 @@ export default function SurveyPage(props) {
             }
     })
     .then(res => {
-      console.log(res);
       if (res.data.data) {
         setCount(res.data.data.findUserByName.surveyCount);
       } else {
         if (res.data.errors[0].message === "Unauthorized") {
           setError("You are not authorized. Please sign out and sign in again.");
         } else {
-          console.log("!");
           setError("There was a problem fetching survey responses.");
         }
       }
     }).catch(error => {
-      console.log("!");
       setError("There was a problem fetching survey responses.");
     })
   }, []);
@@ -139,7 +136,6 @@ export default function SurveyPage(props) {
 
   const submitSurvey = (e) => {
     e.preventDefault();
-    console.log(qOneContent, rating, qTwoContent);
     if (!qOneContent.length || !rating || !qTwoContent.length) {
       setError("At least one question was not completed. Please redo the survey.");
     } else {
@@ -166,7 +162,6 @@ export default function SurveyPage(props) {
               }
       })
       .then(res => {
-        console.log(res);
         if (res.data.data) {
           let newSurvey = {'date': res.data.data.createSurvey.survey.date, 
             'rate': res.data.data.createSurvey.survey.rate, 'answer1': res.data.data.createSurvey.survey.answer1, 
@@ -182,13 +177,11 @@ export default function SurveyPage(props) {
             setError("Survey response could not be saved. Make sure your entries only contain" +
             "alphanumeric characters and does not include any illegal characters.");
           } else {
-            console.log("!!");
             setError("Survey response could not be saved. Try again later.");
           }
         }
       })
       .catch(error => {
-        console.log("!!");
         setError("Survey response could not be saved. Try again later.");
       });  
     }

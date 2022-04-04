@@ -18,7 +18,6 @@ import ReactWordcloud from 'react-wordcloud';
 import ErrorMessage from './ErrorMessage';
 import CircularProgress from '@mui/material/CircularProgress';
 
-
 ChartJS.register(
   CategoryScale,
   LinearScale,

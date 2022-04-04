@@ -12,10 +12,6 @@ export class TodoService {
         return await this.todoModel.find({ authorGoogleId: googleId }).sort({}).skip(idx*10).limit(10).lean();
     }
 
-    async findTodoByAuthor(googleId: string) {
-        return await this.todoModel.find({ authorGoogleId: googleId }).sort({}).lean();
-    } 
-
     async findTodoById(id: String) {
         return await this.todoModel.findOne({ _id: id }).lean();
     } 

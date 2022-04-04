@@ -1,7 +1,8 @@
-import { Field, ObjectType, InputType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsNotEmpty, IsNumber, Matches } from 'class-validator';
+import { IsNotEmpty, Matches, ValidateNested } from 'class-validator';
 import * as mongoose from 'mongoose';
+import { User } from 'src/users/users.schema';
 
 export type JournalDocument = Journal & mongoose.Document;
 
@@ -42,4 +43,16 @@ export class CreateJournalInput {
   @Field()
   @IsNotEmpty()
   authorGoogleId: string;
+}
+
+@ObjectType()
+export class CreateJournalResponse{
+
+    @Field(() => User)
+    @ValidateNested()
+    user: User;
+
+    @Field(() => Journal)
+    @ValidateNested()
+    journal: Journal;
 }

@@ -15,7 +15,11 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    # TODO: update for email + google auth
+    # will do the following:
+    #   - fetch from main
+    #   - write env variables
+    #   - down + remove all containers (limited space on VM)
+    #   - up all containers
     steps:
       - uses: actions/checkout@v2 
       - name: Deploy on AWS EC2
@@ -36,8 +40,7 @@ jobs:
             EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
             GOOGLE_AUTH_CLIENT_ID=${{ env.GOOGLE_AUTH_CLIENT_ID }}}
             " > .env
-            docker stop $(docker ps -q)
-            docker-compose down --rmi all --volumes
+            docker-compose down
             docker system prune --all -f --volumes
             docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans
           '

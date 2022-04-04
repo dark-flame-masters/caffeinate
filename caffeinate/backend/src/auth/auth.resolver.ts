@@ -4,7 +4,7 @@ import { Context, GraphQLExecutionContext, Mutation, Resolver } from '@nestjs/gr
 import { ExpressContext } from 'apollo-server-express';
 import { CookieOptions } from 'express';
 import { AuthService } from './auth.service';
-import { LoginResponse } from './dto/login-response';
+import { LoginResponse } from './login-response';
 import { GoogleAuthGuard } from './google.guard';
 
 @Resolver()

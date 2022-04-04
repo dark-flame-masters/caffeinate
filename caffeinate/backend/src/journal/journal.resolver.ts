@@ -1,9 +1,8 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { JournalService } from './journal.service';
-import {  CreateJournalInput, Journal } from './journal.schema';
+import {  CreateJournalInput, CreateJournalResponse, Journal } from './journal.schema';
 import { BadRequestException, UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { CreateJournalResponse } from 'src/auth/dto/create-journal-response';
 import { WordDictionaryResponse } from 'src/users/users.schema';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
@@ -12,12 +11,6 @@ import { validate } from 'class-validator';
 @Resolver()
 export class JournalResolver {
     constructor(private readonly journalService: JournalService, private readonly usersService: UsersService) {}
-
-  @Query(() => [Journal])
-  @UseGuards(GoogleAuthGuard)
-  async findJournalByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
-    return await this.journalService.findJournalByAuthor(userInfo.googleId);
-  }
 
   @Query(() => Journal, {nullable: true})
   @UseGuards(GoogleAuthGuard)

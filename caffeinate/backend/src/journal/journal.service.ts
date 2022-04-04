@@ -14,10 +14,6 @@ export class JournalService {
         return await this.journalModel.find({ authorGoogleId }).sort({date: -1}).skip(idx).limit(1).findOne();
       }
 
-      async findJournalByAuthor(authorGoogleId: string) {
-        return await this.journalModel.find({ authorGoogleId }).sort({date: -1}).lean();
-      } 
-
       async find30SentimentsByAuthor(googleId: string) {
         let veryHappyFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'very happy'}).count();
         let happyFreq = await this.journalModel.find({ authorGoogleId: googleId }).sort({date: -1}).limit(30).find({sentiment: 'happy'}).count();

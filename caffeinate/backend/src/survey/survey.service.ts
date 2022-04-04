@@ -9,10 +9,6 @@ export class SurveyService {
         @InjectModel(Survey.name) private surveyModel: Model<SurveyDocument>,
     ) {}
 
-    async findSurveyByAuthor(googleId: string) {
-      return await this.surveyModel.find({ authorGoogleId: googleId }).sort({date: -1}).lean();
-    } 
-
     async findSurveyByAuthorIndex(googleId: string, idx: number) {
         return await this.surveyModel.find({ authorGoogleId: googleId }).sort({date: -1}).skip(idx).limit(1).findOne();
     }

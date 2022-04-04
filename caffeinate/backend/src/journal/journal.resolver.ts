@@ -8,24 +8,28 @@ import { WordDictionaryResponse } from 'src/users/users.schema';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { validate } from 'class-validator';
+import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 
 @Resolver()
 export class JournalResolver {
     constructor(private readonly journalService: JournalService, private readonly usersService: UsersService) {}
 
   @Query(() => [Journal])
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async findJournalByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
     return await this.journalService.findJournalByAuthor(userInfo.googleId);
   }
 
   @Query(() => Journal, {nullable: true})
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async findJournalByAuthorIndex(@Args('index') index: number, @GoogleUserInfo() userInfo: UserInfo) {
     return await this.journalService.findJournalByAuthorIndex(userInfo.googleId, index);
   }
 
   @Query(() => [WordDictionaryResponse])
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async findJournalDictByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
     // find the target content from all the journals of the user and store then in an array
@@ -35,6 +39,7 @@ export class JournalResolver {
 
 
   @Mutation(() => CreateJournalResponse)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async createJournal(@Args('content') content: string, @GoogleUserInfo() userInfo: UserInfo) {
     //manually validate by function and validate the entire input

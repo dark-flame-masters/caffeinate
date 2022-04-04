@@ -5,6 +5,7 @@ import { validate } from 'class-validator';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { NotifierService } from 'src/notifier/notifier.service';
+import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 import { UsersService } from 'src/users/users.service';
 import { CreateTodoInput, Todo, UpdateTodoInput} from './todo.schema';
 import { TodoService } from './todo.service';
@@ -15,17 +16,20 @@ export class TodoResolver {
 
   @Query(() => [Todo])
   @UseGuards(GoogleAuthGuard)
+  @UseGuards(ThrottlerProxyGQLGuard)
   async findTodoByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
     return await this.todoService.findTodoByAuthor(userInfo.googleId);
   }
 
   @Query(() => [Todo], {nullable: true})
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async findTodoByAuthorIndex(@Args('index') index: number, @GoogleUserInfo() userInfo: UserInfo) {
     return await this.todoService.findTodoByAuthorIndex(userInfo.googleId, index);
   }
 
   @Mutation(() => Todo)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async createTodo(@Args('input') todo: string, @GoogleUserInfo() userInfo: UserInfo) {
 
@@ -44,6 +48,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async deleteTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
@@ -56,6 +61,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Todo)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async completeTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
@@ -68,6 +74,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Todo)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async incompleteTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
@@ -76,6 +83,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Todo)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async setDueDate(@Args('input') updateTodoInput: UpdateTodoInput, @GoogleUserInfo() userInfo: UserInfo) {
     let todo = await this.todoService.findTodoById(updateTodoInput.id);

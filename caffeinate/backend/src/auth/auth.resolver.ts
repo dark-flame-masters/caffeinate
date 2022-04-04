@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Context, GraphQLExecutionContext, Mutation, Resolver } from '@nestjs/graphql';
 import { ExpressContext } from 'apollo-server-express';
 import { CookieOptions } from 'express';
+import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 import { AuthService } from './auth.service';
 import { LoginResponse } from './dto/login-response';
 import { GoogleAuthGuard } from './google.guard';
@@ -26,6 +27,7 @@ export class AuthResolver {
     }
 
     @Mutation(() => LoginResponse)
+    @UseGuards(ThrottlerProxyGQLGuard)
     public async login(@Context() ctx: ExpressContext) {
         try {
             const userInfo = await this.authService.validate(ctx.req.headers['authorization']);
@@ -39,6 +41,7 @@ export class AuthResolver {
     }
 
     @Mutation(() => Boolean)
+    @UseGuards(ThrottlerProxyGQLGuard)
     @UseGuards(GoogleAuthGuard)
     public async logout(@Context() ctx: GraphQLExecutionContext) {
         // await this.authService.logout(ctx.req);

@@ -13,6 +13,7 @@ import { TodoModule } from './todo/todo.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NotifierService } from './notifier/notifier.service';
 import { NotifierModule } from './notifier/notifier.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 
 
@@ -36,6 +37,10 @@ import { NotifierModule } from './notifier/notifier.module';
       sortSchema: true,
       driver: ApolloDriver,
       outputAs: 'class',
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
     }),
     ScheduleModule.forRoot(),
     UsersModule,

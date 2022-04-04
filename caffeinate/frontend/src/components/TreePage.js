@@ -12,7 +12,6 @@ export default function TreePage(props) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    console.log(treeStatus);
     const status = ['Your tree is underdeveloped. Start submitting postively rated surveys so it can start growing.', 
     'Your tree has started growing. The more positive days you have, the faster it will grow.', 
     'Your tree is feeling the love and all the positivity from your surveys. Keep up the positive, happy days!',

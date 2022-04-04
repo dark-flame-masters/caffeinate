@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateTodoInput, Todo, TodoDocument, UpdateTodoInput } from './todo.schema';
+import { UsersService } from 'src/users/users.service';
 import { Model } from 'mongoose';
 
 @Injectable()
 export class TodoService {
-    constructor(@InjectModel(Todo.name) private todoModel: Model<TodoDocument>) {}
+    constructor(@InjectModel(Todo.name) private todoModel: Model<TodoDocument>, private usersService: UsersService) {}
 
     async findTodoByAuthorIndex(googleId: string, idx: number) {
         return await this.todoModel.find({ authorGoogleId: googleId }).sort({}).skip(idx*10).limit(10).lean();
@@ -38,15 +39,23 @@ export class TodoService {
     
     async createTodo(input: CreateTodoInput) {
         let newItem = await this.todoModel.create(input);
+        let user = await this.usersService.findOne(input.authorGoogleId);
         newItem.completed = false;
         newItem.dueDate = null;
-        await newItem.save();
+        let res = await newItem.save();
+        if (res && user) { 
+            user.todoCount++;
+        }
         return newItem;
     }
     
-    async deleteTodo(id: String) {
+    async deleteTodo(googleId: string, id: String) {
         let res = await this.todoModel.deleteOne({ _id: id }).lean();
-        if(res) { return true; }
+        let user = await this.usersService.findOne(googleId);
+        if (res && user) { 
+            user.todoCount--;
+            return true; 
+        }
         return false;
     }
 

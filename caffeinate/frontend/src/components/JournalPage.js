@@ -33,20 +33,16 @@ export default function JournalPage(props) {
             }
     })
     .then(res => {
-      console.log(res);
       if (res.data.data) {
-        console.log(res.data.data);
         setCount(res.data.data.findUserByName.journalCount);
       } else {
         if (res.data.errors[0].message === "Unauthorized") {
           setError("You are not authorized. Please sign out and sign in again.");
         } else {
-          console.log("1");
           setError("There was a problem fetching journal entries.");
         }
       }
     }).catch(error => {
-      console.log("1");
       setError("There was a problem fetching journal entries.");
     })
   }, []);
@@ -56,11 +52,9 @@ export default function JournalPage(props) {
   }, [idx]);
 
   useEffect(() => {
-    console.log(currentJournalEntry);
   }, [currentJournalEntry])
 
   const getJournal = () => {
-    console.log(idx);
     axios({
       url: Constants.GRAPHQL_ENDPOINT,
       method: "post",
@@ -71,15 +65,14 @@ export default function JournalPage(props) {
                   findJournalByAuthorIndex(index: $input){
                     content
                     date
+                    sentiment
                   }
                 }`,
               "variables": {'input': idx },
             }
     })
     .then(res => {
-      console.log(res);
       if (res.data.data) {
-        console.log(res.data.data);
         if (res.data.data.findJournalByAuthorIndex) {
           setCurrentJournalEntry(res.data.data.findJournalByAuthorIndex);
         } else {
@@ -90,13 +83,11 @@ export default function JournalPage(props) {
         if (res.data.errors[0].message === "Unauthorized") {
           setError("You are not authorized. Please sign out and sign in again.");
         } else {
-          console.log("1");
           setError("There was a problem fetching journal entries.");
         }
       }
     })
     .catch(error => {
-      console.log("1");
       setError("There was a problem fetching journal entries.");
     });  
   };
@@ -107,7 +98,6 @@ export default function JournalPage(props) {
     } else {
       setIDX(idx => idx + 1);
     }
-    console.log(idx);
   }
 
   const setViewMode = (viewMode) => {
@@ -149,15 +139,17 @@ export default function JournalPage(props) {
                     journal {
                       content
                       date
+                      sentiment
                     }
                   }
                 }`,
-              "variables": {'input': content },
+              "variables": {input: content },
             }
     })
     .then(res => {
       if (res.data.data) {
-        let newJournal = {'date': res.data.data.createJournal.journal.date, 'content': res.data.data.createJournal.journal.content};
+        let newJournal = {'date': res.data.data.createJournal.journal.date, 'content': res.data.data.createJournal.journal.content, 
+          'sentiment': res.data.data.createJournal.journal.sentiment};
         setCurrentJournalEntry(newJournal);
         setIDX(0);
         setCount(res.data.data.createJournal.user.journalCount);
@@ -220,12 +212,15 @@ export default function JournalPage(props) {
           <div className="journal-paper">
             <div className="paper-lines">
               <p className="date">{Date(currentJournalEntry.date)}</p>
-              <div className="journal-entry">{currentJournalEntry.content.split('\n').map(str => <p key={Math.random()}>{str}</p>)}</div>
+              <div className="journal-entry">{currentJournalEntry.content}</div>
             </div>
           </div>
           {idx !== 0 ? <div className="next" onClick={() => changeJournal(1)} ><NavigateNextIcon style={{ fontSize: 80 }}/></div> : <div className="next-spacing"></div>}
-          <div className="journal-settings" onClick={() => setViewMode(0)}>
-            Write a journal entry
+          <div className="journal-sidebar">
+            <h2 className="sentiment"> You seemed {currentJournalEntry.sentiment} in this entry.</h2>
+            <div className="journal-settings" onClick={() => setViewMode(0)}>
+              Write a journal entry
+            </div>
           </div>
         </div>
       )}

@@ -1,7 +1,6 @@
 import { Field, ObjectType, ID, InputType, Int } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { IsAlphanumeric } from 'class-validator'
 
 export type UserDocument = User & mongoose.Document;
 
@@ -34,6 +33,10 @@ export class User {
     @Prop()
     @Field()
     surveyCount: number;
+
+    @Prop()
+    @Field()
+    todoCount: number;
 
     @Prop()
     @Field()

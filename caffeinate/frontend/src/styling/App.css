@@ -1,0 +1,23 @@
+.background-sound {
+    margin: auto;
+    margin-top: 1em;
+    width: 5em;
+    display: flex;
+    flex-direction: row;
+}
+
+.play {
+    background: url('../media/play.png') no-repeat;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    margin-right: 0.5em;
+}
+
+.pause {
+    background: url('../media/pause.png') no-repeat;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    margin-left: 0.5em;
+}

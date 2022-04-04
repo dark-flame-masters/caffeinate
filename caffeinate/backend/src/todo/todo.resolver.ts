@@ -5,8 +5,10 @@ import { validate } from 'class-validator';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { NotifierService } from 'src/notifier/notifier.service';
+import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 import { UsersService } from 'src/users/users.service';
 import { CreateTodoInput, Todo, UpdateTodoInput} from './todo.schema';
+import { CreateTodoResponse } from 'src/auth/dto/create-todo-response';
 import { TodoService } from './todo.service';
 
 @Resolver()
@@ -15,47 +17,55 @@ export class TodoResolver {
 
   @Query(() => [Todo])
   @UseGuards(GoogleAuthGuard)
+  @UseGuards(ThrottlerProxyGQLGuard)
   async findTodoByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
     return await this.todoService.findTodoByAuthor(userInfo.googleId);
   }
 
   @Query(() => [Todo], {nullable: true})
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async findTodoByAuthorIndex(@Args('index') index: number, @GoogleUserInfo() userInfo: UserInfo) {
     return await this.todoService.findTodoByAuthorIndex(userInfo.googleId, index);
   }
 
-  @Mutation(() => Todo)
+  @Mutation(() => CreateTodoResponse)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async createTodo(@Args('input') todo: string, @GoogleUserInfo() userInfo: UserInfo) {
-
     let newItem = new CreateTodoInput()
     newItem.authorGoogleId = userInfo.googleId;
     newItem.item = todo;
 
     const errors = await validate(newItem)
     if (errors.length > 0){
-        throw new BadRequestException();
+      throw new BadRequestException();
     }
     else{
       newItem = await this.todoService.createTodo({item: todo, authorGoogleId: userInfo.googleId});
-      return newItem;
+      return {
+        user: await this.usersService.updateTodoCount(userInfo.googleId, 1),
+        todo: newItem
+      }
     }
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async deleteTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
     if (todo.authorGoogleId !== userInfo.googleId) throw new UnauthorizedException();
     // delete the notifier iff not completed and not pass due date
     if(todo.dueDate !== null && todo.completed === false && todo.dueDate.valueOf() - new Date().valueOf() > 600000){
-        await this.notifierService.deleteNotifierByTodo(id);
+      await this.notifierService.deleteNotifierByTodo(id);
     }
-    return await this.todoService.deleteTodo(id);
+    await this.usersService.updateTodoCount(userInfo.googleId, -1);
+    return await this.todoService.deleteTodo(userInfo.googleId, id);
   }
 
   @Mutation(() => Todo)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async completeTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
@@ -68,6 +78,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Todo)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async incompleteTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
@@ -76,6 +87,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Todo)
+  @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async setDueDate(@Args('input') updateTodoInput: UpdateTodoInput, @GoogleUserInfo() userInfo: UserInfo) {
     let todo = await this.todoService.findTodoById(updateTodoInput.id);

@@ -11,7 +11,7 @@ import { GoogleAuthGuard } from './google.guard';
 export class AuthResolver {
     private cookieOptions: CookieOptions = {
         path: '/',
-        maxAge: 60 * 60 * 24 // expires in 1 day
+        maxAge: 1000 * 60 * 60 * 24 // expires in 1 day
     }
     constructor(private authService: AuthService,
         configService: ConfigService) {
@@ -20,7 +20,7 @@ export class AuthResolver {
                 ...this.cookieOptions,
                 httpOnly: true,
                 secure: true,
-                sameSite: true,
+                sameSite: 'strict',
             }
         }
     }

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import "../styling/SignInPage.css"
 import axios from "axios";
@@ -19,7 +19,6 @@ export default function SignInPage(props) {
     }, [JSON.stringify(user)]);
 
     const onSuccess = (res) => {
-        console.log(res);
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",
@@ -37,7 +36,6 @@ export default function SignInPage(props) {
                 }
             })
         .then(response => {
-            console.log(response);
             if (response.data.data) {
                 setUser(res.accessToken);
                 setName(res.profileObj.name);

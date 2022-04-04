@@ -3,7 +3,7 @@ import '../styling/HomePage.css';
 import React from 'react';
 
 export default function HomePage(props) {
-    const { user, name, navigate } = props;
+    const { name, navigate } = props;
     const [greeting, setGreeting] = useState('');
     
     const nav = (page) => {

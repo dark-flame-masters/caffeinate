@@ -5,7 +5,6 @@ import { UsersService } from 'src/users/users.service';
 import { CreateJournalInput, Journal, JournalDocument } from './journal.schema';
 import natural = require('natural');
 
-
 @Injectable()
 export class JournalService {
     constructor(@InjectModel(Journal.name) private journalModel: Model<JournalDocument>, private usersService: UsersService) {}

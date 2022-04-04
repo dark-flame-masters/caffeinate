@@ -6,8 +6,6 @@ import { UserInfo } from 'src/auth/user-info.param';
 
 @Injectable()
 export class UsersService {
- 
-
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
@@ -22,6 +20,7 @@ export class UsersService {
     newUser.treeStatus = 0;
     newUser.journalCount = 0;
     newUser.surveyCount = 0;
+    newUser.todoCount = 0;
     newUser.journalDict = JSON.stringify({});
     await newUser.save();
     return newUser;
@@ -61,6 +60,12 @@ export class UsersService {
     // increase the journal count by param count
     let user = await this.userModel.findOneAndUpdate({ googleId }, {$inc : {journalCount : count}}).lean();
     return {...user, journalCount: user.journalCount+count};
+  }
+
+  async updateTodoCount(googleId: string, count: number) {
+    // increase the todo count by param count
+    let user = await this.userModel.findOneAndUpdate({ googleId }, {$inc : {todoCount : count}}).lean();
+    return {...user, todoCount: user.todoCount+count};
   }
 
   async updateSurveyCount(googleId: string, count: number) {

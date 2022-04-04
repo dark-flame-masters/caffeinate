@@ -7,20 +7,12 @@ import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { NotifierService } from 'src/notifier/notifier.service';
 import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 import { UsersService } from 'src/users/users.service';
-import { CreateTodoInput, Todo, UpdateTodoInput} from './todo.schema';
-import { CreateTodoResponse } from 'src/auth/dto/create-todo-response';
+import { CreateTodoInput, CreateTodoResponse, Todo, UpdateTodoInput} from './todo.schema';
 import { TodoService } from './todo.service';
 
 @Resolver()
 export class TodoResolver {
     constructor(private readonly todoService: TodoService, private readonly usersService: UsersService, private readonly notifierService: NotifierService, private readonly configService: ConfigService) {}
-
-  @Query(() => [Todo])
-  @UseGuards(GoogleAuthGuard)
-  @UseGuards(ThrottlerProxyGQLGuard)
-  async findTodoByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
-    return await this.todoService.findTodoByAuthor(userInfo.googleId);
-  }
 
   @Query(() => [Todo], {nullable: true})
   @UseGuards(ThrottlerProxyGQLGuard)

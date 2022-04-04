@@ -1,7 +1,8 @@
-import { Field, ObjectType, ID, InputType, Int } from '@nestjs/graphql';
+import { Field, ObjectType, InputType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsNotEmpty, Matches } from 'class-validator';
+import { IsNotEmpty, Matches, ValidateNested } from 'class-validator';
 import * as mongoose from 'mongoose';
+import { User } from 'src/users/users.schema';
 
 export type TodoDocument = Todo & mongoose.Document;
 
@@ -57,4 +58,16 @@ export class UpdateTodoInput {
     @Field()
     dueDate: Date;
 
+}
+
+@ObjectType()
+export class CreateTodoResponse {
+
+    @Field(() => User)
+    @ValidateNested()
+    user: User;
+
+    @Field(() => Todo)
+    @ValidateNested()
+    todo: Todo;
 }

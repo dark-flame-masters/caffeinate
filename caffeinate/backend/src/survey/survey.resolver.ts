@@ -1,9 +1,8 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { SurveyService } from './survey.service';
-import { CreateSurveyInput, Survey } from './survey.schema';
+import { CreateSurveyInput, CreateSurveyResponse, Survey } from './survey.schema';
 import { UseGuards } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { CreateSurveyResponse } from 'src/auth/dto/create-survey-response';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
@@ -12,13 +11,6 @@ import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 @Resolver()
 export class SurveyResolver {
     constructor(private readonly surveyService: SurveyService, private readonly usersService: UsersService) {}
-
-  @Query(() => [Survey])
-  @UseGuards(GoogleAuthGuard)
-  @UseGuards(ThrottlerProxyGQLGuard)
-  async findSurveyByAuthor(@GoogleUserInfo() userInfo: UserInfo) {
-    return await this.surveyService.findSurveyByAuthor(userInfo.googleId);
-  }
 
   @Query(() => Survey, {nullable: true})
   @UseGuards(GoogleAuthGuard)

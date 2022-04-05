@@ -5,7 +5,7 @@ import { validate } from 'class-validator';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { NotifierService } from 'src/notifier/notifier.service';
-import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
+// import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 import { UsersService } from 'src/users/users.service';
 import { CreateTodoInput, CreateTodoResponse, Todo, UpdateTodoInput} from './todo.schema';
 import { TodoService } from './todo.service';

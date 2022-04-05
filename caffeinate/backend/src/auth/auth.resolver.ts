@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Context, Mutation, Resolver } from '@nestjs/graphql';
 import { ExpressContext } from 'apollo-server-express';
 import { CookieOptions } from 'express';
-import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
+// import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 import { AuthService } from './auth.service';
 import { LoginResponse } from './login-response';
 import { GoogleAuthGuard } from './google.guard';

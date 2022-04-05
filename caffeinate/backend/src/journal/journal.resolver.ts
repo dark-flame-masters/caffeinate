@@ -7,7 +7,7 @@ import { WordDictionaryResponse } from 'src/users/users.schema';
 import { GoogleUserInfo, UserInfo } from 'src/auth/user-info.param';
 import { GoogleAuthGuard } from 'src/auth/google.guard';
 import { validate } from 'class-validator';
-import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
+// import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
 
 @Resolver()
 export class JournalResolver {

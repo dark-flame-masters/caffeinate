@@ -18,6 +18,8 @@ import ReactWordcloud from 'react-wordcloud';
 import ErrorMessage from './ErrorMessage';
 import CircularProgress from '@mui/material/CircularProgress';
 
+// tutorial on using Chart.js and Word Cloud from https://react-chartjs-2.js.org/examples/line-chart https://react-chartjs-2.js.org/examples/doughnut-chart https://react-wordcloud.netlify.app/readme 
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -232,7 +234,7 @@ export default function AnalyticsPage(props) {
             <div className="journal-section_sub">
               Journal Word Cloud
               {cloudLoading ?  <CircularProgress color="inherit"/> : <>
-              {words.length ? <ReactWordcloud words={words} options={wordOptions}/> : <div>No data to show.</div> }
+              {words.length ? <><p>Note: Words greater than 20 characters will not appear in the word cloud.</p><ReactWordcloud words={words} options={wordOptions}/></> : <div>No data to show.</div> }
               </>}
             </div>
 

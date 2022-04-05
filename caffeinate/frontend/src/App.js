@@ -18,7 +18,8 @@ export default function App() {
   const [name, setName] = useState('');
   const navigate = useNavigate();
   const [play, setPlay] = useState(false);
-    
+  
+  // tutorial of ReactHowler from https://github.com/thangngoc89/react-howler/blob/master/examples/react/src/players/OnlyPlayPauseButton.js
   const controlSound = (setting) => {
     if (setting) {
       setPlay(true);

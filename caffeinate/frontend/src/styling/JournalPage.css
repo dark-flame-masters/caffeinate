@@ -35,6 +35,7 @@
     padding-right: 1em;
 }
 
+/* css was based on tutorial https://www.codesdope.com/blog/article/getting-notebook-paper-effect-with-css/ and https://codepen.io/magnificode/pen/rQpaBO */
 .journal-entry {
     font-family: "Handlee";
     color: #483434;

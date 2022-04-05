@@ -121,6 +121,7 @@
     font-size: 1.1em;
     min-height: 20em;
     font-family: 'Krub';
+    word-wrap: break-word;
 }
 
 .survey-response {

@@ -17,6 +17,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import CircularProgress from '@mui/material/CircularProgress';
 
+// learned how to do styling from https://stackoverflow.com/questions/46966413/how-to-style-material-ui-textfield and https://stackoverflow.com/questions/64721126/how-to-style-textfield-in-materialui
 const StyledTextField = styled(TextField)`
 label.focused {
     color: #D7B19D;

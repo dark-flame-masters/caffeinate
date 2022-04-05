@@ -15,14 +15,14 @@ export class TodoResolver {
     constructor(private readonly todoService: TodoService, private readonly usersService: UsersService, private readonly notifierService: NotifierService, private readonly configService: ConfigService) {}
 
   @Query(() => [Todo], {nullable: true})
-  @UseGuards(ThrottlerProxyGQLGuard)
+  // @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async findTodoByAuthorIndex(@Args('index') index: number, @GoogleUserInfo() userInfo: UserInfo) {
     return await this.todoService.findTodoByAuthorIndex(userInfo.googleId, index);
   }
 
   @Mutation(() => CreateTodoResponse)
-  @UseGuards(ThrottlerProxyGQLGuard)
+  // @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async createTodo(@Args('input') todo: string, @GoogleUserInfo() userInfo: UserInfo) {
     let newItem = new CreateTodoInput()
@@ -43,7 +43,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(ThrottlerProxyGQLGuard)
+  // @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async deleteTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
@@ -57,7 +57,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Todo)
-  @UseGuards(ThrottlerProxyGQLGuard)
+  // @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async completeTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
@@ -70,7 +70,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Todo)
-  @UseGuards(ThrottlerProxyGQLGuard)
+  // @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async incompleteTodo(@Args('id') id: string, @GoogleUserInfo() userInfo: UserInfo) {
     const todo = await this.todoService.findTodoById(id);
@@ -79,7 +79,7 @@ export class TodoResolver {
   }
 
   @Mutation(() => Todo)
-  @UseGuards(ThrottlerProxyGQLGuard)
+  // @UseGuards(ThrottlerProxyGQLGuard)
   @UseGuards(GoogleAuthGuard)
   async setDueDate(@Args('input') updateTodoInput: UpdateTodoInput, @GoogleUserInfo() userInfo: UserInfo) {
     let todo = await this.todoService.findTodoById(updateTodoInput.id);

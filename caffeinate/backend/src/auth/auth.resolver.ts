@@ -27,7 +27,7 @@ export class AuthResolver {
     }
 
     @Mutation(() => LoginResponse)
-    @UseGuards(ThrottlerProxyGQLGuard)
+    // @UseGuards(ThrottlerProxyGQLGuard)
     public async login(@Context() ctx: ExpressContext) {
         try {
             const userInfo = await this.authService.validate(ctx.req.headers['authorization']);
@@ -41,7 +41,7 @@ export class AuthResolver {
     }
 
     @Mutation(() => Boolean)
-    @UseGuards(ThrottlerProxyGQLGuard)
+    // @UseGuards(ThrottlerProxyGQLGuard)
     @UseGuards(GoogleAuthGuard)
     public async logout(@Context() ctx: ExpressContext) {
         await this.authService.logout(ctx.req);

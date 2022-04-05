@@ -38,10 +38,10 @@ import { ThrottlerModule } from '@nestjs/throttler';
       driver: ApolloDriver,
       outputAs: 'class',
     }),
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
-    }),
+    // ThrottlerModule.forRoot({
+    //   ttl: 60,
+    //   limit: 10,
+    // }),
     ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,

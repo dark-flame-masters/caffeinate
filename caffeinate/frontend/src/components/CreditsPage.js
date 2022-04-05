@@ -30,6 +30,14 @@ export default function CreditsPage() {
                 <li>https://stackoverflow.com/questions/29537299/react-how-to-update-state-item1-in-state-using-setstate</li>
                 <li>https://github.com/thangngoc89/react-howler/blob/master/examples/react/src/players/OnlyPlayPauseButton.js</li>
                 <li>https://www.youtube.com/watch?v=917TAjUpTxY</li>
+                <li>https://graphql.org/learn/</li>
+                <li>https://www.youtube.com/watch?v=XPSSgAPjTb4</li>
+                <li>https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Date</li>
+                <li>https://regexr.com/</li>
+                <li>https://blog.logrocket.com/sentiment-analysis-node-js/</li>
+                <li>https://docs.nestjs.com/techniques/task-scheduling</li>
+                <li>https://nodemailer.com/about/</li>
+                <li>https://mongoosejs.com/docs/guide.html</li>
             </ul>
 
         </div>

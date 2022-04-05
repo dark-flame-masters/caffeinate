@@ -19,7 +19,6 @@ export default function SignInPage(props) {
     }, [JSON.stringify(user)]);
 
     const onSuccess = (res) => {
-        console.log(res)
         axios({
             url: Constants.GRAPHQL_ENDPOINT,
             method: "post",

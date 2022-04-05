@@ -1,6 +1,6 @@
 import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Context, GraphQLExecutionContext, Mutation, Resolver } from '@nestjs/graphql';
+import { Context, Mutation, Resolver } from '@nestjs/graphql';
 import { ExpressContext } from 'apollo-server-express';
 import { CookieOptions } from 'express';
 import { ThrottlerProxyGQLGuard } from 'src/throttle/throttler-proxy-gql.guard';
@@ -43,8 +43,9 @@ export class AuthResolver {
     @Mutation(() => Boolean)
     @UseGuards(ThrottlerProxyGQLGuard)
     @UseGuards(GoogleAuthGuard)
-    public async logout(@Context() ctx: GraphQLExecutionContext) {
-        // await this.authService.logout(ctx.req);
+    public async logout(@Context() ctx: ExpressContext) {
+        await this.authService.logout(ctx.req);
+        ctx.req.res.cookie('googleAccessToken', '', this.cookieOptions);
         return true;
     }
 }

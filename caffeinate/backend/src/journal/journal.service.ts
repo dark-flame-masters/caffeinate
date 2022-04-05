@@ -57,6 +57,8 @@ export class JournalService {
         let user = await this.usersService.findOne(input.authorGoogleId);
         let wordCounts = JSON.parse(user.journalDict); // get the dictionary from user
         for (const item of wordLst) {
+          //we want to limit the word length to 20 for wordcloud
+          if(item.length>20) continue;
           wordCounts[item] = wordCounts[item] ? wordCounts[item] + 1 : 1;
         }
         // then we save the new dictionary to the user

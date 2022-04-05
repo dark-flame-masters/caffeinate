@@ -38,6 +38,12 @@ export default function CreditsPage() {
                 <li>https://docs.nestjs.com/techniques/task-scheduling</li>
                 <li>https://nodemailer.com/about/</li>
                 <li>https://mongoosejs.com/docs/guide.html</li>
+                <li>SSL setup with Docker, Nginx and Certbot: https://www.programonaut.com/setup-ssl-with-docker-nginx-and-lets-encrypt/</li>
+                <li>NestJS Documentation: https://docs.nestjs.com/</li>
+                <li>Google Identity API Documentation: https://developers.google.com/identity</li>
+                <li>Dockerizing a React App: https://mherman.org/blog/dockerizing-a-react-app/</li>
+                <li>NestJS Starter Dockerfile: https://github.com/marcson909/nest_js_docker_starter/blob/main/Dockerfile</li>
+                <li>Bcrypt fix for Dockerfile: https://stackoverflow.com/questions/69884391/docker-alpine-unable-to-select-packages-python-no-such-package-while-buildin</li>
             </ul>
 
         </div>

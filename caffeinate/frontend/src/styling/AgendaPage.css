@@ -20,6 +20,10 @@
     font-size: 1.2em;
 }
 
+.todo {
+    word-wrap: break-word;
+}
+
 .agenda-slogan {
     margin-top: 0.5em;
     font-weight: 800;
